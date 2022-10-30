@@ -7,11 +7,11 @@ using LazySql.Engine.Enums;
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
-    public sealed partial class SqlClient
+    public sealed partial class LazyClient
     {
         #region Insert
 
-        public static void Insert<T>(T obj) where T : LazyBase => Instance.InternalInsert<T>(obj);
+        public static void Insert<T>(T obj) where T : LazyBase => Instance.InternalInsert(obj);
 
         private void InternalInsert<T>(T obj) where T : LazyBase
         {
@@ -36,7 +36,7 @@ namespace LazySql.Engine.Client
 
             if (autoIncrementColumn != null)
             {
-                object output = ExecuteScalar<T>(queryBuilder);
+                object output = ExecuteScalar(queryBuilder);
                 autoIncrementColumn.PropertyInfo.SetValue(obj, output);
             }
             else

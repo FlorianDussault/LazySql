@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Connector;
 using LazySql.Engine.Definitions;
 
 namespace LazySql.Engine.Client
 {
-    public sealed partial class SqlClient
+    // ReSharper disable once ClassCannotBeInstantiated
+    public sealed partial class LazyClient
     {
         #region Truncate
 

@@ -3,13 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlCore.Engine", "LazySqlCore.Engine\LazySqlCore.Engine.csproj", "{5D26441C-C1B8-4360-B722-153DAF7B56CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazySqlCore.UnitTest", "LazySqlCore.UnitTest\LazySqlCore.UnitTest.csproj", "{0EBE34E5-44CD-441A-B435-E532EC61EEDD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlFramework.Engine", "LazySqlFramework.Engine\LazySqlFramework.Engine.csproj", "{24EEC326-C29B-4E43-8797-9C49A23B91D4}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlCore.UnitTest", "LazySqlCore.UnitTest\LazySqlCore.UnitTest.csproj", "{0EBE34E5-44CD-441A-B435-E532EC61EEDD}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlStandard.Engine", "LazySqlStandard.Engine\LazySqlStandard.Engine.csproj", "{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LazySqlStandard.Engine", "LazySqlStandard.Engine\LazySqlStandard.Engine.csproj", "{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5D26441C-C1B8-4360-B722-153DAF7B56CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D26441C-C1B8-4360-B722-153DAF7B56CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D26441C-C1B8-4360-B722-153DAF7B56CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D26441C-C1B8-4360-B722-153DAF7B56CD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{24EEC326-C29B-4E43-8797-9C49A23B91D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{24EEC326-C29B-4E43-8797-9C49A23B91D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{24EEC326-C29B-4E43-8797-9C49A23B91D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{24EEC326-C29B-4E43-8797-9C49A23B91D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Release|Any CPU.ActiveCfg = Release|Any CPU

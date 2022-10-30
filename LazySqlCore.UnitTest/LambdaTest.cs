@@ -1,4 +1,3 @@
-using System.Formats.Asn1;
 using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySql.Engine.Client.Functions;
@@ -19,10 +18,10 @@ namespace LazySqlCore.UnitTest
             const int COUNT_SIMPLE_TABLE = 20;
             const int COUNT_CHILD_TABLE = 20;
             // Clear Table
-            SqlClient.Truncate<ChildTable>();
-            SqlClient.Truncate<SimpleTable>(true);
+            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
             // Add values
-            Assert.IsEmpty(SqlClient.Get<SimpleTable>());
+            Assert.IsEmpty(LazyClient.Get<SimpleTable>());
             int bot_id = 0;
             for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
             {
@@ -44,8 +43,8 @@ namespace LazySqlCore.UnitTest
                 }
             }
             // Check
-            Assert.AreEqual(COUNT_SIMPLE_TABLE, SqlClient.Get<SimpleTable>().ToList().Count());
-            Assert.AreEqual(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ,SqlClient.Get<ChildTable>().ToList().Count());
+            Assert.That(LazyClient.Get<SimpleTable>().ToList().Count(), Is.EqualTo(COUNT_SIMPLE_TABLE));
+            Assert.That(LazyClient.Get<ChildTable>().ToList().Count(),Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
         }
 
         [Test]
@@ -53,7 +52,7 @@ namespace LazySqlCore.UnitTest
         {
             AddSimpleTables();
 
-            foreach (SimpleTable simpleTable in SqlClient.Get<SimpleTable>(s => s.Id < 10))
+            foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s => s.Id < 10))
             {
                 Assert.Less(simpleTable.Id,10);
             }
@@ -65,7 +64,7 @@ namespace LazySqlCore.UnitTest
         {
             AddSimpleTables();
 
-            foreach (SimpleTable simpleTable in SqlClient.Get<SimpleTable>(s => LzFunctions.Like(s.Id, "%1%") && LzFunctions.Like(s.Id,"%5") ))
+            foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s => LzFunctions.Like(s.Id, "%1%") && LzFunctions.Like(s.Id,"%5") ))
             {
                 Assert.IsTrue(simpleTable.Id.ToString().Contains("1"));
                 Assert.IsTrue(simpleTable.Id.ToString().Contains("5"));

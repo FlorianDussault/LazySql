@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,7 +11,7 @@ using LazySql.Engine.Enums;
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
-    public sealed partial class SqlClient
+    public sealed partial class LazyClient
     {
         public static IEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalGet(expression);
 
@@ -39,26 +38,10 @@ namespace LazySql.Engine.Client
             List<T> values = ExecuteReader<T>(queryBuilder).ToList();
 
             foreach (RelationInformation relation in tableDefinition.Relations)
-            {
-                LoadChildren<T>(relation, values);
-            }
+                LoadChildren(relation, values);
 
             foreach (T value in values)
                 yield return value;
-            
-            yield break;
-             
-
-            bool hasRelations = tableDefinition.Relations != null && tableDefinition.Relations.Count > 0;
-
-            foreach (T value in ExecuteReader<T>(queryBuilder))
-            {
-                if (hasRelations)
-                    foreach (RelationInformation relation in tableDefinition.Relations)
-                        LoadChildren<T>(relation, value);
-
-                yield return value;
-            }
         }
     
         private void BuildSelect(TableDefinition tableDefinition, QueryBuilder queryBuilder)
@@ -89,8 +72,8 @@ namespace LazySql.Engine.Client
             Delegate delegateExpression = relationInformation.Expression.Compile();
 
             IList childValues = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relationInformation.ChildType));
-            MethodInfo method = typeof(SqlClient).GetMethod(nameof(ExecuteReader), BindingFlags.NonPublic | BindingFlags.Static);
-            IEnumerable enumerableChildValues = (IEnumerable)method.MakeGenericMethod(relationInformation.ChildType).Invoke(null, new object[] { queryBuilder });
+            MethodInfo method = typeof(LazyClient).GetMethod(nameof(ExecuteReader), BindingFlags.NonPublic | BindingFlags.Static);
+            IEnumerable enumerableChildValues = (IEnumerable)method!.MakeGenericMethod(relationInformation.ChildType).Invoke(null, new object[] { queryBuilder });
 
             foreach (object enumerableValue in enumerableChildValues)
                 childValues.Add(enumerableValue);
@@ -128,53 +111,7 @@ namespace LazySql.Engine.Client
             {
                 throw new NotImplementedException();
             }
-
-            return;
-            var deleatge = relationInformation.Expression.Compile();
-            
-            //var funcComplied = func.Compile();
-
-            foreach (object childValue in childValues)
-            {
-                
-                foreach (T value in values)
-                {
-                    //if ( deleatge.DynamicInvoke(value, childValue);
-                        ; //bool res = funcComplied(value, childValue);
-                }
-            }
-
         }
-
         
-        private void LoadChildren<T>(RelationInformation relationInformation, object obj)
-        {
-            CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
-            QueryBuilder queryBuilder = new QueryBuilder(childTableDefinition);
-            
-            BuildSelect(childTableDefinition, queryBuilder);
-            queryBuilder.Append(" WHERE ");
-            queryBuilder.Append(relationInformation.Expression, typeof(T), obj);
-
-            IList list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relationInformation.ChildType));
-
-            MethodInfo method = typeof(SqlClient).GetMethod(nameof(ExecuteReader), BindingFlags.NonPublic | BindingFlags.Static);
-            IEnumerable values = (IEnumerable)method.MakeGenericMethod(relationInformation.ChildType).Invoke(null, new object[] { queryBuilder });
-           
-            if (relationInformation.RelationType == RelationType.OneToOne)
-            {
-                foreach (object value in values)
-                {
-                    typeof(T).GetProperty(relationInformation.Column)?.SetValue(obj, value);
-                    return;
-                }
-            }
-            else if (relationInformation.RelationType == RelationType.OneToMany)
-            {
-                foreach (object value in values)
-                    list.Add(value);
-                typeof(T).GetProperty(relationInformation.Column)?.SetValue(obj, list);
-            }
-        }
     }
 }

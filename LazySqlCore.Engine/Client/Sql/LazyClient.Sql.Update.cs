@@ -7,11 +7,11 @@ using LazySql.Engine.Definitions;
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
-    public sealed partial class SqlClient
+    public sealed partial class LazyClient
     {
         #region Update
 
-        public static void Update<T>(T obj) where T : LazyBase => Instance.InternalUpdate<T>(obj);
+        public static void Update<T>(T obj) where T : LazyBase => Instance.InternalUpdate(obj);
 
         private void InternalUpdate<T>(T obj) where T : LazyBase
         {

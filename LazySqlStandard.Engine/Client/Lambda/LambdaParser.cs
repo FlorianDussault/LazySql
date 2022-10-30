@@ -1,16 +1,15 @@
 ﻿using LazySql.Engine.Definitions;
 using System;
-using System.Linq;
 using System.Linq.Expressions;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Enums;
 using System.Reflection;
-using LazySql.Engine.Client.Functions;
 
 namespace LazySql.Engine.Client.Lambda
 {
     internal class LambdaParser
     {
+        // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
         private readonly Expression _expression;
         private readonly Type _type;
         private readonly object _object;
@@ -30,6 +29,7 @@ namespace LazySql.Engine.Client.Lambda
             ParseExpression(_expression);
         }
 
+        // ReSharper disable once ObjectCreationAsStatement
         internal static void Parse(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null) => new LambdaParser(expression, tableDefinition, queryBuilder, type, obj);
 
         internal void ParseExpression(Expression expression)
@@ -55,7 +55,6 @@ namespace LazySql.Engine.Client.Lambda
                     ParseMethodCall(methodCallExpression);
                     break;
                 default:
-                    var a = expression.GetType();
                     throw new ArgumentOutOfRangeException();
             }
         }
@@ -90,8 +89,6 @@ namespace LazySql.Engine.Client.Lambda
             if (columnDefinition == null)
             {
                 throw new NotImplementedException();
-                UnaryExpression objectMember = Expression.Convert(expression, typeof(object));
-                ParseUnary(objectMember);
             }
             else
             {
@@ -108,7 +105,7 @@ namespace LazySql.Engine.Client.Lambda
 
         private void ParseMethodCall(MethodCallExpression expression)
         {
-            if (expression.Method.DeclaringType.IsSubclassOf(typeof(LambdaFunctionParser)))
+            if (expression.Method.DeclaringType!.IsSubclassOf(typeof(LambdaFunctionParser)))
             {
                 LambdaFunctionParser lambdaFunctionParser = (LambdaFunctionParser)Activator.CreateInstance(expression.Method.DeclaringType);
                 lambdaFunctionParser.Parse(expression, this, _queryBuilder);
@@ -116,17 +113,6 @@ namespace LazySql.Engine.Client.Lambda
             }
 
             throw new NotImplementedException();
-
-            ParseExpression(expression.Arguments[0]);
-
-
-
-            if (expression.Method.DeclaringType == typeof(LzFunctions))
-            {
-
-            }
-
-            ParseExpression(expression.Arguments[1]);
         }
 
         private void ParseNodeType(ExpressionType expressionType)

@@ -17,10 +17,10 @@ namespace LazySqlCore.UnitTest
             const int COUNT_SIMPLE_TABLE = 20;
             const int COUNT_CHILD_TABLE = 20;
             // Clear Table
-            SqlClient.Truncate<ChildTable>();
-            SqlClient.Truncate<SimpleTable>(true);
+            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
             // Add values
-            Assert.IsEmpty(SqlClient.Get<SimpleTable>());
+            Assert.IsEmpty(LazyClient.Get<SimpleTable>());
             int bot_id = 0;
             for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
             {
@@ -42,8 +42,8 @@ namespace LazySqlCore.UnitTest
                 }
             }
             // Check
-            Assert.AreEqual(COUNT_SIMPLE_TABLE, SqlClient.Get<SimpleTable>().ToList().Count());
-            Assert.AreEqual(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ,SqlClient.Get<ChildTable>().ToList().Count());
+            Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Get<SimpleTable>().ToList().Count());
+            Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Get<ChildTable>().ToList().Count());
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace LazySqlCore.UnitTest
 
             List<int> allowedIds = new List<int> { 5, 6, 7, 8, 9, 10, 20 };
 
-            foreach (SimpleTable simpleTable in SqlClient.Get<SimpleTable>(i=>(i.Id > 4 && i.Id <= 10) || i.Username == "P20"))
+            foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(i=>(i.Id > 4 && i.Id <= 10) || i.Username == "P20"))
             {
                 Assert.IsTrue(allowedIds.Contains(simpleTable.Id));
             }

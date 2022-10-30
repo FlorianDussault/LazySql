@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\LazySqlCore.Engine\LazySqlCore.Engine.csproj" />
+    <ProjectReference Include="..\LazySqlStandard.Engine\LazySqlStandard.Engine.csproj" />
   </ItemGroup>
 
 </Project>

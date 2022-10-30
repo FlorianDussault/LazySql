@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using LazySql.Engine.Client;
 using LazySql.Engine.Client.Query;

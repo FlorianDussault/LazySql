@@ -1,5 +1,3 @@
-using System.Formats.Asn1;
-using System.Formats.Asn1;
 using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySqlCore.UnitTest.Tables;
@@ -19,10 +17,10 @@ namespace LazySqlCore.UnitTest
             const int COUNT_SIMPLE_TABLE = 20;
             const int COUNT_CHILD_TABLE = 20;
             // Clear Table
-            SqlClient.Truncate<ChildTable>();
-            SqlClient.Truncate<SimpleTable>(true);
+            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
             // Add values
-            Assert.IsEmpty(SqlClient.Get<SimpleTable>());
+            Assert.IsEmpty(LazyClient.Get<SimpleTable>());
             int bot_id = 0;
             for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
             {
@@ -44,8 +42,8 @@ namespace LazySqlCore.UnitTest
                 }
             }
             // Check
-            Assert.AreEqual(COUNT_SIMPLE_TABLE, SqlClient.Get<SimpleTable>().ToList().Count());
-            Assert.AreEqual(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ,SqlClient.Get<ChildTable>().ToList().Count());
+            Assert.That(LazyClient.Get<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
+            Assert.That(LazyClient.Get<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
         }
 
         [Test]
@@ -57,16 +55,16 @@ namespace LazySqlCore.UnitTest
         [Test]
         public void InsertNull()
         {
-            SqlClient.Truncate<ChildTable>();
-            SqlClient.Truncate<SimpleTable>(true);
+            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
 
             new SimpleTable()
             {
 
             }.Insert();
 
-            SimpleTable item = SqlClient.Get<SimpleTable>().First();
-            Assert.AreNotEqual(0, item.Id);
+            SimpleTable item = LazyClient.Get<SimpleTable>().First();
+            Assert.That(item.Id, Is.EqualTo(0));
             Assert.IsNull(item.Username);
             Assert.IsNull(item.Password);
         }

@@ -8,9 +8,10 @@ using LazySql.Engine.Exceptions;
 
 namespace LazySql.Engine.Client
 {
-    public sealed partial class SqlClient
+    // ReSharper disable once ClassCannotBeInstantiated
+    public sealed partial class LazyClient
     {
-        private bool _initialized = false;
+        private bool _initialized;
 
         public static bool Initialized => Instance._initialized;
         

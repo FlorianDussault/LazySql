@@ -17,7 +17,8 @@ using System.Data.SqlClient;
 
 namespace LazySql.Engine.Client 
 {
-    public sealed partial class SqlClient
+    // ReSharper disable once ClassCannotBeInstantiated
+    public sealed partial class LazyClient
     {
         internal static string ConnectionString { get; private set; }
 
@@ -76,7 +77,7 @@ namespace LazySql.Engine.Client
             }
         }
 
-        internal object ExecuteScalar<T>(QueryBuilder queryBuilder) where T : LazyBase
+        internal object ExecuteScalar(QueryBuilder queryBuilder)
         {
             using (SqlConnector sqlConnector = Open())
                 return sqlConnector.ExecuteScalar(queryBuilder.GetQuery(), queryBuilder.GetArguments());
