@@ -36,9 +36,9 @@ namespace LazySql.Engine.Client
 
         #region Delete
 
-        public static void Delete<T>(Expression<Func<T, object>> expression = null) where T : LazyBase => Instance.InternalDelete<T>(expression);
+        public static void Delete<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalDelete<T>(expression);
 
-        private void InternalDelete<T>(Expression<Func<T,object>> expression = null) where T : LazyBase
+        private void InternalDelete<T>(Expression<Func<T,bool>> expression = null) where T : LazyBase
         {
             CheckInitialization<T>(out TableDefinition tableDefinition);
 

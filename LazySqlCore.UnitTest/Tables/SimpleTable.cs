@@ -18,11 +18,15 @@ namespace LazySqlCore.UnitTest.Tables
         [LazyColumn("password", SqlType.String)]
         public string Password { get; set; }
 
+        [LazyColumn("extended_key", SqlType.String)]
+        public string ExtendedKey { get; set; }
         public List<ChildTable> ChildTables { get; set; }
+        public ExtendedTable Extended { get; set; }
 
         public override void InitializeTable()
         {
             AddOneToMany<SimpleTable, ChildTable>(nameof(ChildTables), expression: (p, c) => p.Id == c.ParentId);
+            AddOneToOne<SimpleTable, ExtendedTable>(nameof(Extended), (p, e) => p.ExtendedKey == e.Key);
         }
     }
 }

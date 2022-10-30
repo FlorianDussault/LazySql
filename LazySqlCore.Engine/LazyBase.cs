@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Linq.Expressions;
+using LazySql.Engine.Enums;
 
 namespace LazySql.Engine
 {
     public abstract class LazyBase
     {
-        internal RelationsInformation OneToManyExpressions { get; } = new RelationsInformation();
+        internal RelationsInformation Relations { get; } = new RelationsInformation();
 
         internal void Initialize()
         {
@@ -17,9 +18,14 @@ namespace LazySql.Engine
             
         }
 
-        public void AddOneToMany<T,C>(string column, Expression<Func<T,C, object>> expression) where T : LazyBase where C : LazyBase
+        public void AddOneToMany<T,C>(string column, Expression<Func<T,C, bool>> expression) where T : LazyBase where C : LazyBase
         {
-            OneToManyExpressions.Add(typeof(T), column, typeof(C), expression);
+            Relations.Add(RelationType.OneToMany, typeof(T), column, typeof(C), expression);
+        }
+
+        public void AddOneToOne<T, C>(string column, Expression<Func<T, C, bool>> expression) where T : LazyBase where C : LazyBase
+        {
+            Relations.Add(RelationType.OneToOne, typeof(T), column, typeof(C), expression);
         }
     }
 }

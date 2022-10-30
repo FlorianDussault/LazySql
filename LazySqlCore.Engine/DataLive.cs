@@ -24,13 +24,13 @@ namespace LazySql.Engine
             return primaryKey.PropertyInfo.GetValue(item1).Equals(primaryKey.PropertyInfo.GetValue(item2));
         });
 
-        public void Load(Expression<Func<T, object>>? expression = null)
+        public void Load(Expression<Func<T, bool>> expression = null)
         {
             Clear();
             LoadAdditional();
         }
 
-        public void LoadAdditional(Expression<Func<T, object>>? expression = null)
+        public void LoadAdditional(Expression<Func<T, bool>> expression = null)
         {
             foreach (T item in SqlClient.Get(expression))
             {

@@ -8,7 +8,7 @@ namespace LazySqlCore.UnitTest
         public static void Initialize()
         {
             if (!SqlClient.Initialized)
-                SqlClient.Initialize("Server=localhost\\sqlexpress;Database=LazySql;TrustServerCertificate=Yes;Trusted_Connection=True", typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable));
+                SqlClient.Initialize("Server=localhost\\sqlexpress;Database=LazySql;TrustServerCertificate=Yes;Trusted_Connection=True", typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable), typeof(ExtendedTable));
         }
     }
 }

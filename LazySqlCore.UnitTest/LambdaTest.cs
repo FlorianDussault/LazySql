@@ -65,9 +65,10 @@ namespace LazySqlCore.UnitTest
         {
             AddSimpleTables();
 
-            foreach (SimpleTable simpleTable in SqlClient.Get<SimpleTable>(s => LzFunctions.Like(s.Id, "%1%")))
+            foreach (SimpleTable simpleTable in SqlClient.Get<SimpleTable>(s => LzFunctions.Like(s.Id, "%1%") && LzFunctions.Like(s.Id,"%5") ))
             {
-                Assert.Less(simpleTable.Id, 10);
+                Assert.IsTrue(simpleTable.Id.ToString().Contains("1"));
+                Assert.IsTrue(simpleTable.Id.ToString().Contains("5"));
             }
         }
         

@@ -69,8 +69,8 @@ namespace LazySql.Engine.Client
             LazyBase obj = (LazyBase)Activator.CreateInstance(type);
         
             obj.Initialize();
-            if (obj.OneToManyExpressions != null)
-                tableDefinition.OneToManyExpressions = obj.OneToManyExpressions;
+            if (obj.Relations != null)
+                tableDefinition.Relations = obj.Relations;
 
             PropertyInfo[] properties = type.GetProperties();
             foreach (PropertyInfo propertyInfo in properties)

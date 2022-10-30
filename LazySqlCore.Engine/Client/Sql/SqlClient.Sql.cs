@@ -6,7 +6,10 @@ using LazySql.Engine.Connector;
 using LazySql.Engine.Definitions;
 using LazySql.Engine.Enums;
 
+
 #if NETCORE
+using Microsoft.Data.SqlClient;
+#elif NETSTANDARD
 using Microsoft.Data.SqlClient;
 #else
 using System.Data.SqlClient;

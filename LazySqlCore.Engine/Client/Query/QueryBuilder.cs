@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using LazySql.Engine.Client.Functions;
+using LazySql.Engine.Client.Lambda;
 using LazySql.Engine.Definitions;
 using LazySql.Engine.Enums;
 
@@ -29,11 +30,13 @@ namespace LazySql.Engine.Client.Query
                 _stringBuilder.Append(sql);
             Append(expression);
         }
-    
 
+        
         public void Append(LambdaExpression expression = null, Type type = null, object obj = null)
         {
             if (expression == null) return;
+            LambdaParser.Parse(expression, _tableDefinition, this, type, obj);
+            return;
             if (!(expression.Body is UnaryExpression unaryExpression))
                 throw new NotImplementedException();
             AnalyzeUnaryExpression(unaryExpression);
@@ -41,11 +44,8 @@ namespace LazySql.Engine.Client.Query
 
         private void AnalyzeUnaryExpression(UnaryExpression unaryExpression, Type type = null, object obj = null)
         {
-            if (unaryExpression.NodeType == ExpressionType.Convert)
-            {
-                // new System.Linq.Expressions.Expression.MethodCallExpressionProxy(new System.Linq.Expressions.Expression.UnaryExpressionProxy(unaryExpression).Operand).Method
 
-            }
+            
 
             if (unaryExpression.Operand is MethodCallExpression methodCallExpression)
             {

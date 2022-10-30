@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LazySql.Engine</RootNamespace>
     <AssemblyName>LazySqlFramework.Engine</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,14 +22,16 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -52,6 +55,12 @@
     </Compile>
     <Compile Include="..\LazySqlCore.Engine\Client\Functions\LzFunctions.cs">
       <Link>Client\Functions\LzFunctions.cs</Link>
+    </Compile>
+    <Compile Include="..\LazySqlCore.Engine\Client\Lambda\LambdaFunctionParser.cs">
+      <Link>Client\Lambda\LambdaFunctionParser.cs</Link>
+    </Compile>
+    <Compile Include="..\LazySqlCore.Engine\Client\Lambda\LambdaParser.cs">
+      <Link>Client\Lambda\LambdaParser.cs</Link>
     </Compile>
     <Compile Include="..\LazySqlCore.Engine\Client\Query\QueryBuilder.cs">
       <Link>Client\Query\QueryBuilder.cs</Link>
@@ -86,11 +95,17 @@
     <Compile Include="..\LazySqlCore.Engine\Connector\SqlConnector.cs">
       <Link>Connector\SqlConnector.cs</Link>
     </Compile>
+    <Compile Include="..\LazySqlCore.Engine\DataLive.cs">
+      <Link>DataLive.cs</Link>
+    </Compile>
     <Compile Include="..\LazySqlCore.Engine\Definitions\ColumnDefinition.cs">
       <Link>Definitions\ColumnDefinition.cs</Link>
     </Compile>
     <Compile Include="..\LazySqlCore.Engine\Definitions\TableDefinition.cs">
       <Link>Definitions\TableDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\LazySqlCore.Engine\Enums\RelationType.cs">
+      <Link>Enums\RelationType.cs</Link>
     </Compile>
     <Compile Include="..\LazySqlCore.Engine\Enums\SqlType.cs">
       <Link>Enums\SqlType.cs</Link>
@@ -124,6 +139,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="LazySqlFramework.Engine.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

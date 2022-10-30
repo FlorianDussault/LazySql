@@ -42,6 +42,7 @@ namespace LazySqlCore.UnitTest
                 }
             }
             // Check
+            var VALUES = SqlClient.Get<SimpleTable>().ToList().Count();
             Assert.AreEqual(COUNT_SIMPLE_TABLE, SqlClient.Get<SimpleTable>().ToList().Count());
             Assert.AreEqual(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ,SqlClient.Get<ChildTable>().ToList().Count());
         }

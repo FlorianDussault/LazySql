@@ -10,7 +10,7 @@ namespace LazySql.Engine.Definitions
     {
         public Type TableType { get; }
         public LazyTable Table { get; }
-        public RelationsInformation OneToManyExpressions { get; set; } = null;
+        public RelationsInformation Relations { get; set; } = null;
         public TableDefinition(Type type, LazyTable table)
         {
             TableType = type;

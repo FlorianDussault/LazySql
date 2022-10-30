@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using LazySql.Engine.Enums;
 
 namespace LazySql.Engine
 {
@@ -9,8 +10,10 @@ namespace LazySql.Engine
         public string Column { get; }
         public Type ChildType { get; }
         public LambdaExpression Expression { get; }
-        public RelationInformation(Type parentType, string column, Type childType, LambdaExpression expression)
+        public RelationType RelationType { get; }
+        public RelationInformation(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression)
         {
+            RelationType = relationType;
             ParentType = parentType;
             Column = column;
             ChildType = childType;

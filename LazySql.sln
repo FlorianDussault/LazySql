@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlFramework.Engine", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlCore.UnitTest", "LazySqlCore.UnitTest\LazySqlCore.UnitTest.csproj", "{0EBE34E5-44CD-441A-B435-E532EC61EEDD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LazySqlStandard.Engine", "LazySqlStandard.Engine\LazySqlStandard.Engine.csproj", "{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EBE34E5-44CD-441A-B435-E532EC61EEDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6693BB4E-B072-43F5-96D2-3D91D7FFC17D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

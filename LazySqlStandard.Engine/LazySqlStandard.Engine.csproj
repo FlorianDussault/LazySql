@@ -1,0 +1,73 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <SignAssembly>False</SignAssembly>
+    <Title>LazySql (.NET Standard)</Title>
+    <Authors>Florian Dussault</Authors>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>none</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\LazySqlCore.Engine\Attributes\LazyColumn.cs" Link="Attributes\LazyColumn.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Attributes\LazyTable.cs" Link="Attributes\LazyTable.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Attributes\PrimaryKey.cs" Link="Attributes\PrimaryKey.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Functions\LzFunctions.cs" Link="Client\Functions\LzFunctions.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Lambda\LambdaFunctionParser.cs" Link="Client\Lambda\LambdaFunctionParser.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Lambda\LambdaParser.cs" Link="Client\Lambda\LambdaParser.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Query\QueryBuilder.cs" Link="Client\Query\QueryBuilder.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Query\SqlArgument.cs" Link="Client\Query\SqlArgument.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Query\SqlArguments.cs" Link="Client\Query\SqlArguments.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\SqlClient.cs" Link="Client\SqlClient.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\SqlClient.Initialize.cs" Link="Client\SqlClient.Initialize.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Sql\SqlClient.Sql.cs" Link="Client\Sql\SqlClient.Sql.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Sql\SqlClient.Sql.Delete.cs" Link="Client\Sql\SqlClient.Sql.Delete.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Sql\SqlClient.Sql.Insert.cs" Link="Client\Sql\SqlClient.Sql.Insert.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Sql\SqlClient.Sql.Read.cs" Link="Client\Sql\SqlClient.Sql.Read.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Client\Sql\SqlClient.Sql.Update.cs" Link="Client\Sql\SqlClient.Sql.Update.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Connector\SqlConnector.cs" Link="Connector\SqlConnector.cs" />
+    <Compile Include="..\LazySqlCore.Engine\DataLive.cs" Link="DataLive.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Definitions\ColumnDefinition.cs" Link="Definitions\ColumnDefinition.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Definitions\TableDefinition.cs" Link="Definitions\TableDefinition.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Enums\RelationType.cs" Link="Enums\RelationType.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Enums\SqlType.cs" Link="Enums\SqlType.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Exceptions\LazySqlException.cs" Link="Exceptions\LazySqlException.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Exceptions\LazySqlExecuteException.cs" Link="Exceptions\LazySqlExecuteException.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Exceptions\LazySqlInitializeException.cs" Link="Exceptions\LazySqlInitializeException.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Exceptions\LazySqlLiveException.cs" Link="Exceptions\LazySqlLiveException.cs" />
+    <Compile Include="..\LazySqlCore.Engine\LazyBase.cs" Link="LazyBase.cs" />
+    <Compile Include="..\LazySqlCore.Engine\RelationInformation.cs" Link="RelationInformation.cs" />
+    <Compile Include="..\LazySqlCore.Engine\RelationsInformation.cs" Link="RelationsInformation.cs" />
+    <Compile Include="..\LazySqlCore.Engine\SqlExtensions.cs" Link="SqlExtensions.cs" />
+    <Compile Include="..\LazySqlCore.Engine\Tools.cs" Link="Tools.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Attributes\" />
+    <Folder Include="Client\Functions\" />
+	  <Folder Include="Client\Lambda\" />
+	  <Folder Include="Client\Query\" />
+	  <Folder Include="Client\Sql\" />
+	  <Folder Include="Connector\" />
+	  <Folder Include="Definitions\" />
+	  <Folder Include="Enums\" />
+	  <Folder Include="Exceptions\" />
+	  
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
+  </ItemGroup>
+
+</Project>
