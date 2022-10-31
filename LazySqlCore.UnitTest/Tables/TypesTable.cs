@@ -79,7 +79,7 @@ namespace LazySqlCore.UnitTest.Tables
         public string? TypeText { get; set; }
 
         [LazyColumn("type_time", SqlType.Time)]
-        public TimeSpan? TypeTime { get; set; }
+        public DateTime? TypeTime { get; set; }
 
         //[LazyColumn("type_timestamp", SqlType.Binary)]
         //public byte[]? TypeTimestamp { get; set; }

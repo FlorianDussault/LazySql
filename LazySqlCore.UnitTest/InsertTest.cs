@@ -64,7 +64,7 @@ namespace LazySqlCore.UnitTest
             }.Insert();
 
             SimpleTable item = LazyClient.Get<SimpleTable>().First();
-            Assert.That(item.Id, Is.EqualTo(0));
+            Assert.That(item.Id, Is.EqualTo(1));
             Assert.IsNull(item.Username);
             Assert.IsNull(item.Password);
         }

@@ -36,6 +36,8 @@ namespace LazySql.Engine.Client
             }
 
             List<T> values = ExecuteReader<T>(queryBuilder).ToList();
+            if (values.Count == 0) yield break;
+
 
             foreach (RelationInformation relation in tableDefinition.Relations)
                 LoadChildren(relation, values);
@@ -43,7 +45,8 @@ namespace LazySql.Engine.Client
             foreach (T value in values)
                 yield return value;
         }
-    
+
+
         private void BuildSelect(TableDefinition tableDefinition, QueryBuilder queryBuilder)
         {
             tableDefinition.GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out _, out _, out _);
@@ -55,7 +58,8 @@ namespace LazySql.Engine.Client
         {
             if (values.Count == 0) return;
             CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
-            QueryBuilder queryBuilder = new QueryBuilder(childTableDefinition);
+            
+            QueryBuilder queryBuilder = new(childTableDefinition);
 
             BuildSelect(childTableDefinition, queryBuilder);
             queryBuilder.Append(" WHERE ");
@@ -71,10 +75,9 @@ namespace LazySql.Engine.Client
 
             Delegate delegateExpression = relationInformation.Expression.Compile();
 
-            IList childValues = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relationInformation.ChildType));
-            MethodInfo method = typeof(LazyClient).GetMethod(nameof(ExecuteReader), BindingFlags.NonPublic | BindingFlags.Static);
-            IEnumerable enumerableChildValues = (IEnumerable)method!.MakeGenericMethod(relationInformation.ChildType).Invoke(null, new object[] { queryBuilder });
+            IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticGenericMethod<IEnumerable>(typeof(LazyClient), nameof(ExecuteReader), relationInformation.ChildType, new object[] { queryBuilder });
 
+            IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
             foreach (object enumerableValue in enumerableChildValues)
                 childValues.Add(enumerableValue);
 
