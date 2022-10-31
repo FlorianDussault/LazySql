@@ -28,19 +28,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\LazySqlCore.Engine\Client\Sql\LazyClient.Sql.cs" Link="Client\Sql\LazyClient.Sql.cs" />
-    <Compile Include="..\LazySqlCore.Engine\Client\Sql\LazyClient.Sql.Delete.cs" Link="Client\Sql\LazyClient.Sql.Delete.cs" />
-    <Compile Include="..\LazySqlCore.Engine\Client\Sql\LazyClient.Sql.Insert.cs" Link="Client\Sql\LazyClient.Sql.Insert.cs" />
-    <Compile Include="..\LazySqlCore.Engine\Client\Sql\LazyClient.Sql.Read.cs" Link="Client\Sql\LazyClient.Sql.Read.cs" />
-    <Compile Include="..\LazySqlCore.Engine\Client\Sql\LazyClient.Sql.Update.cs" Link="Client\Sql\LazyClient.Sql.Update.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-	  <Folder Include="Client\Sql\" />
-	  
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
   </ItemGroup>
