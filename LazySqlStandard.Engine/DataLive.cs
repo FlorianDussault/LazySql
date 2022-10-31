@@ -13,13 +13,28 @@ namespace LazySql.Engine
     /// <typeparam name="T">Supported Object</typeparam>
     public class DataLive<T> : List<T>  where T : LazyBase
     {
-        private readonly TableDefinition _tableDefinition;
-        private IReadOnlyList<ColumnDefinition> _primaryKeys;
+        private readonly IReadOnlyList<ColumnDefinition> _primaryKeys;
 
-        public DataLive()
+        /// <summary>
+        /// DataLive
+        /// </summary>
+        /// <param name="loadAllData">if true, all the data will be load from the database</param>
+        public DataLive(bool loadAllData = false)
         {
-            LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
-            _tableDefinition.GetColumns(out _, out _, out _, out _primaryKeys);
+            LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+            tableDefinition.GetColumns(out _, out _, out _, out _primaryKeys);
+            if(loadAllData) Load();
+        }
+
+        /// <summary>
+        /// Create DataLive object and load it
+        /// </summary>
+        /// <param name="expression">Expression</param>
+        public DataLive(Expression<Func<T, bool>> expression)
+        {
+            LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+            tableDefinition.GetColumns(out _, out _, out _, out _primaryKeys);
+            Load(expression);
         }
 
         /// <summary>
