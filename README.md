@@ -12,8 +12,21 @@ LazySql is a micro ORM to simplify the interfacing between an application and a 
 ## Table of content
 
 - [Installation](#installation)
+- [Compatibility](#compatibility)
 - [License](#license)
 - [Links](#links)
+
+## Compatibility
+
+### .NET
+
+|  | .NET Core | .NET Framework | .NET Standard |
+| --- | --- | --- | --- |
+| Minimum version | 6.0 | 4.8 | 2.0 |
+
+### Database
+
+Only Sql-Server (≥ 2012)
 
 ## Installation
 
