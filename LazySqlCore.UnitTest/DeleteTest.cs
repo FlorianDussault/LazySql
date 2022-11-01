@@ -17,7 +17,8 @@ namespace LazySqlCore.UnitTest
             const int COUNT_SIMPLE_TABLE = 20;
             const int COUNT_CHILD_TABLE = 20;
             // Clear Table
-            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SubChildTable>();
+            LazyClient.Delete<ChildTable>();
             LazyClient.Truncate<SimpleTable>(true);
             // Add values
             Assert.IsEmpty(LazyClient.Get<SimpleTable>());
@@ -50,7 +51,8 @@ namespace LazySqlCore.UnitTest
         public void Truncate()
         {
             AddSimpleTables();
-            LazyClient.Truncate<ChildTable>();
+            LazyClient.Truncate<SubChildTable>();
+            LazyClient.Delete<ChildTable>();
             Assert.IsEmpty(LazyClient.Get<ChildTable>());
             LazyClient.Truncate<SimpleTable>(true);
             Assert.IsEmpty(LazyClient.Get<SimpleTable>());

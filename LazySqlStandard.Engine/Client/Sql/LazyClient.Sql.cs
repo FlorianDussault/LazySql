@@ -15,6 +15,7 @@ using Microsoft.Data.SqlClient;
 using System.Data.SqlClient;
 #endif
 
+// ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client 
 {
     // ReSharper disable once ClassCannotBeInstantiated
@@ -24,69 +25,68 @@ namespace LazySql.Engine.Client
 
         private SqlConnector Open()
         {
-            SqlConnector sqlConnector = new SqlConnector();
+            SqlConnector sqlConnector = new();
             sqlConnector.Open();
             return sqlConnector;
         }
 
-        internal static IEnumerable<T> ExecuteReader<T>(QueryBuilder queryBuilder) where T : LazyBase => Instance.InternalExecuteReader<T>(queryBuilder);
-        private IEnumerable<T> InternalExecuteReader<T>(QueryBuilder queryBuilder) where T : LazyBase
+        internal static IEnumerable<object> ExecuteReader(QueryBuilder queryBuilder) => Instance.InternalExecuteReader(queryBuilder);
+        private IEnumerable<object> InternalExecuteReader(QueryBuilder queryBuilder)
         {
-            using (SqlConnector sqlConnector = Open())
+            using SqlConnector sqlConnector = Open();
+            SqlDataReader sqlDataReader =
+                sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
+
+            while (sqlDataReader.Read())
             {
-                SqlDataReader sqlDataReader =
-                    sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
-                TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
+                object instance = Activator.CreateInstance(tableDefinition.TableType);
 
-                while (sqlDataReader.Read())
+                // TODO: code cleaning
+                foreach (ColumnDefinition columnDefinition in tableDefinition.Where(c =>
+                             c.Column.SqlType != SqlType.Children))
                 {
-                    T instance = (T) Activator.CreateInstance(tableDefinition.TableType);
+                    object value = null;
+                    if (!sqlDataReader.IsDBNull(columnDefinition.Index))
+                        switch (columnDefinition.Column.SqlType)
+                        {
+                            //case SqlType.Varchar:
+                            //    value = sqlDataReader.GetString(columnDefinition.Index);
+                            //    break;
+                            //case SqlType.Int:
+                            //    value = sqlDataReader.GetInt32(columnDefinition.Index);
+                            //    break;
+                            //case SqlType.Bit:
+                            //    value = sqlDataReader.GetBoolean(columnDefinition.Index);
+                            //    break;
+                            //case SqlType.BigInt:
+                            //    value = sqlDataReader.GetValue(columnDefinition.Index);
+                            //    break;
+                            default:
+                                value = sqlDataReader.GetValue(columnDefinition.Index);
+                                break;
+                            //throw new ArgumentOutOfRangeException();
+                        }
 
-                    foreach (ColumnDefinition columnDefinition in tableDefinition.Where(c =>
-                                 c.Column.SqlType != SqlType.Children))
-                    {
-                        object value = null;
-                        if (!sqlDataReader.IsDBNull(columnDefinition.Index))
-                            switch (columnDefinition.Column.SqlType)
-                            {
-                                //case SqlType.Varchar:
-                                //    value = sqlDataReader.GetString(columnDefinition.Index);
-                                //    break;
-                                //case SqlType.Int:
-                                //    value = sqlDataReader.GetInt32(columnDefinition.Index);
-                                //    break;
-                                //case SqlType.Bit:
-                                //    value = sqlDataReader.GetBoolean(columnDefinition.Index);
-                                //    break;
-                                //case SqlType.BigInt:
-                                //    value = sqlDataReader.GetValue(columnDefinition.Index);
-                                //    break;
-                                default:
-                                    value = sqlDataReader.GetValue(columnDefinition.Index);
-                                    break;
-                                    //throw new ArgumentOutOfRangeException();
-                            }
-
-                        columnDefinition.PropertyInfo.SetValue(instance, value);
-                    }
-
-                    yield return instance;
+                    columnDefinition.PropertyInfo.SetValue(instance, value);
                 }
 
-                sqlDataReader.Close();
+                yield return instance;
             }
+
+            sqlDataReader.Close();
         }
 
         internal object ExecuteScalar(QueryBuilder queryBuilder)
         {
-            using (SqlConnector sqlConnector = Open())
-                return sqlConnector.ExecuteScalar(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            using SqlConnector sqlConnector = Open();
+            return sqlConnector.ExecuteScalar(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
 
         internal void ExecuteNonQuery(QueryBuilder queryBuilder)
         {
-            using (SqlConnector sqlConnector = Open())
-                sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            using SqlConnector sqlConnector = Open();
+            sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
     }
 }

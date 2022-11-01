@@ -44,9 +44,12 @@ namespace LazySql.Engine.Connector
             if (sqlArguments == null) return;
             foreach (SqlArgument sqlArgument in sqlArguments)
             {
+                
                 var parameter = _sqlCommand.Parameters.AddWithValue(sqlArgument.Name, sqlArgument.Value ?? DBNull.Value);
                 if (sqlArgument.Type != SqlType.Default)
-                    parameter.DbType = (DbType) sqlArgument.Type;
+                {
+                    parameter.SqlDbType = (SqlDbType) sqlArgument.Type;
+                }
             }
         }
 

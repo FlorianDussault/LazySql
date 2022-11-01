@@ -5,6 +5,7 @@ using LazySql.Engine.Client.Query;
 using LazySql.Engine.Connector;
 using LazySql.Engine.Definitions;
 
+// ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
@@ -12,23 +13,31 @@ namespace LazySql.Engine.Client
     {
         #region Truncate
 
-        public static void Truncate<T>(bool reseed = false) where T : LazyBase => Instance.InternalTruncate<T>(reseed);
+        /// <summary>
+        /// Truncate table
+        /// </summary>
+        /// <typeparam name="T">Type of item</typeparam>
+        /// <param name="reseed">Execute RESEED (DBCC CHECKIDENT) for a table with relations</param>
+        public static void Truncate<T>(bool reseed = false) where T : LazyBase => Instance.InternalTruncate(typeof(T), reseed);
 
-        private void InternalTruncate<T>(bool reseed = false) where T : LazyBase
+        /// <summary>
+        /// Truncate table
+        /// </summary>
+        /// <param name="type">Type of object</param>
+        /// <param name="reseed">Execute RESEED (DBCC CHECKIDENT) for a table with relations</param>
+        private void InternalTruncate(Type type, bool reseed = false)
         {
-            CheckInitialization<T>(out TableDefinition tableDefinition);
+            CheckInitialization(type, out TableDefinition tableDefinition);
 
-            using (SqlConnector sqlConnector = Open())
+            using SqlConnector sqlConnector = Open();
+            if (reseed)
             {
-                if (reseed)
-                {
-                    InternalDelete<T>();
-                    sqlConnector.ExecuteQuery($"DBCC CHECKIDENT ('{tableDefinition.Table.TableName}', RESEED, 0)");
-                }
-                else
-                {
-                    sqlConnector.ExecuteQuery($"TRUNCATE TABLE {tableDefinition.Table.TableName}");
-                }
+                InternalDelete(type);
+                sqlConnector.ExecuteQuery($"DBCC CHECKIDENT ('{tableDefinition.Table.TableName}', RESEED, 0)");
+            }
+            else
+            {
+                sqlConnector.ExecuteQuery($"TRUNCATE TABLE {tableDefinition.Table.TableName}");
             }
         }
 
@@ -36,39 +45,54 @@ namespace LazySql.Engine.Client
 
         #region Delete
 
-        public static void Delete<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalDelete<T>(expression);
+        /// <summary>
+        /// Delete one or more items from the database
+        /// </summary>
+        /// <typeparam name="T">Type of item</typeparam>
+        /// <param name="expression">Filter expression</param>
+        public static void Delete<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalDelete(typeof(T), expression);
 
-        private void InternalDelete<T>(Expression<Func<T,bool>> expression = null) where T : LazyBase
+        /// <summary>
+        /// Delete one or more items from the database
+        /// </summary>
+        /// <param name="type">Type of item</param>
+        /// <param name="expression">Filter Expression</param>
+        private void InternalDelete(Type type, LambdaExpression expression = null)
         {
-            CheckInitialization<T>(out TableDefinition tableDefinition);
+            CheckInitialization(type, out TableDefinition tableDefinition);
 
-            QueryBuilder queryBuilder = new QueryBuilder(tableDefinition);
+            QueryBuilder queryBuilder = new(tableDefinition);
             queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName}");
 
             if (expression != null)
-            {
                 queryBuilder.Append(" WHERE ", expression);
-            }
 
             ExecuteNonQuery(queryBuilder);
         }
 
-
+        /// <summary>
+        /// Delete an item from the database
+        /// </summary>
+        /// <typeparam name="T">Type of item</typeparam>
+        /// <param name="obj">Item</param>
         public static void Delete<T>(T obj) where T : LazyBase => Instance.InternalDelete(obj);
 
-
-        public void InternalDelete<T>(T obj) where T : LazyBase
+        /// <summary>
+        /// Delete an item from the database
+        /// </summary>
+        /// <param name="obj">Item</param>
+        private void InternalDelete(object obj)
         {
-            CheckInitialization<T>(out TableDefinition tableDefinition);
+            CheckInitialization(obj.GetType(), out TableDefinition tableDefinition);
 
             tableDefinition.GetColumns(out _, out _, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
             BinaryExpression binaryExpression = null;
             foreach (ColumnDefinition primaryKey in primaryKeys)
             {
-                var objExpression = Expression.Parameter(typeof(T), "source");
-                var member = Expression.Property(objExpression, primaryKey.PropertyInfo);
-                var value = Expression.Constant(primaryKey.PropertyInfo.GetValue(obj));
+                ParameterExpression objExpression = Expression.Parameter(obj.GetType(), "source");
+                MemberExpression member = Expression.Property(objExpression, primaryKey.PropertyInfo);
+                ConstantExpression value = Expression.Constant(primaryKey.PropertyInfo.GetValue(obj));
                 BinaryExpression childExpression = Expression.Equal(member, value);
                 if (binaryExpression == null)
                 {
@@ -82,10 +106,9 @@ namespace LazySql.Engine.Client
             queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName} WHERE ");
             queryBuilder.Append(binaryExpression);
 
-            using (SqlConnector sqlConnector = Open())
-                sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            using SqlConnector sqlConnector = Open();
+            sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
-
 
         #endregion
     }

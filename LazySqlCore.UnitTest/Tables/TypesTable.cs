@@ -2,26 +2,27 @@
 using LazySql.Engine;
 using LazySql.Engine.Attributes;
 using LazySql.Engine.Enums;
+using System.Xml.Linq;
 
 namespace LazySqlCore.UnitTest.Tables
 {
     [LazyTable("types")]
     public class TypesTable : LazyBase
     {
-        [LazyColumn("id", SqlType.Int32)]
+        [LazyColumn("id", SqlType.Int)]
         [PrimaryKey(true)]
         public int Id { get; set; }
 
-        [LazyColumn("type_bigint", SqlType.Int64)]
+        [LazyColumn("type_bigint", SqlType.BigInt)]
         public long? TypeBigint { get; set; }
 
         [LazyColumn("type_binary", SqlType.Binary)]
         public Byte[]? TypeBinary { get; set; }
 
-        [LazyColumn("type_bit", SqlType.Boolean)]
+        [LazyColumn("type_bit", SqlType.Bit)]
         public bool? TypeBit { get; set; }
 
-        [LazyColumn("type_char", SqlType.String)]
+        [LazyColumn("type_char", SqlType.Char)]
         public string? TypeChar { get; set; }
 
         [LazyColumn("type_date", SqlType.Date)]
@@ -36,7 +37,7 @@ namespace LazySqlCore.UnitTest.Tables
         [LazyColumn("type_decimal", SqlType.Decimal)]
         public decimal? TypeDecimal { get; set; }
 
-        [LazyColumn("type_float", SqlType.Double)]
+        [LazyColumn("type_float", SqlType.Float)]
         public double? TypeFloat { get; set; }
 
         //[LazyColumn("type_geography", SqlType.g)]
@@ -48,49 +49,46 @@ namespace LazySqlCore.UnitTest.Tables
         [LazyColumn("type_image", SqlType.Binary)]
         public byte[]? TypeImage { get; set; }
 
-        [LazyColumn("type_int", SqlType.Int32)]
+        [LazyColumn("type_int", SqlType.Int)]
         public int? TypeInt { get; set; }
 
         [LazyColumn("type_money", SqlType.Decimal)]
         public decimal? TypeMoney { get; set; }
 
-        [LazyColumn("type_ntext", SqlType.String)]
+        [LazyColumn("type_ntext", SqlType.NText)]
         public string? TypeNtext { get; set; }
 
         [LazyColumn("type_numeric", SqlType.Decimal)]
         public decimal? TypeNumeric { get; set; }
 
-        [LazyColumn("type_real", SqlType.Single)]
+        [LazyColumn("type_real", SqlType.Real)]
         public Single? TypeReal { get; set; }
 
         [LazyColumn("type_smalldatime", SqlType.Date)]
         public DateTime? TypeSmalldatime { get; set; }
 
-        [LazyColumn("type_smallint", SqlType.Int16)]
+        [LazyColumn("type_smallint", SqlType.SmallInt)]
         public short? TypeSmallint { get; set; }
 
         [LazyColumn("type_smallmoney", SqlType.Decimal)]
         public decimal? TypeSmallmoney { get; set; }
 
-        [LazyColumn("type_sql_variant", SqlType.String)]
+        [LazyColumn("type_sql_variant", SqlType.Variant)]
         public string? TypeSqlVariant { get; set; }
 
-        [LazyColumn("type_text", SqlType.String)]
+        [LazyColumn("type_text", SqlType.Text)]
         public string? TypeText { get; set; }
 
         [LazyColumn("type_time", SqlType.Time)]
-        public DateTime? TypeTime { get; set; }
+        public TimeSpan? TypeTime { get; set; }
 
-        //[LazyColumn("type_timestamp", SqlType.Binary)]
-        //public byte[]? TypeTimestamp { get; set; }
-
-        [LazyColumn("type_tinyint", SqlType.Byte)]
+        [LazyColumn("type_tinyint", SqlType.TinyInt)]
         public byte? TypeTinyint { get; set; }
 
-        [LazyColumn("type_uniqueidentifier", SqlType.Guid)]
+        [LazyColumn("type_uniqueidentifier", SqlType.UniqueIdentifier)]
         public Guid? TypeUniqueidentifier { get; set; }
 
-        //[LazyColumn("type_xml", SqlType.Xml)]
-        //public long TypeXml { get; set; }
+        [LazyColumn("type_xml", SqlType.Xml)]
+        public string TypeXml { get; set; }
     }
 }

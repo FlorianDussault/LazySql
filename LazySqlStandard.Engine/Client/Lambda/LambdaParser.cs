@@ -65,9 +65,76 @@ namespace LazySql.Engine.Client.Lambda
 
         private void ParseBinary(BinaryExpression expression)
         {
+            if (ParseNullEquality(expression)) return;
+            
+            //if (expression.NodeType == ExpressionType.Equal || expression.NodeType == ExpressionType.NotEqual)
+            //{
+            //    if (ParseNullEquality(expression))
+                
+            //    // support for IS NULL or IS NOT NULL
+            //    bool isLeftNull = IsValueExpressionNull(expression.Left);
+            //    bool isRightNull = IsValueExpressionNull(expression.Right);
+
+            //    if (isLeftNull && isRightNull)
+            //    {
+            //        if (expression.NodeType == ExpressionType.Equal)
+            //        {
+            //            // null = null
+            //            _queryBuilder.Append(" 1 = 1 ");
+            //        }
+            //        // null != null
+            //        _queryBuilder.Append(" 1 != 1 ");
+            //    }
+            //}
+
+            
+
+            
+            
             ParseExpression(expression.Left);
             ParseNodeType(expression.NodeType);
             ParseExpression(expression.Right);
+        }
+
+        private bool ParseNullEquality(BinaryExpression expression)
+        {
+            if (expression.NodeType != ExpressionType.Equal && expression.NodeType != ExpressionType.NotEqual)
+                return false;
+
+            bool isLeftNull = IsValueExpressionNull(expression.Left);
+            bool isRightNull = IsValueExpressionNull(expression.Right);
+
+            if (!isLeftNull && !isRightNull) return false;
+
+            string nullQuery = expression.NodeType == ExpressionType.Equal ? " IS NULL " : " IS NOT NULL ";
+
+            // null found in expression
+
+            if (isRightNull == isLeftNull)
+            {
+                // null == null
+                _queryBuilder.Append($" NULL {nullQuery} ");
+                return true;
+            }
+
+            if (isLeftNull)
+            {
+                ParseExpression(expression.Right);
+                _queryBuilder.Append(nullQuery);
+                return true;
+            }
+            ParseExpression(expression.Left);
+            _queryBuilder.Append(nullQuery);
+            return true;
+        }
+
+        private bool IsValueExpressionNull(Expression expression)
+        {
+            if (expression is ConstantExpression constantExpression)
+                return ParseConstantValue(constantExpression) == null;
+            if (expression is MemberExpression memberExpression && _type != null && memberExpression.Member.DeclaringType == _type)
+                return ParseMemberValue(memberExpression) == null;
+            return false;
         }
 
         private void ParseMember(MemberExpression expression)
@@ -75,12 +142,8 @@ namespace LazySql.Engine.Client.Lambda
             if (_type != null && expression.Member.DeclaringType == _type)
             {
                 // Find Parent
-                PropertyInfo propertyInfo = ((PropertyInfo) expression.Member);
-                object value = propertyInfo.GetValue(_object);
-
-                
-
-                string argumentName = _queryBuilder.RegisterArgument(_parentTableDefinition.GetColumn(propertyInfo.Name).Column.SqlType, value);
+                PropertyInfo propertyInfo = (PropertyInfo) expression.Member;
+                string argumentName = _queryBuilder.RegisterArgument(_parentTableDefinition.GetColumn(propertyInfo.Name).Column.SqlType, ParseMemberValue(expression));
                 _queryBuilder.Append(argumentName);
                 return;
             }
@@ -96,11 +159,21 @@ namespace LazySql.Engine.Client.Lambda
             }
         }
 
+        private object ParseMemberValue(MemberExpression expression)
+        {
+            PropertyInfo propertyInfo = (PropertyInfo)expression.Member;
+            return propertyInfo.GetValue(_object);
+        }
+
         private void ParseConstant(ConstantExpression expression)
         {
-            string argument = _queryBuilder.RegisterArgument(SqlType.Default, expression.Value);
+            string argument = _queryBuilder.RegisterArgument(SqlType.Default, ParseConstantValue(expression));
             _queryBuilder.Append(argument);
-            //Append($" {_sqlArguments.Register(SqlType.Default, constantExpression.Value)}");
+        }
+
+        private object ParseConstantValue(ConstantExpression expression)
+        {
+            return expression.Value;
         }
 
         private void ParseMethodCall(MethodCallExpression expression)

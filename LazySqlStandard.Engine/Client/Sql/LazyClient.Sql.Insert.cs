@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Definitions;
 using LazySql.Engine.Enums;
 
+// ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
@@ -11,11 +13,21 @@ namespace LazySql.Engine.Client
     {
         #region Insert
 
-        public static void Insert<T>(T obj) where T : LazyBase => Instance.InternalInsert(obj);
+        /// <summary>
+        /// Insert an item
+        /// </summary>
+        /// <typeparam name="T">Type of the item</typeparam>
+        /// <param name="obj">Item</param>
+        public static void Insert<T>(T obj) where T : LazyBase => Instance.InternalInsert(typeof(T), obj);
 
-        private void InternalInsert<T>(T obj) where T : LazyBase
+        /// <summary>
+        /// Insert an item
+        /// </summary>
+        /// <param name="type">Type of the item</param>
+        /// <param name="obj">Item</param>
+        private void InternalInsert(Type type, object obj)
         {
-            CheckInitialization<T>(out TableDefinition tableDefinition);
+            CheckInitialization(type, out TableDefinition tableDefinition);
             tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _,
                 out IReadOnlyList<ColumnDefinition> primaryKeys);
 

@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Connector;
 using LazySql.Engine.Definitions;
 
+// ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client
 {
     // ReSharper disable once ClassCannotBeInstantiated
@@ -11,22 +13,26 @@ namespace LazySql.Engine.Client
     {
         #region Update
 
-        public static void Update<T>(T obj) where T : LazyBase => Instance.InternalUpdate(obj);
+        /// <summary>
+        /// Update an item
+        /// </summary>
+        /// <typeparam name="T">Type of Item</typeparam>
+        /// <param name="obj">Item</param>
+        public static void Update<T>(T obj) where T : LazyBase => Instance.InternalUpdate(typeof(T), obj);
 
-        private void InternalUpdate<T>(T obj) where T : LazyBase
+        private void InternalUpdate(Type type, object obj)
         {
-            CheckInitialization<T>(out TableDefinition tableDefinition);
+            CheckInitialization(type, out TableDefinition tableDefinition);
 
             tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
-        
-            QueryBuilder queryBuilder = new QueryBuilder(tableDefinition);
+            QueryBuilder queryBuilder = new(tableDefinition);
             queryBuilder.Append($"UPDATE {tableDefinition.Table.TableName} SET ");
             List<string> values = new List<string>();
-            for (int i = 0; i < columns.Count;i++)
+            foreach (ColumnDefinition column in columns)
             {
-                string argumentName = queryBuilder.RegisterArgument(columns[i].Column.SqlType, columns[i].PropertyInfo.GetValue(obj));
-                values.Add($"{columns[i].Column.SqlColumnName} = {argumentName}");
+                string argumentName = queryBuilder.RegisterArgument(column.Column.SqlType, column.PropertyInfo.GetValue(obj));
+                values.Add($"{column.Column.SqlColumnName} = {argumentName}");
             }
             queryBuilder.Append(string.Join(", ", values));
        
@@ -34,9 +40,9 @@ namespace LazySql.Engine.Client
             BinaryExpression binaryExpression = null;
             foreach (ColumnDefinition primaryKey in primaryKeys)
             {
-                var objExpression = Expression.Parameter(typeof(T), "source");
-                var member = Expression.Property(objExpression, primaryKey.PropertyInfo);
-                var value = Expression.Constant(primaryKey.PropertyInfo.GetValue(obj));
+                ParameterExpression objExpression = Expression.Parameter(type, "source");
+                MemberExpression member = Expression.Property(objExpression, primaryKey.PropertyInfo);
+                ConstantExpression value = Expression.Constant(primaryKey.PropertyInfo.GetValue(obj));
                 BinaryExpression childExpression = Expression.Equal(member, value);
                 if (binaryExpression == null)
                 {
@@ -52,8 +58,8 @@ namespace LazySql.Engine.Client
                 queryBuilder.Append(binaryExpression);
             }
 
-            using (SqlConnector sqlConnector = Open())
-                sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            using SqlConnector sqlConnector = Open();
+            sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
 
         #endregion

@@ -21,5 +21,10 @@ namespace LazySql.Engine
             MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
             return (T) method!.MakeGenericMethod(typeArguments).Invoke(null, parameters);
         }
+        public static T InvokeStaticMethod<T>(Type typeOfClass, string methodName, object[] parameters)
+        {
+            MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+            return (T)method.Invoke(null, parameters);
+        }
     }
 }

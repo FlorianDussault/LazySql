@@ -8,17 +8,17 @@ namespace LazySqlCore.UnitTest.Tables
     [LazyTable("simple_table")]
     public class SimpleTable : LazyBase
     {
-        [LazyColumn("user_id", SqlType.Int32)]
+        [LazyColumn("user_id", SqlType.Int)]
         [PrimaryKey(true)]
         public int Id { get; set; }
 
-        [LazyColumn("username", SqlType.String)]
+        [LazyColumn("username", SqlType.VarChar)]
         public string Username { get; set; }
 
-        [LazyColumn("password", SqlType.String)]
+        [LazyColumn("password", SqlType.VarChar)]
         public string Password { get; set; }
 
-        [LazyColumn("extended_key", SqlType.String)]
+        [LazyColumn("extended_key", SqlType.VarChar)]
         public string ExtendedKey { get; set; }
         public List<ChildTable> ChildTables { get; set; }
         public ExtendedTable Extended { get; set; }
