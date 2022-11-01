@@ -12,6 +12,7 @@ LazySql is a micro ORM to simplify the interfacing between an application and a 
 - [Compatibility](#compatibility)
    - [Sql Server](#sql-server)
       - [Sql queries](#sql-queries)
+      - [Data Types](#data-types)
 - [License](#license)
 - [Links](#links)
 
