@@ -59,7 +59,7 @@ Minimum version: Sql Server 2012
 | datetime2                      |       🟢      |                 |
 | smalldatetime                  |       🟢      |                 |
 | datetime                       |       🟢      |                 |
-| time                           |       🟡      | In Progress     |
+| time                           |       🟢      |                 |
 | char                           |       🟢      |                 |
 | varchar                        |       🟢      |                 |
 | text                           |       🟢      |                 |
@@ -71,7 +71,7 @@ Minimum version: Sql Server 2012
 | image                          |       🟢      |                 |
 | hierarchyid                    |       🔴      | Nothing planned |
 | uniqueidentifier               |       🟢      |                 |
-| xml                            |       🟡      | In Progress     |
+| xml                            |       🟢      |                 |
 | Spatial Geometry Types         |       🔴      | Nothing planned |
 | Spatial Geography Types        |       🔴      | Nothing planned |
 
