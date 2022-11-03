@@ -78,7 +78,7 @@ Minimum version: Sql Server 2012
 
 ##### Sql Functions
 
-| **Data Type**                  | **Supported** | **Comment**     |
+| **Function Name**                  | **Supported** | **Comment**     |
 |--------------------------------|:-------------:|-----------------|
 | LIKE                           |       🟢      |                 |
 | NOT LIKE                       |       🟢      |                 |
