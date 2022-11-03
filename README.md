@@ -81,7 +81,7 @@ Minimum version: Sql Server 2012
 | **Data Type**                  | **Supported** | **Comment**     |
 |--------------------------------|:-------------:|-----------------|
 | LIKE                           |       🟢      |                 |
-| NOT LIKE                       |       🟡      | In Progress     |
+| NOT LIKE                       |       🟢      |                 |
 | DATEADD                        |       🟢      |                 |
 | DATEDIFF                       |       🟢      |                 |
 | DATENAME                       |       🟡      | In Progress     |
