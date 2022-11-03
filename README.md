@@ -90,9 +90,9 @@ Minimum version: Sql Server 2012
 | GETDATE                        |       🟢      |                 |
 | GETUTCDATE                     |       🟡      | In Progress     |
 | ISDATE                         |       🟢      |                 |
-| MONTH                          |       🟡      | In Progress     |
+| MONTH                          |       🟢      |                 |
 | SYSDATETIME                    |       🟡      | In Progress     |
-| YEAR                           |       🟡      | In Progress     |
+| YEAR                           |       🟢      |                 |
 
 ## Installation
 
