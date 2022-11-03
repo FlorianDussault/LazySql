@@ -13,6 +13,7 @@ LazySql is a micro ORM to simplify the interfacing between an application and a 
    - [Sql Server](#sql-server)
       - [Sql queries](#sql-queries)
       - [Data Types](#data-types)
+      - [Sql Functions](#sql-functions)
 - [License](#license)
 - [Links](#links)
 
@@ -74,6 +75,24 @@ Minimum version: Sql Server 2012
 | xml                            |       🟢      |                 |
 | Spatial Geometry Types         |       🔴      | Nothing planned |
 | Spatial Geography Types        |       🔴      | Nothing planned |
+
+##### Sql Functions
+
+| **Data Type**                  | **Supported** | **Comment**     |
+|--------------------------------|:-------------:|-----------------|
+| LIKE                           |       🟢      |                 |
+| NOT LIKE                       |       🟡      | In Progress     |
+| DATEADD                        |       🟡      | In Progress     |
+| DATEDIFF                       |       🟡      | In Progress     |
+| DATENAME                       |       🟡      | In Progress     |
+| DATEPART                       |       🟡      | In Progress     |
+| DAY                            |       🟡      | In Progress     |
+| GETDATE                        |       🟢      |                 |
+| GETUTCDATE                     |       🟡      | In Progress     |
+| ISDATE                         |       🟢      |                 |
+| MONTH                          |       🟡      | In Progress     |
+| SYSDATETIME                    |       🟡      | In Progress     |
+| YEAR                           |       🟡      | In Progress     |
 
 ## Installation
 
