@@ -82,11 +82,11 @@ Minimum version: Sql Server 2012
 |--------------------------------|:-------------:|-----------------|
 | LIKE                           |       🟢      |                 |
 | NOT LIKE                       |       🟡      | In Progress     |
-| DATEADD                        |       🟡      | In Progress     |
-| DATEDIFF                       |       🟡      | In Progress     |
+| DATEADD                        |       🟢      |                 |
+| DATEDIFF                       |       🟢      |                 |
 | DATENAME                       |       🟡      | In Progress     |
 | DATEPART                       |       🟡      | In Progress     |
-| DAY                            |       🟡      | In Progress     |
+| DAY                            |       🟢      |                 |
 | GETDATE                        |       🟢      |                 |
 | GETUTCDATE                     |       🟡      | In Progress     |
 | ISDATE                         |       🟢      |                 |
