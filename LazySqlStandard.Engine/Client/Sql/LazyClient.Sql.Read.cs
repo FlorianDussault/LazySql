@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Definitions;
 using LazySql.Engine.Enums;
+using LazySql.Engine.Helpers;
 
 // ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client
@@ -13,9 +14,9 @@ namespace LazySql.Engine.Client
     // ReSharper disable once ClassCannotBeInstantiated
     public sealed partial class LazyClient
     {
-        public static IEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalGet(typeof(T), expression).Cast<T>();
+        public static IEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null, Expression<Func<T,object>> orderByExpression = null) where T : LazyBase => Instance.InternalGet(typeof(T), expression, orderByExpression).Cast<T>();
 
-        private IEnumerable InternalGet(Type type, LambdaExpression expression)
+        private IEnumerable InternalGet(Type type, LambdaExpression expression, LambdaExpression orderByExpression = null)
         {
             CheckInitialization(type, out TableDefinition tableDefinition);
             QueryBuilder queryBuilder = new(tableDefinition);
@@ -23,6 +24,10 @@ namespace LazySql.Engine.Client
 
             if (expression != null)
                 queryBuilder.Append(" WHERE ", expression);
+
+            if(orderByExpression != null)
+                queryBuilder.Append(" ORDER BY ", orderByExpression);
+
 
             if (tableDefinition.Relations.Count == 0)
             {
@@ -39,27 +44,6 @@ namespace LazySql.Engine.Client
 
             foreach (object value in values)
                 yield return value;
-            //yield return GetWithQuery(type, queryBuilder);
-            yield break;
-            
-
-            //if (tableDefinition.Relations.Count == 0)
-            //{
-            //    foreach (object value in ExecuteReader(queryBuilder))
-            //    {
-            //        yield return value;
-            //    }
-            //    yield break;
-            //}
-
-            //List<object> values = ExecuteReader(queryBuilder).ToList();
-            //if (values.Count == 0) yield break;
-            
-            //foreach (RelationInformation relation in tableDefinition.Relations)
-            //    LoadChildren(type, relation, values);
-
-            //foreach (object value in values)
-            //    yield return value;
         }
 
         private static IEnumerable<object> GetWithQuery(Type type, QueryBuilder queryBuilder)

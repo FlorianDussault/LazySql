@@ -102,9 +102,9 @@ namespace LazySql.Engine.Client
                 binaryExpression = Expression.AndAlso(binaryExpression, childExpression);
             }
 
-            QueryBuilder queryBuilder = new QueryBuilder(tableDefinition);
+            QueryBuilder queryBuilder = new(tableDefinition);
             queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName} WHERE ");
-            queryBuilder.Append(binaryExpression);
+            queryBuilder.Append(binaryExpression, obj.GetType());
 
             using SqlConnector sqlConnector = Open();
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());

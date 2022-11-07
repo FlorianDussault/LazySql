@@ -1,7 +1,6 @@
 ﻿using LazySqlCore.UnitTest.Tables;
 using LazySql.Engine;
 using LazySql.Engine.Client;
-using NUnit.Framework.Constraints;
 
 namespace LazySqlCore.UnitTest
 {
@@ -41,6 +40,8 @@ namespace LazySqlCore.UnitTest
                 Assert.IsTrue(simpleTable.ExtendedKey == simpleTable.Extended.Key);
             }
         }
+
+        
 
         [Test]
         public void Hierarchy()

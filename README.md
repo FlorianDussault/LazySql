@@ -17,6 +17,30 @@ LazySql is a micro ORM to simplify the interfacing between an application and a 
 - [License](#license)
 - [Links](#links)
 
+## Installation
+
+Use NuGet ([LazySqlStandard.Engine](https://www.nuget.org/packages/LazySqlStandard.Engine/)) !
+
+Packet manager:
+```sh
+PM> NuGet\Install-Package LazySqlStandard.Engine -Version 1.0.7-alpha
+```
+
+.NET CLI:
+```sh
+> dotnet add package LazySqlStandard.Engine --version 1.0.7-alpha
+```
+
+Paket CLI:
+```sh
+> paket add LazySqlStandard.Engine --version 1.0.7-alpha
+```
+
+Paket CLI:
+```xml
+<PackageReference Include="LazySqlStandard.Engine" Version="1.0.7-alpha" />
+```
+
 ## Compatibility
 
 ### .NET
@@ -78,45 +102,93 @@ Minimum version: Sql Server 2012
 
 ##### Sql Functions
 
-| **Function Name**                  | **Supported** | **Comment**     |
-|--------------------------------|:-------------:|-----------------|
-| LIKE                           |       🟢      |                 |
-| NOT LIKE                       |       🟢      |                 |
-| DATEADD                        |       🟢      |                 |
-| DATEDIFF                       |       🟢      |                 |
-| DATENAME                       |       🟡      | In Progress     |
-| DATEPART                       |       🟡      | In Progress     |
-| DAY                            |       🟢      |                 |
-| GETDATE                        |       🟢      |                 |
-| GETUTCDATE                     |       🟡      | In Progress     |
-| ISDATE                         |       🟢      |                 |
-| MONTH                          |       🟢      |                 |
-| SYSDATETIME                    |       🟡      | In Progress     |
-| YEAR                           |       🟢      |                 |
+| **Function Name** | **C# Compatibility** | **Supported** | **Comment**     |
+|-------------------|-------------|:-------------:|-----------------|
+|             |          **Date Functions**           ||
+| `DATEADD`    |                    |       🟢      |                 |
+| `DATEDIFF`    |                       |       🟢      |                 |
+| `DATENAME`    |                       |       🟡      | In Progress     |
+| `DATEPART`    |                       |       🟡      | In Progress     |
+| `DAY`    |                            |       🟢      |                 |
+| `GETDATE`    |                        |       🟢      |                 |
+| `GETUTCDATE`    |                     |       🟡      | In Progress     |
+| `ISDATE`    |                         |       🟢      |                 |
+| `MONTH`    |                          |       🟢      |                 |
+| `SYSDATETIME`    |                    |       🟡      | In Progress     |
+| `YEAR`    |                           |       🟢      |                 |
+|             |          **String Functions**           ||
+| `ASCII`    |                           |       🟢      |                 |
+| `CHAR`    |                            |       🟢      |                 |
+| `CHARINDEX`    | <ul><li>`+`</li><li>`String.Format`</li><li>`$` (string interpolation)</li></ul>                    |       🟢      |                 |
+|`CONCAT_WS`    | `String.Join()`                   |       🟢      |                 |
+| `DATALENGTH`    |                      |       🟢      |                 |
+| `DIFFERENCE`    |                      |       🟡      | In Progress     |
+| `FORMAT`    |                          |       🟡      | In Progress     |
+| `LEFT`    |                            |       🟡      | In Progress     |
+| `LEN`    |                             |       🟡      | In Progress     |
+| `LOWER`    |                           |       🟡      | In Progress     |
+| `LTRIM`    |                           |       🟡      | In Progress     |
+| `NCHAR`    |                           |       🟡      | In Progress     |
+| `PATINDEX`    |                        |       🟡      | In Progress     |
+| `QUOTENAME`    |                       |       🟡      | In Progress     |
+| `REPLACE`    |                         |       🟡      | In Progress     |
+| `REPLICATE`    |                       |       🟡      | In Progress     |
+| `REVERSE`    |                         |       🟡      | In Progress     |
+| `RIGHT`    |                           |       🟡      | In Progress     |
+| `RTRIM`    |                           |       🟡      | In Progress     |
+| `SOUNDEX`    |                         |       🟡      | In Progress     |
+| `SPACE`    |                           |       🟡      | In Progress     |
+| `STR`    |                             |       🟡      | In Progress     |
+| `STUFF`    |                           |       🟡      | In Progress     |
+| `SUBSTRING`    |                       |       🟡      | In Progress     |
+| `TRANSLATE`    |                       |       🟡      | In Progress     |
+| `TRIM`    |                            |       🟡      | In Progress     |
+| `UNICODE`    |                         |       🟡      | In Progress     |
+| `UPPER`    |                           |       🟡      | In Progress     |
+|             |          **Math/Numeric Functions**           ||
+| `ABS`    |                             |       🟡      | In Progress     |
+| `ACOS`    |                            |       🟡      | In Progress     |
+| `ASIN`    |                            |       🟡      | In Progress     |
+| `ATAN`    |                            |       🟡      | In Progress     |
+| `ATN2`    |                            |       🟡      | In Progress     |
+| `AVG`    |                             |       🟡      | In Progress     |
+| `CEILING`    |                         |       🟡      | In Progress     |
+| `COUNT`    |                           |       🟡      | In Progress     |
+| `COS`    |                             |       🟡      | In Progress     |
+| `COT`    |                             |       🟡      | In Progress     |
+| `DEGREES`    |                         |       🟡      | In Progress     |
+| `EXP`    |                             |       🟡      | In Progress     |
+| `FLOOR`    |                           |       🟡      | In Progress     |
+| `LOG`    |                             |       🟡      | In Progress     |
+| `LOG10`    |                           |       🟡      | In Progress     |
+| `MAX`    |                             |       🟡      | In Progress     |
+| `MIN`    |                             |       🟡      | In Progress     |
+| `PI`    |                              |       🟡      | In Progress     |
+| `POWER`    |                           |       🟡      | In Progress     |
+| `RADIANS`    |                         |       🟡      | In Progress     |
+| `RAND`    |                            |       🟡      | In Progress     |
+| `ROUND`    |                           |       🟡      | In Progress     |
+| `SIGN`    |                            |       🟡      | In Progress     |
+| `SIN`    |                             |       🟡      | In Progress     |
+| `SQRT`    |                            |       🟡      | In Progress     |
+| `SQUARE`    |                          |       🟡      | In Progress     |
+| `SUM`    |                             |       🟡      | In Progress     |
+| `TAN`    |                             |       🟡      | In Progress     |
+|             |          **Advanced Functions**           ||
+| `CAST`    |                            |       🟡      | In Progress     |
+| `COALESCE`    |                        |       🟡      | In Progress     |
+| `CONVERT`    |                         |       🟡      | In Progress     |
+| `CURRENT_USER`    |                    |       🟡      | In Progress     |
+| `IIF`    |                             |       🟡      | In Progress     |
+| `ISNULL`    |                          |       🟡      | In Progress     |
+| `ISNUMERIC`    |                       |       🟡      | In Progress     |
+| `NULLIF`    |                          |       🟡      | In Progress     |
+| `SESSION_USER`    |                    |       🟡      | In Progress     |
+| `SESSIONPROPERTY`    |                 |       🟡      | In Progress     |
+| `SYSTEM_USER`    |                     |       🟡      | In Progress     |
+| `USER_NAME`    |                       |       🟡      | In Progress     |
 
-## Installation
 
-Use NuGet ([LazySqlStandard.Engine](https://www.nuget.org/packages/LazySqlStandard.Engine/)) !
-
-Packet manager:
-```sh
-PM> NuGet\Install-Package LazySqlStandard.Engine -Version 1.0.5-alpha
-```
-
-.NET CLI:
-```sh
-> dotnet add package LazySqlStandard.Engine --version 1.0.5-alpha
-```
-
-Paket CLI:
-```sh
-> paket add LazySqlStandard.Engine --version 1.0.5-alpha
-```
-
-Paket CLI:
-```xml
-<PackageReference Include="LazySqlStandard.Engine" Version="1.0.5-alpha" />
-```
 
 ## License
 

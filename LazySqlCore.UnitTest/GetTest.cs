@@ -66,6 +66,12 @@ namespace LazySqlCore.UnitTest
             }
         }
 
+        [Test]
+        public void OrderBy()
+        {
+            AddSimpleTables();
+            LazyClient.Get<SimpleTable>(orderByExpression: s => s.Username).ToList();
+        }
         
     }
 }

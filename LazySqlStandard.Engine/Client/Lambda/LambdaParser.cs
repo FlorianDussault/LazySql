@@ -4,6 +4,9 @@ using System.Linq.Expressions;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Enums;
 using System.Reflection;
+using System.Security.Cryptography;
+using LazySql.Engine.Client.Functions;
+using LazySql.Engine.Helpers;
 
 namespace LazySql.Engine.Client.Lambda
 {
@@ -54,7 +57,11 @@ namespace LazySql.Engine.Client.Lambda
                 case MethodCallExpression methodCallExpression:
                     ParseMethodCall(methodCallExpression);
                     break;
+                case NewArrayExpression newArrayExpression:
+                    ParseNewArrayExpression(newArrayExpression);
+                    break;
                 default:
+                    // new System.Collections.Generic.ICollectionDebugView<System.Linq.Expressions.Expression>(new System.Linq.Expressions.Expression.NewArrayExpressionProxy(expression).Expressions).Items[0]
                     throw new ArgumentOutOfRangeException();
             }
         }
@@ -66,30 +73,6 @@ namespace LazySql.Engine.Client.Lambda
         private void ParseBinary(BinaryExpression expression)
         {
             if (ParseNullEquality(expression)) return;
-            
-            //if (expression.NodeType == ExpressionType.Equal || expression.NodeType == ExpressionType.NotEqual)
-            //{
-            //    if (ParseNullEquality(expression))
-                
-            //    // support for IS NULL or IS NOT NULL
-            //    bool isLeftNull = IsValueExpressionNull(expression.Left);
-            //    bool isRightNull = IsValueExpressionNull(expression.Right);
-
-            //    if (isLeftNull && isRightNull)
-            //    {
-            //        if (expression.NodeType == ExpressionType.Equal)
-            //        {
-            //            // null = null
-            //            _queryBuilder.Append(" 1 = 1 ");
-            //        }
-            //        // null != null
-            //        _queryBuilder.Append(" 1 != 1 ");
-            //    }
-            //}
-
-            
-
-            
             
             ParseExpression(expression.Left);
             ParseNodeType(expression.NodeType);
@@ -128,6 +111,25 @@ namespace LazySql.Engine.Client.Lambda
             return true;
         }
 
+        internal bool GetValueFromExpression(Expression expression, out object obj)
+        {
+            if (expression is ConstantExpression constantExpression)
+                obj = ParseConstantValue(constantExpression);
+            else if (expression is MemberExpression memberExpression && _type != null &&
+                     memberExpression.Member.DeclaringType == _type)
+                obj = ParseMemberValue(memberExpression);
+            else if (expression is UnaryExpression unaryExpression)
+            {
+                return GetValueFromExpression(unaryExpression.Operand, out obj);
+            }
+            else
+            {
+                obj = null;
+                return false;
+            }
+            return true;
+        }
+
         private bool IsValueExpressionNull(Expression expression)
         {
             if (expression is ConstantExpression constantExpression)
@@ -151,7 +153,9 @@ namespace LazySql.Engine.Client.Lambda
             ColumnDefinition columnDefinition = _tableDefinition.GetColumn(expression.Member.Name);
             if (columnDefinition == null)
             {
-                throw new NotImplementedException();
+                object value = Expression.Lambda(expression).Compile().DynamicInvoke();
+                string argumentName = _queryBuilder.RegisterArgument(value.GetType().ToSqlType(), value);
+                _queryBuilder.Append(argumentName);
             }
             else
             {
@@ -167,11 +171,11 @@ namespace LazySql.Engine.Client.Lambda
 
         private void ParseConstant(ConstantExpression expression)
         {
-            string argument = _queryBuilder.RegisterArgument(SqlType.Default, ParseConstantValue(expression));
+            string argument = _queryBuilder.RegisterArgument(expression.Type.ToSqlType(), expression.Value);
             _queryBuilder.Append(argument);
         }
 
-        private object ParseConstantValue(ConstantExpression expression)
+        private object? ParseConstantValue(ConstantExpression expression)
         {
             return expression.Value;
         }
@@ -184,8 +188,21 @@ namespace LazySql.Engine.Client.Lambda
                 lambdaFunctionParser.Parse(expression, this, _queryBuilder);
                 return;
             }
+            else
+            {
+                LambdaFunctionParser lambdaFunctionParser  = (LambdaFunctionParser)Activator.CreateInstance(typeof(LzCSharpFunctions));
+                lambdaFunctionParser.Parse(expression, this, _queryBuilder);
+            }
+        }
 
-            throw new NotImplementedException();
+        private void ParseNewArrayExpression(NewArrayExpression newArrayExpression)
+        {
+            for (int i = 0; i < newArrayExpression.Expressions.Count; i++)
+            {
+                ParseExpression(newArrayExpression.Expressions[i]);
+                if (i + 1 < newArrayExpression.Expressions.Count)
+                    _queryBuilder.Append(", ");
+            }
         }
 
         private void ParseNodeType(ExpressionType expressionType)

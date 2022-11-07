@@ -7,16 +7,17 @@
     <SignAssembly>False</SignAssembly>
     <Title>LazySql (.NET Standard)</Title>
     <Authors>Florian Dussault</Authors>
-    <AssemblyVersion>0.1.0.6</AssemblyVersion>
-    <FileVersion>0.1.0.6</FileVersion>
+    <AssemblyVersion>0.1.0.7</AssemblyVersion>
+    <FileVersion>0.1.0.8</FileVersion>
     <LangVersion>preview</LangVersion>
     <Description>Micro ORM for C# .NET</Description>
     <Copyright>Florian Dussault © 2022</Copyright>
     <PackageProjectUrl>https://github.com/FlorianDussault/LazySql</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FlorianDussault/LazySql</RepositoryUrl>
     <PackageTags>C# ORM;Sqlserver;Database;ORM</PackageTags>
-    <Version>1.0.6-alpha</Version>
+    <Version>1.0.8-alpha</Version>
     <RootNamespace>LazySql.Engine</RootNamespace>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -50,6 +51,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
     <DebugType>full</DebugType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />

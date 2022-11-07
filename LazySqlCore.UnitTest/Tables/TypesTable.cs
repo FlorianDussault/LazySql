@@ -2,7 +2,6 @@
 using LazySql.Engine;
 using LazySql.Engine.Attributes;
 using LazySql.Engine.Enums;
-using System.Xml.Linq;
 
 namespace LazySqlCore.UnitTest.Tables
 {
