@@ -67,10 +67,55 @@ namespace LazySqlCore.UnitTest
         }
 
         [Test]
-        public void OrderBy()
+        public void GetOrderBy()
         {
-            AddSimpleTables();
-            LazyClient.Get<SimpleTable>(orderByExpression: s => s.Username).ToList();
+            LazyClient.Truncate<SubChildTable>(true);
+            LazyClient.Delete<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
+
+            Random rand = new(DateTime.Now.Millisecond);
+            for (int i = 0; i < 1000; i++)
+            {
+                new SimpleTable{Username = rand.Next(0,50).ToString("00")}.Insert();
+            }
+
+
+            IEnumerable<SimpleTable>? list = LazyClient.Get<SimpleTable>().OrderByAsc(s => s.Username);
+            int lastNumber = -1;
+            foreach (SimpleTable simpleTable in list)
+            {
+                int number = int.Parse(simpleTable.Username);
+                Assert.That(lastNumber, Is.LessThanOrEqualTo(number));
+                lastNumber = number;
+            }
+
+            list = LazyClient.Get<SimpleTable>().OrderByDesc(s => s.Username);
+            lastNumber = int.MaxValue;
+            foreach (SimpleTable simpleTable in list)
+            {
+                int number = int.Parse(simpleTable.Username);
+                Assert.That(lastNumber, Is.GreaterThanOrEqualTo(number));
+                lastNumber = number;
+            }
+        }
+
+        [Test]
+        public void GetTop()
+        {
+            LazyClient.Truncate<SubChildTable>(true);
+            LazyClient.Delete<ChildTable>();
+            LazyClient.Truncate<SimpleTable>(true);
+
+            Random rand = new(DateTime.Now.Millisecond);
+            for (int i = 0; i < 1000; i++)
+            {
+                new SimpleTable { Username = rand.Next(0, 50).ToString("00") }.Insert();
+            }
+
+            List<SimpleTable> list = LazyClient.Get<SimpleTable>().OrderByDesc(s => s.Id).Top(2).ToList();
+            Assert.That(2, Is.EqualTo(list.Count));
+            Assert.That(1000, Is.EqualTo(list[0].Id));
+            Assert.That(999, Is.EqualTo(list[1].Id));
         }
         
     }

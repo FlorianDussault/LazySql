@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Linq.Expressions;
 using LazySql.Engine.Client.Query;
@@ -14,39 +15,75 @@ namespace LazySql.Engine.Client
     // ReSharper disable once ClassCannotBeInstantiated
     public sealed partial class LazyClient
     {
-        public static IEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null, Expression<Func<T,object>> orderByExpression = null) where T : LazyBase => Instance.InternalGet(typeof(T), expression, orderByExpression).Cast<T>();
+    //    public static IEnumerable<T> GetOld<T>(Expression<Func<T, bool>> expression = null, Expression<Func<T,object>> orderByExpression = null) where T : LazyBase => Instance.InternalGet(typeof(T), expression, orderByExpression).Cast<T>();
 
-        private IEnumerable InternalGet(Type type, LambdaExpression expression, LambdaExpression orderByExpression = null)
+    //    private IEnumerable InternalGet(Type type, LambdaExpression expression, LambdaExpression orderByExpression = null)
+    //    {
+    //        CheckInitialization(type, out TableDefinition tableDefinition);
+    //        QueryBuilder queryBuilder = new(tableDefinition);
+    //        BuildSelect(tableDefinition, queryBuilder);
+
+    //        if (expression != null)
+    //            queryBuilder.Append(" WHERE ", expression);
+
+    //        if(orderByExpression != null)
+    //            queryBuilder.Append(" ORDER BY ", orderByExpression);
+
+
+    //        if (tableDefinition.Relations.Count == 0)
+    //        {
+    //            foreach (object o in GetWithQuery(type, queryBuilder))
+    //                yield return o;
+    //            yield break;
+    //        }
+
+    //        List<object> values = GetWithQuery(type, queryBuilder).ToList();
+    //        if (values.Count == 0) yield break;
+
+    //        foreach (RelationInformation relation in tableDefinition.Relations)
+    //            LoadChildren(type, relation, values);
+
+    //        foreach (object value in values)
+    //            yield return value;
+    //    }
+
+        public static LazyEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalGet2<T>(typeof(T), expression);
+
+        private LazyEnumerable<T> InternalGet2<T>(Type type, LambdaExpression expression) where T :LazyBase
         {
-            CheckInitialization(type, out TableDefinition tableDefinition);
-            QueryBuilder queryBuilder = new(tableDefinition);
-            BuildSelect(tableDefinition, queryBuilder);
+            return new(type, expression);
 
-            if (expression != null)
-                queryBuilder.Append(" WHERE ", expression);
+            //yield return lazyEnumerable.GetEnumerator();
 
-            if(orderByExpression != null)
-                queryBuilder.Append(" ORDER BY ", orderByExpression);
+            //CheckInitialization(type, out TableDefinition tableDefinition);
+            //QueryBuilder queryBuilder = new(tableDefinition);
+            //BuildSelect(tableDefinition, queryBuilder);
+
+            //if (expression != null)
+            //    queryBuilder.Append(" WHERE ", expression);
+
+            //if (orderByExpression != null)
+            //    queryBuilder.Append(" ORDER BY ", orderByExpression);
 
 
-            if (tableDefinition.Relations.Count == 0)
-            {
-                foreach (object o in GetWithQuery(type, queryBuilder))
-                    yield return o;
-                yield break;
-            }
+            //if (tableDefinition.Relations.Count == 0)
+            //{
+            //    foreach (object o in GetWithQuery(type, queryBuilder))
+            //        yield return o;
+            //    yield break;
+            //}
 
-            List<object> values = GetWithQuery(type, queryBuilder).ToList();
-            if (values.Count == 0) yield break;
+            //List<object> values = GetWithQuery(type, queryBuilder).ToList();
+            //if (values.Count == 0) yield break;
 
-            foreach (RelationInformation relation in tableDefinition.Relations)
-                LoadChildren(type, relation, values);
+            //foreach (RelationInformation relation in tableDefinition.Relations)
+            //    LoadChildren(type, relation, values);
 
-            foreach (object value in values)
-                yield return value;
+            //foreach (object value in values)
+            //    yield return value;
         }
 
-        private static IEnumerable<object> GetWithQuery(Type type, QueryBuilder queryBuilder)
+        internal static IEnumerable<object> GetWithQuery(Type type, QueryBuilder queryBuilder)
         {
             CheckInitialization(type, out TableDefinition tableDefinition);
             if (tableDefinition.Relations.Count == 0)
@@ -67,18 +104,18 @@ namespace LazySql.Engine.Client
         }
 
 
-        private static void BuildSelect(TableDefinition tableDefinition, QueryBuilder queryBuilder)
+        internal static void BuildSelect(TableDefinition tableDefinition, QueryBuilder queryBuilder, int? top = null)
         {
             tableDefinition.GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out _, out _, out _);
-            queryBuilder.Append($"SELECT {string.Join(", ", allColumns.Where(c => c.Column.SqlType != SqlType.Children).Select(c => c.Column.SqlColumnName))} FROM {tableDefinition.Table.TableName}");
+            queryBuilder.Append($"SELECT {(top!= null ? $" TOP {top} " : string.Empty)} {string.Join(", ", allColumns.Where(c => c.Column.SqlType != SqlType.Children).Select(c => c.Column.SqlColumnName))} FROM {tableDefinition.Table.TableName}");
 
         }
 
-        private static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
+        internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
         {
             if (values.Count == 0) return;
             CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
-            
+
             QueryBuilder queryBuilder = new(childTableDefinition);
 
             BuildSelect(childTableDefinition, queryBuilder);
@@ -95,7 +132,7 @@ namespace LazySql.Engine.Client
 
             Delegate delegateExpression = relationInformation.Expression.Compile();
             IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
-                nameof(GetWithQuery), new object[] {relationInformation.ChildType, queryBuilder});
+                nameof(GetWithQuery), new object[] { relationInformation.ChildType, queryBuilder });
 
             //IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient), nameof(ExecuteReader),  new object[] { queryBuilder });
 
@@ -110,7 +147,7 @@ namespace LazySql.Engine.Client
                     IList children = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relationInformation.ChildType));
                     foreach (object childValue in childValues)
                     {
-                        if ((bool) delegateExpression.DynamicInvoke(parentValue, childValue))
+                        if ((bool)delegateExpression.DynamicInvoke(parentValue, childValue))
                         {
                             children.Add(childValue);
                         }
@@ -124,7 +161,7 @@ namespace LazySql.Engine.Client
                 {
                     foreach (object childValue in childValues)
                     {
-                        if ((bool) delegateExpression.DynamicInvoke(parentValue, childValue))
+                        if ((bool)delegateExpression.DynamicInvoke(parentValue, childValue))
                         {
                             parentType.GetProperty(relationInformation.Column)?.SetValue(parentValue, childValue);
                             break;

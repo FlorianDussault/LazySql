@@ -23,22 +23,22 @@ Use NuGet ([LazySqlStandard.Engine](https://www.nuget.org/packages/LazySqlStanda
 
 Packet manager:
 ```sh
-PM> NuGet\Install-Package LazySqlStandard.Engine -Version 1.0.7-alpha
+PM> NuGet\Install-Package LazySqlStandard.Engine -Version 1.0.9-alpha
 ```
 
 .NET CLI:
 ```sh
-> dotnet add package LazySqlStandard.Engine --version 1.0.7-alpha
+> dotnet add package LazySqlStandard.Engine --version 1.0.9-alpha
 ```
 
 Paket CLI:
 ```sh
-> paket add LazySqlStandard.Engine --version 1.0.7-alpha
+> paket add LazySqlStandard.Engine --version 1.0.9-alpha
 ```
 
 Paket CLI:
 ```xml
-<PackageReference Include="LazySqlStandard.Engine" Version="1.0.7-alpha" />
+<PackageReference Include="LazySqlStandard.Engine" Version="1.0.9-alpha" />
 ```
 
 ## Compatibility

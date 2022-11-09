@@ -104,7 +104,7 @@ namespace LazySql.Engine.Client
 
             QueryBuilder queryBuilder = new(tableDefinition);
             queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName} WHERE ");
-            queryBuilder.Append(binaryExpression, obj.GetType());
+            queryBuilder.Append(binaryExpression, obj.GetType(), obj);
 
             using SqlConnector sqlConnector = Open();
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());

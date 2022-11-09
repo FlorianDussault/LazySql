@@ -22,6 +22,8 @@ namespace LazySql.Engine.Helpers
         public static T InvokeStaticMethod<T>(Type typeOfClass, string methodName, object[] parameters)
         {
             MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+            if (method == null)
+                throw new NotSupportedException();
             return (T)method.Invoke(null, parameters);
         }
 
