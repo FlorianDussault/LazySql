@@ -42,15 +42,18 @@ namespace LazySql.Engine.Connector
         private void AddValues(SqlArguments sqlArguments)
         {
             if (sqlArguments == null) return;
-            foreach (SqlArgument sqlArgument in sqlArguments)
-            {
-                
-                var parameter = _sqlCommand.Parameters.AddWithValue(sqlArgument.Name, sqlArgument.Value ?? DBNull.Value);
-                if (sqlArgument.Type != SqlType.Default)
-                {
-                    parameter.SqlDbType = (SqlDbType) sqlArgument.Type;
-                }
-            }
+            foreach (SqlArgument sqlArgument in sqlArguments) AddValue(sqlArgument);
+        }
+
+        private void AddValue(SqlArgument sqlArgument)
+        {
+            SqlParameter parameter = _sqlCommand.Parameters.AddWithValue(sqlArgument.Name, sqlArgument.Value ?? DBNull.Value);
+            if (sqlArgument.Type != SqlType.Default)
+                parameter.SqlDbType = (SqlDbType) sqlArgument.Type;
+            if (sqlArgument.ArgumentType == SqlArgumentType.Out)
+                parameter.Direction = ParameterDirection.Output;
+            if (sqlArgument.ArgumentType == SqlArgumentType.ReturnValue)
+                parameter.Direction = ParameterDirection.ReturnValue;
         }
 
         public SqlDataReader ExecuteQuery(string query, SqlArguments arguments = null)
@@ -96,6 +99,44 @@ namespace LazySql.Engine.Connector
             catch (Exception ex)
             {
                 throw LazySqlExecuteException.Generate(ex, query, _sqlCommand.Parameters);
+            }
+        }
+
+        public (DataSet dataset, SqlArguments arguments, int? returnValue) ExecuteStoredProcedure(string procedureName, SqlArguments arguments)
+        {
+            _sqlCommand.CommandText = procedureName;
+            _sqlCommand.CommandType = CommandType.StoredProcedure;
+            AddValues(arguments);
+            AddValue(new SqlArgument("@LAZY_RETURN_VALUE",SqlType.Int,null) {ArgumentType = SqlArgumentType.ReturnValue});
+
+            try
+            {
+                int? returnValue = null;
+                using SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
+                sqlDataAdapter.SelectCommand = _sqlCommand;
+                sqlDataAdapter.SelectCommand.CommandType = CommandType.StoredProcedure;
+                DataSet dataSet = new();
+                sqlDataAdapter.Fill(dataSet);
+
+                SqlArguments outputArguments = new();
+                foreach (SqlParameter sqlParameter in sqlDataAdapter.SelectCommand.Parameters)
+                {
+                    switch (sqlParameter.Direction)
+                    {
+                        case ParameterDirection.Output:
+                            outputArguments.Add(new SqlArgument(sqlParameter.ParameterName, (SqlType) sqlParameter.DbType, sqlParameter.Value == DBNull.Value ? null : sqlParameter.Value){ArgumentType = SqlArgumentType.Out});
+                            break;
+                        case ParameterDirection.ReturnValue:
+                            returnValue = (int)sqlParameter.Value;
+                            break;
+                    }
+                }
+
+                return (dataSet, outputArguments, returnValue);
+            }
+            catch (Exception ex)
+            {
+                throw LazySqlExecuteException.Generate(ex, procedureName, _sqlCommand.Parameters);
             }
         }
     }

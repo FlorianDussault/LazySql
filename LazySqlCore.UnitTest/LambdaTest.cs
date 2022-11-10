@@ -2,7 +2,6 @@ using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySql.Engine.Client.Functions;
 using LazySqlCore.UnitTest.Tables;
-using Newtonsoft.Json.Linq;
 
 namespace LazySqlCore.UnitTest
 {
@@ -27,7 +26,7 @@ namespace LazySqlCore.UnitTest
             int bot_id = 0;
             for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
             {
-                var st = new SimpleTable()
+                SimpleTable? st = new SimpleTable()
                 {
                     Username = $"U{i + 1}",
                     Password = $"P{i + 1}"
@@ -127,7 +126,7 @@ namespace LazySqlCore.UnitTest
             simpleTable.Insert();
 
             {
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
                 Assert.IsEmpty(values);
             }
 
@@ -138,7 +137,7 @@ namespace LazySqlCore.UnitTest
             simpleTable.Insert();
 
             {
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
                 Assert.That(1, Is.EqualTo(values.Count()));
             }
         }
@@ -157,7 +156,7 @@ namespace LazySqlCore.UnitTest
             simpleTable.Insert();
 
             {
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
                 Assert.IsNotEmpty(values);
             }
         }
@@ -177,7 +176,7 @@ namespace LazySqlCore.UnitTest
 
             {
                 int day = DateTime.Now.Day;
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
                 Assert.IsNotEmpty(values);
             }
         }
@@ -199,7 +198,7 @@ namespace LazySqlCore.UnitTest
 
             {
                 int month = DateTime.Now.Month;
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
                 Assert.IsNotEmpty(values);
             }
         }
@@ -219,7 +218,7 @@ namespace LazySqlCore.UnitTest
 
             {
                 int year = DateTime.Now.Year;
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
                 Assert.IsNotEmpty(values);
             }
         }
@@ -239,12 +238,12 @@ namespace LazySqlCore.UnitTest
 
             {
                 int year = DateTime.Now.Year + 1;
-                var values = LazyClient.Get<SimpleTable>((s) =>
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) =>
                     LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, 1, LzFunctions.GetDate())) == year);
                 Assert.IsNotEmpty(values);
 
                 year = DateTime.Now.Year - 1;
-                var values2 = LazyClient.Get<SimpleTable>((s) =>
+                LazyEnumerable<SimpleTable>? values2 = LazyClient.Get<SimpleTable>((s) =>
                     LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, -1, LzFunctions.GetDate())) == year);
                 Assert.IsNotEmpty(values2);
             }
@@ -266,7 +265,7 @@ namespace LazySqlCore.UnitTest
             {
                 DateTime start = DateTime.Now;
                 DateTime end = start.AddYears(8);
-                var values = LazyClient.Get<SimpleTable>((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
+                LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
                 Assert.IsNotEmpty(values);
                 values = LazyClient.Get<SimpleTable>((s) => LzFunctions.DateDiff(LzDatePart.Year, end, start) == -8);
                 Assert.IsNotEmpty(values);

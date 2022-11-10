@@ -7,15 +7,15 @@
     <SignAssembly>False</SignAssembly>
     <Title>LazySql (.NET Standard)</Title>
     <Authors>Florian Dussault</Authors>
-    <AssemblyVersion>0.1.0.9</AssemblyVersion>
-    <FileVersion>0.1.0.9</FileVersion>
+    <AssemblyVersion>0.1.0.10</AssemblyVersion>
+    <FileVersion>0.1.0.10</FileVersion>
     <LangVersion>preview</LangVersion>
     <Description>Micro ORM for C# .NET</Description>
     <Copyright>Florian Dussault © 2022</Copyright>
     <PackageProjectUrl>https://github.com/FlorianDussault/LazySql</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FlorianDussault/LazySql</RepositoryUrl>
     <PackageTags>C# ORM;Sqlserver;Database;ORM</PackageTags>
-    <Version>1.0.9-alpha</Version>
+    <Version>1.0.10-alpha</Version>
     <RootNamespace>LazySql.Engine</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -30,27 +30,27 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net48|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
-    <DebugType>none</DebugType>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

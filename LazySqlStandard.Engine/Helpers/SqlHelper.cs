@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Text;
 using LazySql.Engine.Enums;
 
 namespace LazySql.Engine.Helpers

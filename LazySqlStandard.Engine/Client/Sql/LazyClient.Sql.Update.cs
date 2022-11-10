@@ -59,7 +59,7 @@ namespace LazySql.Engine.Client
             }
 
             using SqlConnector sqlConnector = Open();
-            sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
 
         #endregion

@@ -25,7 +25,7 @@ namespace LazySqlCore.UnitTest
             int bot_id = 0;
             for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
             {
-                var st = new SimpleTable()
+                SimpleTable? st = new SimpleTable()
                 {
                     Username = $"U{i+1}",
                     Password = $"P{i + 1}"

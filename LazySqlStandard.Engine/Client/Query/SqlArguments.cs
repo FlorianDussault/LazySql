@@ -3,7 +3,7 @@ using LazySql.Engine.Enums;
 
 namespace LazySql.Engine.Client.Query
 {
-    internal sealed class SqlArguments : List<SqlArgument>
+    public sealed class SqlArguments : List<SqlArgument>
     {
         internal string Register(SqlType type,  object obj)
         {
@@ -11,5 +11,18 @@ namespace LazySql.Engine.Client.Query
             Add(new SqlArgument(argumentName, type, obj));
             return argumentName;
         }
+
+        public SqlArguments Add(string name, SqlType sqlType, object obj)
+        {
+            Add(new SqlArgument(name, sqlType, obj));
+            return this;
+        }
+
+        public SqlArguments AddOut(string name, SqlType sqlType)
+        {
+            Add(new SqlArgument(name, sqlType, null) {ArgumentType = SqlArgumentType.Out});
+            return this;
+        }
+
     }
 }

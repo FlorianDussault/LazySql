@@ -33,11 +33,11 @@ namespace LazySql.Engine.Client
             if (reseed)
             {
                 InternalDelete(type);
-                sqlConnector.ExecuteQuery($"DBCC CHECKIDENT ('{tableDefinition.Table.TableName}', RESEED, 0)");
+                sqlConnector.ExecuteNonQuery($"DBCC CHECKIDENT ('{tableDefinition.Table.TableName}', RESEED, 0)");
             }
             else
             {
-                sqlConnector.ExecuteQuery($"TRUNCATE TABLE {tableDefinition.Table.TableName}");
+                sqlConnector.ExecuteNonQuery($"TRUNCATE TABLE {tableDefinition.Table.TableName}");
             }
         }
 
@@ -107,7 +107,7 @@ namespace LazySql.Engine.Client
             queryBuilder.Append(binaryExpression, obj.GetType(), obj);
 
             using SqlConnector sqlConnector = Open();
-            sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+            sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         }
 
         #endregion

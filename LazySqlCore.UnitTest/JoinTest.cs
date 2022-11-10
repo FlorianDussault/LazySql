@@ -33,7 +33,7 @@ namespace LazySqlCore.UnitTest
             new SimpleTable() {Username = "USR_3", Password = "PWD_3", ExtendedKey = "BB"}.Insert();
             new SimpleTable() {Username = "USR_4", Password = "PWD_4", ExtendedKey = "AA"}.Insert();
 
-            var tables = LazyClient.Get<SimpleTable>().ToList();
+            List<SimpleTable>? tables = LazyClient.Get<SimpleTable>().ToList();
             foreach (SimpleTable simpleTable in tables)
             {
                 Assert.NotNull(simpleTable.Extended);

@@ -7,7 +7,6 @@ using System;
 using System.Text.RegularExpressions;
 using LazySql.Engine.Enums;
 using LazySql.Engine.Helpers;
-using static System.Net.Mime.MediaTypeNames;
 using System.Linq;
 
 namespace LazySql.Engine.Client.Functions
