@@ -1,19 +1,18 @@
-﻿using System.Collections.Generic;
-using LazySql.Engine.Definitions;
+﻿namespace LazySql.Engine.Client;
 
-namespace LazySql.Engine.Client
+/// <summary>
+/// LazyClient
+/// </summary>
+public sealed partial class LazyClient
 {
-    public sealed partial class LazyClient
+    private IReadOnlyCollection<TableDefinition> _tables;
+
+    #region Singleton
+    private static LazyClient Instance { get; } = new LazyClient();
+
+    private LazyClient()
     {
-        private IReadOnlyCollection<TableDefinition> _tables;
-
-        #region Singleton
-        private static LazyClient Instance { get; } = new LazyClient();
-
-        private LazyClient()
-        {
-        }
-
-        #endregion
     }
+
+    #endregion
 }

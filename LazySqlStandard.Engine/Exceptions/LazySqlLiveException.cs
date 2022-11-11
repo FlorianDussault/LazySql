@@ -1,9 +1,8 @@
-﻿namespace LazySql.Engine.Exceptions
+﻿namespace LazySql.Engine.Exceptions;
+
+public class LazySqlLiveException : LazySqlException
 {
-    public class LazySqlLiveException : LazySqlException
+    public LazySqlLiveException(string message) : base(message)
     {
-        public LazySqlLiveException(string message) : base(message)
-        {
-        }
     }
 }

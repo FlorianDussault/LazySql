@@ -1,7 +1,4 @@
-﻿using System;
-
-
-#if NETCORE
+﻿#if NETCORE
 using Microsoft.Data.SqlClient;
 #elif NETSTANDARD
 using Microsoft.Data.SqlClient;

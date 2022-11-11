@@ -1,23 +1,41 @@
-﻿using System;
-using System.Linq.Expressions;
-using LazySql.Engine.Enums;
+﻿namespace LazySql.Engine;
 
-namespace LazySql.Engine
+/// <summary>
+/// Relation information
+/// </summary>
+internal class RelationInformation
 {
-    internal class RelationInformation
+    /// <summary>
+    /// Type of parent
+    /// </summary>
+    public Type ParentType { get; }
+
+    /// <summary>
+    /// Parent column
+    /// </summary>
+    public string Column { get; }
+
+    /// <summary>
+    /// Type of child object
+    /// </summary>
+    public Type ChildType { get; }
+
+    /// <summary>
+    /// Join Expression
+    /// </summary>
+    public LambdaExpression Expression { get; }
+
+    /// <summary>
+    /// Type of relation
+    /// </summary>
+    public RelationType RelationType { get; }
+
+    public RelationInformation(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression)
     {
-        public Type ParentType { get; }
-        public string Column { get; }
-        public Type ChildType { get; }
-        public LambdaExpression Expression { get; }
-        public RelationType RelationType { get; }
-        public RelationInformation(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression)
-        {
-            RelationType = relationType;
-            ParentType = parentType;
-            Column = column;
-            ChildType = childType;
-            Expression = expression;
-        }
+        RelationType = relationType;
+        ParentType = parentType;
+        Column = column;
+        ChildType = childType;
+        Expression = expression;
     }
 }

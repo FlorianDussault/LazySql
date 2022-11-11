@@ -1,27 +1,34 @@
-﻿using LazySql.Engine.Enums;
+﻿namespace LazySql.Engine.Client.Query;
 
-namespace LazySql.Engine.Client.Query
+/// <summary>
+/// Sql Argument
+/// </summary>
+public sealed class SqlArgument
 {
-    public sealed class SqlArgument
+    /// <summary>
+    /// Name
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Type
+    /// </summary>
+    public SqlType Type { get; }
+
+    /// <summary>
+    /// Value
+    /// </summary>
+    public object Value { get; }
+
+    /// <summary>
+    /// Argument Type
+    /// </summary>
+    internal SqlArgumentType ArgumentType { get; set; } = SqlArgumentType.In;
+
+    internal SqlArgument(string name, SqlType type, object value)
     {
-        public string Name { get; }
-        public SqlType Type { get; }
-        public object Value { get; }
-
-        internal SqlArgumentType ArgumentType { get; set; } = SqlArgumentType.In;
-
-        internal SqlArgument(string name, SqlType type, object value)
-        {
-            Name = name;
-            Type = type;
-            Value = value;
-        }
-    }
-
-    internal enum SqlArgumentType
-    {
-        In = 0,
-        Out = 1,
-        ReturnValue = 2
+        Name = name;
+        Type = type;
+        Value = value;
     }
 }

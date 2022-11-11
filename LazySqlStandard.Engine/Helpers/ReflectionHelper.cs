@@ -1,36 +1,34 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
+﻿namespace LazySql.Engine.Helpers;
 
-namespace LazySql.Engine.Helpers
+/// <summary>
+/// Reflection Helper
+/// </summary>
+internal static class ReflectionHelper
 {
-    internal static class ReflectionHelper
+    /// <summary>
+    /// Create a List<T> object
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    public static IList CreateList(Type type)
     {
-        public static IList CreateList(Type type)
-        {
-            return (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
-        }
+        return (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(type));
+    }
 
-        public static T InvokeStaticGenericMethod<T>(Type typeOfClass, string methodName, Type typeArgument, object[] parameters) => InvokeStaticGenericMethod<T>(typeOfClass, methodName, new[] { typeArgument }, parameters);
-
-        public static T InvokeStaticGenericMethod<T>(Type typeOfClass, string methodName, Type[] typeArguments, object[] parameters)
-        {
-            MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
-            return (T)method!.MakeGenericMethod(typeArguments).Invoke(null, parameters);
-        }
-        public static T InvokeStaticMethod<T>(Type typeOfClass, string methodName, object[] parameters)
-        {
-            MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
-            if (method == null)
-                throw new NotSupportedException();
-            return (T)method.Invoke(null, parameters);
-        }
-
-        public static void InvokeStaticMethod(Type typeOfClass, string methodName, object[] parameters)
-        {
-            MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
-            method.Invoke(null, parameters);
-        }
+    /// <summary>
+    /// Invoke a static method
+    /// </summary>
+    /// <typeparam name="T">Type of return</typeparam>
+    /// <param name="typeOfClass">Type of class</param>
+    /// <param name="methodName">Method Name</param>
+    /// <param name="parameters">Parameters</param>
+    /// <returns>Return from method</returns>
+    /// <exception cref="NotSupportedException"></exception>
+    public static T InvokeStaticMethod<T>(Type typeOfClass, string methodName, object[] parameters)
+    {
+        MethodInfo method = typeOfClass.GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Static);
+        if (method == null)
+            throw new NotSupportedException();
+        return (T)method.Invoke(null, parameters);
     }
 }

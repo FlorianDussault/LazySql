@@ -1,43 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using LazySql.Engine.Enums;
+﻿namespace LazySql.Engine.Helpers;
 
-namespace LazySql.Engine.Helpers
+/// <summary>
+/// Sql Helper
+/// </summary>
+internal static class SqlHelper
 {
-    internal static class SqlHelper
+    /// <summary>
+    /// Map of types
+    /// </summary>
+    private static Dictionary<Type, SqlType> _map;
+
+    static SqlHelper()
     {
-        private static Dictionary<Type, SqlType> _map;
-
-        static SqlHelper()
+        _map = new Dictionary<Type, SqlType>
         {
-            _map = new Dictionary<Type, SqlType>
-            {
-                [typeof(long)] = SqlType.BigInt,
-                [typeof(byte[])] = SqlType.Binary,
-                [typeof(bool)] = SqlType.Bit,
-                [typeof(string)] = SqlType.NVarChar,
-                [typeof(char[])] = SqlType.NVarChar,
-                [typeof(DateTime)] = SqlType.DateTime,
-                [typeof(DateTimeOffset)] = SqlType.DateTimeOffset,
-                [typeof(byte)] = SqlType.TinyInt,
-                [typeof(short)] = SqlType.SmallInt,
-                [typeof(int)] = SqlType.Int,
-                [typeof(decimal)] = SqlType.Money,
-                [typeof(float)] = SqlType.Real,
-                [typeof(double)] = SqlType.Float,
-                [typeof(TimeSpan)] = SqlType.Time,
-                [typeof(Guid)] = SqlType.UniqueIdentifier
-            };
+            [typeof(long)] = SqlType.BigInt,
+            [typeof(byte[])] = SqlType.Binary,
+            [typeof(bool)] = SqlType.Bit,
+            [typeof(string)] = SqlType.NVarChar,
+            [typeof(char[])] = SqlType.NVarChar,
+            [typeof(DateTime)] = SqlType.DateTime,
+            [typeof(DateTimeOffset)] = SqlType.DateTimeOffset,
+            [typeof(byte)] = SqlType.TinyInt,
+            [typeof(short)] = SqlType.SmallInt,
+            [typeof(int)] = SqlType.Int,
+            [typeof(decimal)] = SqlType.Money,
+            [typeof(float)] = SqlType.Real,
+            [typeof(double)] = SqlType.Float,
+            [typeof(TimeSpan)] = SqlType.Time,
+            [typeof(Guid)] = SqlType.UniqueIdentifier
+        };
 
-        }
+    }
 
-
-        public static SqlType ToSqlType(this Type type)
-        {
-            Type typeToCheck = Nullable.GetUnderlyingType(type) ?? type;
-            if (_map.ContainsKey(typeToCheck))
-                return _map[typeToCheck];
-            return SqlType.Default;
-        }
+    /// <summary>
+    /// Convert Type to SqlType
+    /// </summary>
+    /// <param name="type">Type of object</param>
+    /// <returns>Sql Type</returns>
+    public static SqlType ToSqlType(this Type type)
+    {
+        Type typeToCheck = Nullable.GetUnderlyingType(type) ?? type;
+        if (_map.ContainsKey(typeToCheck))
+            return _map[typeToCheck];
+        return SqlType.Default;
     }
 }

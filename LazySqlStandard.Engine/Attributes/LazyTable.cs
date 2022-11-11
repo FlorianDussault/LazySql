@@ -1,15 +1,22 @@
-﻿using System;
+﻿namespace LazySql.Engine.Attributes;
 
-namespace LazySql.Engine.Attributes
+/// <summary>
+/// Attribute to declare a class compatible with LazySql
+/// </summary>
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class LazyTable : Attribute
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class LazyTable : Attribute
-    {
-        public string TableName { get; }
+    /// <summary>
+    /// Table Name
+    /// </summary>
+    internal string TableName { get; }
 
-        public LazyTable(string tableName)
-        {
-            TableName = tableName;
-        }
+    /// <summary>
+    /// Table Name
+    /// </summary>
+    /// <param name="tableName"></param>
+    public LazyTable(string tableName)
+    {
+        TableName = tableName;
     }
 }

@@ -1,9 +1,22 @@
-﻿namespace LazySql.Engine.Enums
+﻿namespace LazySql.Engine.Enums;
+
+/// <summary>
+/// Relation Type
+/// </summary>
+internal enum RelationType
 {
-    internal enum RelationType
-    {
-        OneToOne = 0,
-        OneToOneFlatten = 1,
-        OneToMany = 2,
-    }
+    /// <summary>
+    /// One to One
+    /// </summary>
+    OneToOne = 0,
+
+    /// <summary>
+    /// One to One (flatten)
+    /// </summary>
+    OneToOneFlatten = 1,
+
+    /// <summary>
+    /// One to many
+    /// </summary>
+    OneToMany = 2,
 }

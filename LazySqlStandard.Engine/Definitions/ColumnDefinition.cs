@@ -1,25 +1,43 @@
-﻿using System.Reflection;
-using LazySql.Engine.Attributes;
+﻿namespace LazySql.Engine.Definitions;
 
-namespace LazySql.Engine.Definitions
+/// <summary>
+/// Column Definition
+/// </summary>
+internal sealed class ColumnDefinition
 {
-    internal sealed class ColumnDefinition
+    /// <summary>
+    /// Object Property
+    /// </summary>
+    public PropertyInfo PropertyInfo { get; }
+
+    /// <summary>
+    /// Lazy Column
+    /// </summary>
+    public LazyColumn Column { get; }
+
+    /// <summary>
+    /// Primary Key information
+    /// </summary>
+
+    public PrimaryKey PrimaryKey { get; }
+
+    /// <summary>
+    /// Index of the column
+    /// </summary>
+    public int Index { get; }
+
+    public ColumnDefinition(PropertyInfo propertyInfo, LazyColumn column, int index, PrimaryKey primaryKey)
     {
-        public PropertyInfo PropertyInfo { get; }
-        public LazyColumn Column { get; }
-
-        public PrimaryKey PrimaryKey { get; }
-
-        public int Index { get; }
-
-        public ColumnDefinition(PropertyInfo propertyInfo, LazyColumn column, int index, PrimaryKey primaryKey)
-        {
-            PropertyInfo = propertyInfo;
-            Column = column;
-            Index = index;
-            PrimaryKey = primaryKey;
-        }
-
-        public object GetValue(object obj) => PropertyInfo.GetValue(obj, null );
+        PropertyInfo = propertyInfo;
+        Column = column;
+        Index = index;
+        PrimaryKey = primaryKey;
     }
+
+    /// <summary>
+    /// Get Value of an object
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public object GetValue(object obj) => PropertyInfo.GetValue(obj, null );
 }
