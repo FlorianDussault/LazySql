@@ -1,125 +1,126 @@
 ﻿// ReSharper disable once CheckNamespace
-using System.Linq.Expressions;
-
 namespace LazySql.Engine.Client;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
-    //private IEnumerable<T> InternalSelect<T>(string query, SqlArguments sqlArguments)
-    //{
-    //    using SqlConnector sqlConnector = Open();
-    //    using SqlDataReader sqlDataReader = sqlConnector.ExecuteQuery(query, sqlArguments);
-    //    DataTable dataTable = new();
-    //    dataTable.Load(sqlDataReader);
-
-    //    if (typeof(T) == typeof(DynamicObject))
-    //    {
-    //        return dataTable.ToDynamic().Cast<T>();
-    //    }
-    //    if (typeof(T) == typeof(LazyBase))
-    //    {
-    //        return dataTable.ToLazyObject<T>();
-    //    }
-
-    //    throw new NotImplementedException();
-    //}
     public static ILazyEnumerable<T> Select<T>(string tableName = null) => Instance.InternalSelect<T>(tableName);
 
-    private ILazyEnumerable<T> InternalSelect<T>(string tableName) => new LazyEnumerable2<T>(tableName);
-
-    // Select<T>("table_name").Where(a=> a.Id = 10).Top(10)
-
-}
-
-public interface ILazyEnumerable<T> : IEnumerable<T>
-{
-    ILazyEnumerable<T> Where(Expression<Func<T, bool>> whereExpression);
-    ILazyEnumerable<T> OrderByAsc(Expression<Func<T, object>> orderByExpression);
-    ILazyEnumerable<T> OrderByDesc(Expression<Func<T, object>> orderByExpression);
-    ILazyEnumerable<T> Top(int top);
-}
-
-internal class LazyEnumerable2<T> : ILazyEnumerable<T>
-{
-    private readonly string _tableName;
-    private Expression _whereExpression;
-    private readonly List<(bool orderByAsc, Expression expression)> _orderByExpressions;
-    private int? _top = null;
-    public LazyEnumerable2(string tableName)
+    private ILazyEnumerable<T> InternalSelect<T>(string tableName)
     {
-        _tableName = tableName;
-        _orderByExpressions = new List<(bool orderByAsc, Expression expression)>();
+        CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+        if (string.IsNullOrWhiteSpace(tableName) && tableDefinition.ObjectType == ObjectType.Dynamic)
+            throw new LazySqlException($"You can call the {nameof(Select)} method with a Dynamic type without a table name in argument");
+        return new LazyEnumerable<T>(tableName);
     }
 
-    public ILazyEnumerable<T> Where(Expression<Func<T, bool>> whereExpression)
+
+    internal static IEnumerable<object> GetWithQuery(Type type, QueryBuilder queryBuilder)
     {
-        _whereExpression = whereExpression;
-        return this;
-    }
-
-    public ILazyEnumerable<T> OrderByAsc(Expression<Func<T, object>> orderByExpression)
-    {
-        _orderByExpressions.Add((true, orderByExpression));
-        return this;
-    }
-
-    public ILazyEnumerable<T> OrderByDesc(Expression<Func<T, object>> orderByExpression)
-    {
-        _orderByExpressions.Add((false, orderByExpression));
-        return this;
-    }
-
-    public ILazyEnumerable<T> Top(int top)
-    {
-        _top = top;
-        return this;
-    }
-
-    public IEnumerator<T> GetEnumerator() => Execute().Cast<T>().GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    private IEnumerable Execute()
-    {
-        LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
-
-        QueryBuilder queryBuilder = new(tableDefinition);
-        LazyClient.BuildSelect(tableDefinition, queryBuilder, _top);
-
-        if (_whereExpression != null)
-            queryBuilder.Append(" WHERE ", _whereExpression);
-
-        if (_orderByExpressions.Count > 0)
-        {
-            queryBuilder.Append(" ORDER BY ");
-            foreach ((bool isLast, (bool orderByAsc, Expression expression) value) valueTuple in _orderByExpressions
-                         .ForeachWithLast())
-            {
-                queryBuilder.Append(valueTuple.value.expression);
-                queryBuilder.Append(valueTuple.value.orderByAsc ? " ASC " : " DESC ");
-                if (!valueTuple.isLast)
-                    queryBuilder.Append(", ");
-            }
-        }
-
+        CheckInitialization(type, out TableDefinition tableDefinition);
         if (tableDefinition.Relations.Count == 0)
         {
-            foreach (object o in LazyClient.GetWithQuery(typeof(T), queryBuilder))
-                yield return o;
+            foreach (object value in ExecuteReader(queryBuilder))
+                yield return value;
             yield break;
         }
 
-        List<object> values = LazyClient.GetWithQuery(typeof(T), queryBuilder).ToList();
+        List<object> values = ExecuteReader(queryBuilder).ToList();
         if (values.Count == 0) yield break;
 
         foreach (RelationInformation relation in tableDefinition.Relations)
-            LazyClient.LoadChildren(typeof(T), relation, values);
+            LoadChildren(type, relation, values);
 
         foreach (object value in values)
             yield return value;
+    }
 
+    /// <summary>
+    /// Build SELECT
+    /// </summary>
+    /// <param name="tableDefinition">Table definition</param>
+    /// <param name="queryBuilder">Query Builder</param>
+    /// <param name="top">TOP</param>
+    internal static void BuildSelect(TableDefinition tableDefinition, string tableName, QueryBuilder queryBuilder, int? top = null)
+    {
+        tableDefinition.GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out _, out _, out _);
 
-       
+        string columnsList;
+        if (tableDefinition.ObjectType == ObjectType.LazyObject)
+            columnsList = string.Join(", ", allColumns.Where(c => c.Column.SqlType != SqlType.Children).Select(c => c.Column.SqlColumnName));
+        else
+            columnsList = "*";
+
+        queryBuilder.Append($"SELECT {(top != null ? $" TOP {top} " : string.Empty)} {columnsList} FROM {tableName ?? tableDefinition.Table.TableName}");
+
+    }
+
+    /// <summary>
+    /// Load Children
+    /// </summary>
+    /// <param name="parentType">Parent Type</param>
+    /// <param name="relationInformation">Relation Information</param>
+    /// <param name="values">Parent values</param>
+    /// <exception cref="NotImplementedException"></exception>
+    internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
+    {
+        if (values.Count == 0) return;
+        CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
+
+        QueryBuilder queryBuilder = new(childTableDefinition);
+
+        BuildSelect(childTableDefinition, null, queryBuilder);
+        queryBuilder.Append(" WHERE ");
+
+        for (int index = 0; index < values.Count; index++)
+        {
+            queryBuilder.Append("(");
+            queryBuilder.Append(relationInformation.Expression, parentType, values[index]);
+            queryBuilder.Append(")");
+            if (index + 1 < values.Count)
+                queryBuilder.Append(" OR ");
+        }
+
+        Delegate delegateExpression = relationInformation.Expression.Compile();
+        IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
+            nameof(GetWithQuery), new object[] { relationInformation.ChildType, queryBuilder });
+
+        IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
+        foreach (object enumerableValue in enumerableChildValues)
+            childValues.Add(enumerableValue);
+
+        if (relationInformation.RelationType == RelationType.OneToMany)
+        {
+            foreach (object parentValue in values)
+            {
+                IList children = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(relationInformation.ChildType));
+                foreach (object childValue in childValues)
+                {
+                    if ((bool)delegateExpression.DynamicInvoke(parentValue, childValue))
+                    {
+                        children.Add(childValue);
+                    }
+                }
+                parentType.GetProperty(relationInformation.Column)?.SetValue(parentValue, children);
+            }
+        }
+        else if (relationInformation.RelationType == RelationType.OneToOne)
+        {
+            foreach (object parentValue in values)
+            {
+                foreach (object childValue in childValues)
+                {
+                    if ((bool)delegateExpression.DynamicInvoke(parentValue, childValue))
+                    {
+                        parentType.GetProperty(relationInformation.Column)?.SetValue(parentValue, childValue);
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
     }
 }

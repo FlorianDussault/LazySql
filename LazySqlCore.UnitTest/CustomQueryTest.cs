@@ -1,4 +1,3 @@
-using System.Data;
 using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySql.Engine.Client.Query;
@@ -73,72 +72,5 @@ public class CustomQueryTest
     {
         Assert.That(LazyClient.ExecuteScalar<string>("SELECT CONCAT('Hello', ' ', @WorldVariable)", new SqlArguments().Add("@WorldVariable", SqlType.NVarChar, "WORLD")), Is.EqualTo("Hello WORLD"));
         Assert.That(LazyClient.ExecuteScalar<int>("SELECT 9876"), Is.EqualTo(9876));
-    }
-
-    [Test]
-    public void ExecuteQueryDataTable()
-    {
-        AddSimpleTables();
-
-        //DataTable dataTable = LazyClient.Select<DataTable>(
-        //    "SELECT * FROM simple_table WHERE user_id LIKE '%1%' AND username LIKE @Username", new SqlArguments().Add("@Username", SqlType.NVarChar, "%1%"));
-        //Assert.IsNotEmpty(dataTable.Rows);
-
-        //foreach (DataRow row in dataTable.Rows)
-        //{
-        //    Assert.IsTrue(row["user_id"].ToString()!.Contains('1'));
-        //    Assert.IsTrue(row["username"].ToString()!.Contains('1'));
-        //}
-    }
-
-    [Test]
-    public void ExecuteQueryDynamic()
-    {
-        throw new NotImplementedException();
-        //AddSimpleTables();
-
-        //DataTable dataTable = LazyClient.ExecuteQuery<DataTable>(
-        //    "SELECT * FROM simple_table WHERE user_id LIKE '%1%' AND username LIKE @Username", new SqlArguments().Add("@Username", SqlType.NVarChar, "%1%"));
-        //Assert.IsNotEmpty(dataTable.Rows);
-
-        //foreach (DataRow row in dataTable.Rows)
-        //{
-        //    Assert.IsTrue(row["user_id"].ToString()!.Contains('1'));
-        //    Assert.IsTrue(row["username"].ToString()!.Contains('1'));
-        //}
-    }
-
-    [Test]
-    public void ExecuteQueryLazyObject()
-    {
-        throw new NotImplementedException();
-        //AddSimpleTables();
-
-        //DataTable dataTable = LazyClient.ExecuteQuery<DataTable>(
-        //    "SELECT * FROM simple_table WHERE user_id LIKE '%1%' AND username LIKE @Username", new SqlArguments().Add("@Username", SqlType.NVarChar, "%1%"));
-        //Assert.IsNotEmpty(dataTable.Rows);
-
-        //foreach (DataRow row in dataTable.Rows)
-        //{
-        //    Assert.IsTrue(row["user_id"].ToString()!.Contains('1'));
-        //    Assert.IsTrue(row["username"].ToString()!.Contains('1'));
-        //}
-    }
-
-    [Test]
-    public void ExecuteQueryObject()
-    {
-        throw new NotImplementedException();
-        //AddSimpleTables();
-
-        //DataTable dataTable = LazyClient.ExecuteQuery<DataTable>(
-        //    "SELECT * FROM simple_table WHERE user_id LIKE '%1%' AND username LIKE @Username", new SqlArguments().Add("@Username", SqlType.NVarChar, "%1%"));
-        //Assert.IsNotEmpty(dataTable.Rows);
-
-        //foreach (DataRow row in dataTable.Rows)
-        //{
-        //    Assert.IsTrue(row["user_id"].ToString()!.Contains('1'));
-        //    Assert.IsTrue(row["username"].ToString()!.Contains('1'));
-        //}
     }
 }

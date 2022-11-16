@@ -5,7 +5,7 @@
 /// </summary>
 public sealed partial class LazyClient
 {
-    private IReadOnlyCollection<TableDefinition> _tables;
+    private List<TableDefinition> _tables;
 
     #region Singleton
     private static LazyClient Instance { get; } = new LazyClient();

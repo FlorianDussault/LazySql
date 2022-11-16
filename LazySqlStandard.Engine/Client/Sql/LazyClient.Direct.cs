@@ -11,19 +11,14 @@ public sealed partial class LazyClient
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
-    public static int ExecuteNonQuery(string query, SqlArguments arguments = null) =>
-        Instance.InternalExecuteNonQuery(query, arguments);
+    public static int ExecuteNonQuery(string query, SqlArguments arguments = null) => Instance.InternalExecuteNonQuery(query, arguments);
 
     /// <summary>
     /// Executes a Transact-SQL statement against the connection and returns the number of rows affected. 
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
-    private int InternalExecuteNonQuery(string query, SqlArguments arguments)
-    {
-        using SqlConnector sqlConnector = Open();
-        return sqlConnector.ExecuteNonQuery(query, arguments ?? new SqlArguments());
-    }
+    private int InternalExecuteNonQuery(string query, SqlArguments arguments) => Open().ExecuteNonQuery(query, arguments ?? new SqlArguments());
 
     /// <summary>
     /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored
@@ -32,8 +27,7 @@ public sealed partial class LazyClient
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
     /// <returns></returns>
-    public static T ExecuteScalar<T>(string query, SqlArguments arguments = null) =>
-        Instance.InternalExecuteScalar<T>(query, arguments);
+    public static T ExecuteScalar<T>(string query, SqlArguments arguments = null) => Instance.InternalExecuteScalar<T>(query, arguments);
 
     /// <summary>
     /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored
@@ -42,11 +36,5 @@ public sealed partial class LazyClient
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
     /// <returns></returns>
-    private T InternalExecuteScalar<T>(string query, SqlArguments arguments = null)
-    {
-        using SqlConnector sqlConnector = Open();
-        return (T) sqlConnector.ExecuteScalar(query, arguments);
-    }
-
-   
+    private T InternalExecuteScalar<T>(string query, SqlArguments arguments = null) => (T)Open().ExecuteScalar(query, arguments);
 }

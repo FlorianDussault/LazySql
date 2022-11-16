@@ -15,15 +15,18 @@ internal sealed class TableDefinition : List<ColumnDefinition>
     /// </summary>
     public LazyTable Table { get; }
 
+    public ObjectType ObjectType { get; }
+
     /// <summary>
     /// Relations with other objects
     /// </summary>
     public RelationsInformation Relations { get; set; } = null;
 
-    public TableDefinition(Type type, LazyTable table)
+    public TableDefinition(Type type, LazyTable table, ObjectType objectType)
     {
         TableType = type;
         Table = table;
+        ObjectType = objectType;
     }
 
     /// <summary>
@@ -86,4 +89,11 @@ internal sealed class TableDefinition : List<ColumnDefinition>
     {
         return this.FirstOrDefault(c => string.Equals(c.PropertyInfo.Name, propertyName, StringComparison.InvariantCultureIgnoreCase));
     }
+}
+
+internal enum ObjectType
+{
+    LazyObject,
+    Object,
+    Dynamic
 }

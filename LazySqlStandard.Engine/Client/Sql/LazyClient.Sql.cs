@@ -1,4 +1,6 @@
 ﻿// ReSharper disable once CheckNamespace
+using System.Data;
+
 namespace LazySql.Engine.Client;
 
 /// <summary>
@@ -39,39 +41,41 @@ public sealed partial class LazyClient
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 
+        
+
+        List<(int Index, ColumnDefinition ColumnDefinition)> columns = new();
+        for (int i = 0; i < sqlDataReader.FieldCount; i++)
+        {
+            ColumnDefinition columnDefinition = tableDefinition.FirstOrDefault(c=> string.Equals(c.Column.ColumnName, sqlDataReader.GetName(i), StringComparison.InvariantCultureIgnoreCase));
+            if (columnDefinition != null) columns.Add((i, columnDefinition));
+        }
+
+        if (tableDefinition.ObjectType == ObjectType.Dynamic)
+        {
+            while (sqlDataReader.Read())
+            {
+                IDictionary<string, object> obj = new ExpandoObject();
+
+                for (int i = 0; i < sqlDataReader.FieldCount; i++)
+                    obj.Add(sqlDataReader.GetName(i), sqlDataReader.IsDBNull(i) ? null : sqlDataReader.GetValue(i));
+
+                yield return obj;
+            }
+            yield break;
+        }
+
         while (sqlDataReader.Read())
         {
             object instance = Activator.CreateInstance(tableDefinition.TableType);
 
-            // TODO: code cleaning
-            foreach (ColumnDefinition columnDefinition in tableDefinition.Where(c =>
-                         c.Column.SqlType != SqlType.Children))
+            foreach ((int Index, ColumnDefinition ColumnDefinition) column in columns)
             {
                 object value = null;
-                if (!sqlDataReader.IsDBNull(columnDefinition.Index))
-                    switch (columnDefinition.Column.SqlType)
-                    {
-                        //case SqlType.Varchar:
-                        //    value = sqlDataReader.GetString(columnDefinition.Index);
-                        //    break;
-                        //case SqlType.Int:
-                        //    value = sqlDataReader.GetInt32(columnDefinition.Index);
-                        //    break;
-                        //case SqlType.Bit:
-                        //    value = sqlDataReader.GetBoolean(columnDefinition.Index);
-                        //    break;
-                        //case SqlType.BigInt:
-                        //    value = sqlDataReader.GetValue(columnDefinition.Index);
-                        //    break;
-                        default:
-                            value = sqlDataReader.GetValue(columnDefinition.Index);
-                            break;
-                        //throw new ArgumentOutOfRangeException();
-                    }
-
-                columnDefinition.PropertyInfo.SetValue(instance, value);
+                if (!sqlDataReader.IsDBNull(column.Index))
+                    value = sqlDataReader.GetValue(column.Index);
+                column.ColumnDefinition.PropertyInfo.SetValue(instance, value);
             }
-
+            
             yield return instance;
         }
 

@@ -35,4 +35,8 @@ public record Simple_Table
     public int User_Id { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+
+    public string NotInSqlFiled { get; set; }
+
+    public List<ChildTable> NotSqlType { get; set; }
 }
