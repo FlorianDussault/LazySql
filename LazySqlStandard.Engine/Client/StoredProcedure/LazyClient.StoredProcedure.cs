@@ -1,5 +1,4 @@
-﻿using System.Dynamic;
-using LazySql.Engine.Client.StoredProcedure;
+﻿using LazySql.Engine.Client.StoredProcedure;
 
 // ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client;

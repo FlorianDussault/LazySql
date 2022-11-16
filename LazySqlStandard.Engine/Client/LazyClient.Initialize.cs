@@ -79,13 +79,13 @@ public sealed partial class LazyClient
             throw new LazySqlInitializeException($"{type.Name} is not a class");
         if (type.IsAssignableFrom(typeof(LazyTable)))
             throw new LazySqlInitializeException($"{type.Name} does not implement the class {nameof(LazyBase)}");
-        if (!(Attribute.GetCustomAttribute(type, typeof(LazyTable)) is LazyTable tableAttribute))
-            throw new LazySqlInitializeException($"Attribute {nameof(LazyTable)} missing in class {type.FullName}");
+
+        LazyTable tableAttribute = (LazyTable) Attribute.GetCustomAttribute(type, typeof(LazyTable)) ?? new LazyTable(type.Name);
 
         if (string.IsNullOrWhiteSpace(tableAttribute.TableName))
             throw new LazySqlInitializeException($"The table name is missing in the attribute {nameof(LazyTable)} in class {type.FullName}");
 
-        TableDefinition tableDefinition = new TableDefinition(type, tableAttribute);
+        TableDefinition tableDefinition = new(type, tableAttribute);
 
         LazyBase obj = (LazyBase)Activator.CreateInstance(type);
         
@@ -140,6 +140,12 @@ public sealed partial class LazyClient
         if (!_initialized)
             throw new LazySqlInitializeException($"Call method {nameof(Initialize)} first.");
         TableDefinition table = _tables.FirstOrDefault(t => t.TableType == type);
+
+        if (table == null)
+        {
+            CheckTable(type);
+        }
+
         tableDefinition = table ?? throw new LazySqlInitializeException($"Table not found in method {nameof(Initialize)}");
     }
 }

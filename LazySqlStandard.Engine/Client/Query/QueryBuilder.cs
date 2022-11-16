@@ -37,7 +37,7 @@ internal sealed class QueryBuilder
     /// </summary>
     /// <param name="sql">Sql</param>
     /// <param name="expression">Expression</param>
-    public void Append(string sql = null, LambdaExpression expression = null)
+    public void Append(string sql = null, Expression expression = null)
     {
         if (sql != null)
             _stringBuilder.Append(sql);

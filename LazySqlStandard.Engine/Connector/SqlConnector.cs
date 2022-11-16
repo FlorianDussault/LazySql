@@ -103,14 +103,14 @@ internal sealed class SqlConnector : IDisposable
     /// </summary>
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
-    public void ExecuteNonQuery(string query, SqlArguments arguments = null)
+    public int ExecuteNonQuery(string query, SqlArguments arguments = null)
     {
         _sqlCommand.CommandText = query;
         AddValues(arguments);
 
         try
         {
-            _sqlCommand.ExecuteNonQuery();
+            return _sqlCommand.ExecuteNonQuery();
         }
         catch (Exception ex)
         {

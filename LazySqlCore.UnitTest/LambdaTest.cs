@@ -22,7 +22,7 @@ public class LambdaTest
         LazyClient.Delete<ChildTable>();
         LazyClient.Truncate<SimpleTable>(true);
         // Add values
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
@@ -45,8 +45,8 @@ public class LambdaTest
         }
 
         // Check
-        Assert.That(LazyClient.Get<SimpleTable>().ToList().Count(), Is.EqualTo(COUNT_SIMPLE_TABLE));
-        Assert.That(LazyClient.Get<ChildTable>().ToList().Count(),
+        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count(), Is.EqualTo(COUNT_SIMPLE_TABLE));
+        Assert.That(LazyClient.Select<ChildTable>().ToList().Count(),
             Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE));
     }
 
@@ -55,7 +55,7 @@ public class LambdaTest
     {
         AddSimpleTables();
 
-        foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s => s.Id < 10))
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>().Where(s => s.Id < 10))
         {
             Assert.Less(simpleTable.Id, 10);
         }
@@ -68,7 +68,7 @@ public class LambdaTest
         AddSimpleTables();
 
         int valInt = 1;
-        foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s => s.Id < 9 + valInt))
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>().Where(s => s.Id < 9 + valInt))
         {
             Assert.Less(simpleTable.Id, 10);
         }
@@ -77,7 +77,7 @@ public class LambdaTest
             string valString = "U";
 
             List<SimpleTable> simpleTables =
-                LazyClient.Get<SimpleTable>(s => s.Username == valString + "10").ToList();
+                LazyClient.Select<SimpleTable>().Where(s => s.Username == valString + "10").ToList();
 
             Assert.That(1, Is.EqualTo(simpleTables.Count));
             Assert.That("U10", Is.EqualTo(simpleTables[0].Username));
@@ -91,7 +91,7 @@ public class LambdaTest
     {
         AddSimpleTables();
 
-        foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s =>
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>().Where(s =>
                      LzFunctions.Like(s.Id, "%1%") && LzFunctions.Like(s.Id, "%5")))
         {
             Assert.IsTrue(simpleTable.Id.ToString().Contains("1"));
@@ -104,7 +104,7 @@ public class LambdaTest
     {
         AddSimpleTables();
 
-        foreach (SimpleTable simpleTable in LazyClient.Get<SimpleTable>(s =>
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>().Where(s =>
                      LzFunctions.NotLike(s.Id, "%1%") && LzFunctions.NotLike(s.Id, "%5")))
         {
             Assert.IsFalse(simpleTable.Id.ToString().Contains("1"));
@@ -126,7 +126,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
             Assert.IsEmpty(values);
         }
 
@@ -137,7 +137,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(s.Username) == 1);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
             Assert.That(1, Is.EqualTo(values.Count()));
         }
     }
@@ -156,7 +156,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
             Assert.IsNotEmpty(values);
         }
     }
@@ -176,7 +176,7 @@ public class LambdaTest
 
         {
             int day = DateTime.Now.Day;
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
             Assert.IsNotEmpty(values);
         }
     }
@@ -198,7 +198,7 @@ public class LambdaTest
 
         {
             int month = DateTime.Now.Month;
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
             Assert.IsNotEmpty(values);
         }
     }
@@ -218,7 +218,7 @@ public class LambdaTest
 
         {
             int year = DateTime.Now.Year;
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
             Assert.IsNotEmpty(values);
         }
     }
@@ -238,12 +238,12 @@ public class LambdaTest
 
         {
             int year = DateTime.Now.Year + 1;
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) =>
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) =>
                 LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, 1, LzFunctions.GetDate())) == year);
             Assert.IsNotEmpty(values);
 
             year = DateTime.Now.Year - 1;
-            LazyEnumerable<SimpleTable>? values2 = LazyClient.Get<SimpleTable>((s) =>
+            ILazyEnumerable<SimpleTable>? values2 = LazyClient.Select<SimpleTable>().Where((s) =>
                 LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, -1, LzFunctions.GetDate())) == year);
             Assert.IsNotEmpty(values2);
         }
@@ -265,9 +265,9 @@ public class LambdaTest
         {
             DateTime start = DateTime.Now;
             DateTime end = start.AddYears(8);
-            LazyEnumerable<SimpleTable>? values = LazyClient.Get<SimpleTable>((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
+            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
             Assert.IsNotEmpty(values);
-            values = LazyClient.Get<SimpleTable>((s) => LzFunctions.DateDiff(LzDatePart.Year, end, start) == -8);
+            values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.DateDiff(LzDatePart.Year, end, start) == -8);
             Assert.IsNotEmpty(values);
 
             //year = DateTime.Now.Year - 1;
@@ -290,9 +290,9 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s =>
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s =>
             LzFunctions.Concat(s.Username, " ", s.Password) == "HELLO WORLD"));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s =>
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s =>
             LzFunctions.Concat(s.Username, " ", s.Password) == "HELLOWORLD"));
     }
 
@@ -310,8 +310,8 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => s.Username + " " + s.Password == "HELLO WORLD"));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => s.Username + " " + s.Password == "HELLO2WORLD"));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => s.Username + " " + s.Password == "HELLO WORLD"));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => s.Username + " " + s.Password == "HELLO2WORLD"));
     }
 
     [Test]
@@ -328,9 +328,9 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s =>
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s =>
             LzFunctions.ConcatWs("@", s.Username, s.Password, "!") == "HELLO@WORLD@!"));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s =>
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s =>
             LzFunctions.ConcatWs("@", s.Username, s.Password, "!") == "HELLOWORLD@!"));
     }
 
@@ -348,10 +348,10 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Ascii(s.Username) == 72));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Ascii(s.Username) == 12));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Ascii(s.Password) == 87));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Ascii(s.Password) == 93));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Ascii(s.Username) == 72));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Ascii(s.Username) == 12));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Ascii(s.Password) == 87));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Ascii(s.Password) == 93));
     }
 
     [Test]
@@ -368,10 +368,10 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Char(72) == "H"));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Char(72) == "W"));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Char(87) == "W"));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.Char(87) == "H"));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Char(72) == "H"));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Char(72) == "W"));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Char(87) == "W"));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.Char(87) == "H"));
     }
 
     [Test]
@@ -388,13 +388,13 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex(null, "world", 2) == null));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("hello", null, 2) == null));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("hello", "world", null) == null));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("world", "hello world", 0) == 7));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("world", "hello world", 0) == 8));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("hello", "hello world", 0) == 1));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.CharIndex("hello", "hello world", 2) == 0));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex(null, "world", 2) == null));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("hello", null, 2) == null));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("hello", "world", null) == null));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("world", "hello world", 0) == 7));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("world", "hello world", 0) == 8));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("hello", "hello world", 0) == 1));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.CharIndex("hello", "hello world", 2) == 0));
     }
 
     [Test]
@@ -411,10 +411,10 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.DataLength(null) == null));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.DataLength(-1) == 4));
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.DataLength(s.Username) == 5));
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>(s => LzFunctions.DataLength(s.Username) == 4));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.DataLength(null) == null));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.DataLength(-1) == 4));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.DataLength(s.Username) == 5));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>().Where(s => LzFunctions.DataLength(s.Username) == 4));
     }
 
     [Test]
@@ -431,7 +431,7 @@ public class LambdaTest
         };
         simpleTable.Insert();
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s=>string.Join("@", s.Username, s.Password) == "HELLO@WORLD"));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s=>string.Join("@", s.Username, s.Password) == "HELLO@WORLD"));
     }
 
 
@@ -454,7 +454,7 @@ public class LambdaTest
 
         string hello = "HELLO";
 
-        Assert.IsNotEmpty(LazyClient.Get<SimpleTable>(s => s.Username == $"{hello} WORLD, {hello} {simpleTable.Id}!"));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>().Where(s => s.Username == $"{hello} WORLD, {hello} {simpleTable.Id}!"));
     }
 
     //[Test]

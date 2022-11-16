@@ -35,7 +35,7 @@ public sealed partial class LazyClient
     private IEnumerable<object> InternalExecuteReader(QueryBuilder queryBuilder)
     {
         using SqlConnector sqlConnector = Open();
-        SqlDataReader sqlDataReader =
+        using SqlDataReader sqlDataReader =
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 

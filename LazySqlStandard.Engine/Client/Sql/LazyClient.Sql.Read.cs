@@ -5,15 +5,15 @@ namespace LazySql.Engine.Client;
 public sealed partial class LazyClient
 {
     /// <summary>
-    /// Get Values from Sql
+    /// Select Values from Sql
     /// </summary>
     /// <typeparam name="T">Type of value</typeparam>
     /// <param name="expression">Where expression</param>
     /// <returns>Values</returns>
-    public static LazyEnumerable<T> Get<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalGet<T>(typeof(T), expression);
+    private static LazyEnumerable<T> Select<T>(Expression<Func<T, bool>> expression = null) where T : LazyBase => Instance.InternalGet<T>(typeof(T), expression);
 
     /// <summary>
-    /// Get Values from Sql
+    /// Select Values from Sql
     /// </summary>
     /// <typeparam name="T">Type of value</typeparam>
     /// <param name="type">Type of value</param>

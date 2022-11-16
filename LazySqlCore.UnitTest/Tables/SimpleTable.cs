@@ -29,3 +29,10 @@ public class SimpleTable : LazyBase
         AddOneToOne<SimpleTable, ExtendedTable>(nameof(Extended), (p, e) => p.ExtendedKey == e.Key);
     }
 }
+
+public record Simple_Table
+{
+    public int User_Id { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+}

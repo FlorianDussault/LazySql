@@ -21,7 +21,7 @@ public class InsertTest
         LazyClient.Delete<ChildTable>();
         LazyClient.Truncate<SimpleTable>(true);
         // Add values
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
@@ -43,8 +43,8 @@ public class InsertTest
             }
         }
         // Check
-        Assert.That(LazyClient.Get<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
-        Assert.That(LazyClient.Get<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
+        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
+        Assert.That(LazyClient.Select<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
     }
 
     [Test]
@@ -65,7 +65,7 @@ public class InsertTest
 
         }.Insert();
 
-        SimpleTable item = LazyClient.Get<SimpleTable>().First();
+        SimpleTable item = LazyClient.Select<SimpleTable>().First();
         Assert.That(item.Id, Is.EqualTo(1));
         Assert.IsNull(item.Username);
         Assert.IsNull(item.Password);

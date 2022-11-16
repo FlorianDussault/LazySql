@@ -25,7 +25,7 @@ public class TypesTest
         Reset();
         long val = long.MaxValue;
         new TypesTable() {TypeBigint = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeBigint));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeBigint));
     }
 
     [Test]
@@ -39,7 +39,7 @@ public class TypesTest
             val[i] = (byte)rand.Next(0, 255);
         }
         new TypesTable() { TypeBinary = val }.Insert();
-        byte[] result = LazyClient.Get<TypesTable>().First().TypeBinary!;
+        byte[] result = LazyClient.Select<TypesTable>().First().TypeBinary!;
 
         for (int i = 0; i < val.Length; i++)
         {
@@ -52,7 +52,7 @@ public class TypesTest
         Reset();
         bool val = true;
         new TypesTable() { TypeBit = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeBit));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeBit));
     }
 
     [Test]
@@ -61,7 +61,7 @@ public class TypesTest
         Reset();
         string val = "hello";
         new TypesTable() { TypeChar = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeChar?.Trim()));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeChar?.Trim()));
     }
 
     [Test]
@@ -70,7 +70,7 @@ public class TypesTest
         Reset();
         DateTime val = DateTime.Today;
         new TypesTable() { TypeDate = val }.Insert();
-        Assert.That(LazyClient.Get<TypesTable>().First().TypeDate,Is.EqualTo(val));
+        Assert.That(LazyClient.Select<TypesTable>().First().TypeDate,Is.EqualTo(val));
     }
 
     [Test]
@@ -79,7 +79,7 @@ public class TypesTest
         Reset();
         DateTime val = DateTime.Now;
         new TypesTable() { TypeDateTime2 = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeDateTime2));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeDateTime2));
     }
 
     [Test]
@@ -88,7 +88,7 @@ public class TypesTest
         Reset();
         DateTimeOffset val = DateTimeOffset.Now;
         new TypesTable() { TypeDatetimeoffset = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeDatetimeoffset));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeDatetimeoffset));
     }
 
     [Test]
@@ -97,7 +97,7 @@ public class TypesTest
         Reset();
         decimal val = 1.5M;
         new TypesTable() { TypeDecimal = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeDecimal));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeDecimal));
     }
 
     [Test]
@@ -106,7 +106,7 @@ public class TypesTest
         Reset();
         double val = 1.14F;
         new TypesTable() { TypeFloat = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeFloat));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeFloat));
     }
        
     [Test]
@@ -120,7 +120,7 @@ public class TypesTest
             val[i] = (byte)rand.Next(0, 255);
         }
         new TypesTable() { TypeImage = val }.Insert();
-        byte[] result = LazyClient.Get<TypesTable>().First().TypeImage!;
+        byte[] result = LazyClient.Select<TypesTable>().First().TypeImage!;
 
         for (int i = 0; i < val.Length; i++)
         {
@@ -134,7 +134,7 @@ public class TypesTest
         Reset();
         int val = int.MaxValue;
         new TypesTable() { TypeInt = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeInt));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeInt));
     }
     [Test]
     public void TypeMoney()
@@ -142,7 +142,7 @@ public class TypesTest
         Reset();
         decimal val = 1.14M;
         new TypesTable() { TypeMoney = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeMoney));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeMoney));
     }
 
     [Test]
@@ -151,7 +151,7 @@ public class TypesTest
         Reset();
         string val = "ntext value";
         new TypesTable() { TypeNtext = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeNtext));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeNtext));
     }
 
     [Test]
@@ -160,7 +160,7 @@ public class TypesTest
         Reset();
         decimal val = 1.14M;
         new TypesTable() { TypeDecimal = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeDecimal));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeDecimal));
     }
 
 
@@ -170,7 +170,7 @@ public class TypesTest
         Reset();
         float val = Epsilon;
         new TypesTable() { TypeReal = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeReal));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeReal));
     }
 
     [Test]
@@ -179,7 +179,7 @@ public class TypesTest
         Reset();
         DateTime val = DateTime.Today;
         new TypesTable() { TypeSmalldatime = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeSmalldatime));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeSmalldatime));
     }
     [Test]
     public void TypeSmallint()
@@ -187,7 +187,7 @@ public class TypesTest
         Reset();
         short val = short.MaxValue;
         new TypesTable() { TypeSmallint = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeSmallint));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeSmallint));
     }
     [Test]
     public void TypeSmallmoney()
@@ -195,7 +195,7 @@ public class TypesTest
         Reset();
         decimal val = 1.14M;
         new TypesTable() { TypeSmallmoney = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeSmallmoney));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeSmallmoney));
     }
     [Test]
     public void TypeSqlVariant()
@@ -203,7 +203,7 @@ public class TypesTest
         Reset();
         string? val ="VARIANT";
         new TypesTable() { TypeSqlVariant = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeSqlVariant));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeSqlVariant));
     }
     [Test]
     public void TypeText()
@@ -211,7 +211,7 @@ public class TypesTest
         Reset();
         string? val = "TYPE TEXT";
         new TypesTable() { TypeText = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeText));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeText));
     }
 
     [Test]
@@ -221,7 +221,7 @@ public class TypesTest
         Reset();
         TimeSpan val = DateTime.Now.TimeOfDay;
         new TypesTable() { TypeTime = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeTime));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeTime));
     }
 
 
@@ -231,7 +231,7 @@ public class TypesTest
         Reset();
         byte val = byte.MaxValue;
         new TypesTable() { TypeTinyint = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeTinyint));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeTinyint));
     }
 
     [Test]
@@ -240,7 +240,7 @@ public class TypesTest
         Reset();
         Guid val = Guid.NewGuid();
         new TypesTable() { TypeUniqueidentifier = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeUniqueidentifier));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeUniqueidentifier));
     }
 
     [Test]
@@ -249,7 +249,7 @@ public class TypesTest
         Reset();
         string val = XDocument.Parse("<hello><unit><test>123</test></unit></hello>").ToString(SaveOptions.DisableFormatting);
         new TypesTable() { TypeXml = val }.Insert();
-        Assert.That(val, Is.EqualTo(LazyClient.Get<TypesTable>().First().TypeXml));
+        Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeXml));
     }
 
 
