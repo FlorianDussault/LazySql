@@ -249,9 +249,9 @@ public class SelectTest
         }
 
         List<SimpleTable> list = LazyClient.Select<SimpleTable>().OrderByDesc(s => s.Id).Top(2).ToList();
-        Assert.That(2, Is.EqualTo(list.Count));
-        Assert.That(1000, Is.EqualTo(list[0].Id));
-        Assert.That(999, Is.EqualTo(list[1].Id));
+        Assert.That(list.Count, Is.EqualTo(2));
+        Assert.That(list[0].Id, Is.EqualTo(1000));
+        Assert.That(list[1].Id, Is.EqualTo(999));
     }
 
 }

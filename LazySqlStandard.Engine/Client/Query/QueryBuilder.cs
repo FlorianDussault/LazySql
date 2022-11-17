@@ -57,6 +57,20 @@ internal sealed class QueryBuilder
     }
 
     /// <summary>
+    /// Append expression
+    /// </summary>
+    /// <param name="expression">Expression</param>
+    /// <param name="type">Type of object</param>
+    /// <param name="obj">object</param>
+    /// <param name="alias1"></param>
+    /// <param name="alias2"></param>
+    public void AppendWithAliases(Expression expression, LambdaAlias alias1, LambdaAlias alias2)
+    {
+        if (expression == null) return;
+        LambdaAliasParser.Parse(expression, this, alias1, alias2);
+    }
+
+    /// <summary>
     /// Register new argument
     /// </summary>
     /// <param name="type">Sql Type of argument</param>

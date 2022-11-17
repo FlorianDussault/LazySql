@@ -4,8 +4,21 @@ namespace LazySql.Engine.Client;
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
+    /// <summary>
+    /// Select in database
+    /// </summary>
+    /// <typeparam name="T">Object type</typeparam>
+    /// <param name="tableName">Table name (mandatory for dynamic type)</param>
+    /// <returns>Enumerable</returns>
     public static ILazyEnumerable<T> Select<T>(string tableName = null) => Instance.InternalSelect<T>(tableName);
 
+    /// <summary>
+    /// Select in database
+    /// </summary>
+    /// <typeparam name="T">Object type</typeparam>
+    /// <param name="tableName">Table name (mandatory for dynamic type)</param>
+    /// <returns>Enumerable</returns>
+    /// <exception cref="LazySqlException"></exception>
     private ILazyEnumerable<T> InternalSelect<T>(string tableName)
     {
         CheckInitialization(typeof(T), out TableDefinition tableDefinition);
@@ -13,19 +26,24 @@ public sealed partial class LazyClient
             throw new LazySqlException($"You can call the {nameof(Select)} method with a Dynamic type without a table name in argument");
         return new LazyEnumerable<T>(tableName);
     }
-
-
-    internal static IEnumerable<object> GetWithQuery(Type type, QueryBuilder queryBuilder)
+    
+    /// <summary>
+    /// Execute Query
+    /// </summary>
+    /// <param name="type">Type of object</param>
+    /// <param name="selectQuery">Table definition</param>
+    /// <returns>IEnumerable</returns>
+    internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery)
     {
         CheckInitialization(type, out TableDefinition tableDefinition);
         if (tableDefinition.Relations.Count == 0)
         {
-            foreach (object value in ExecuteReader(queryBuilder))
+            foreach (object value in ExecuteReader(selectQuery.BuildQuery()))
                 yield return value;
             yield break;
         }
 
-        List<object> values = ExecuteReader(queryBuilder).ToList();
+        List<object> values = ExecuteReader(selectQuery.BuildQuery()).ToList();
         if (values.Count == 0) yield break;
 
         foreach (RelationInformation relation in tableDefinition.Relations)
@@ -33,26 +51,6 @@ public sealed partial class LazyClient
 
         foreach (object value in values)
             yield return value;
-    }
-
-    /// <summary>
-    /// Build SELECT
-    /// </summary>
-    /// <param name="tableDefinition">Table definition</param>
-    /// <param name="queryBuilder">Query Builder</param>
-    /// <param name="top">TOP</param>
-    internal static void BuildSelect(TableDefinition tableDefinition, string tableName, QueryBuilder queryBuilder, int? top = null)
-    {
-        tableDefinition.GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out _, out _, out _);
-
-        string columnsList;
-        if (tableDefinition.ObjectType == ObjectType.LazyObject)
-            columnsList = string.Join(", ", allColumns.Where(c => c.Column.SqlType != SqlType.Children).Select(c => c.Column.SqlColumnName));
-        else
-            columnsList = "*";
-
-        queryBuilder.Append($"SELECT {(top != null ? $" TOP {top} " : string.Empty)} {columnsList} FROM {tableName ?? tableDefinition.Table.TableName}");
-
     }
 
     /// <summary>
@@ -65,25 +63,28 @@ public sealed partial class LazyClient
     internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
     {
         if (values.Count == 0) return;
+        CheckInitialization(parentType, out TableDefinition parentTableDefinition);
         CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
 
-        QueryBuilder queryBuilder = new(childTableDefinition);
+        // SELECT * FROM T1
+        // WHERE EXISTS
+        //    (SELECT* FROM T2
+        //    WHERE T1.a= T2.a and T1.b= T2.b)
 
-        BuildSelect(childTableDefinition, null, queryBuilder);
-        queryBuilder.Append(" WHERE ");
-
-        for (int index = 0; index < values.Count; index++)
+        SelectQuery selectQuery = new(childTableDefinition);
+        void WhereAction(SelectQuery query)
         {
-            queryBuilder.Append("(");
-            queryBuilder.Append(relationInformation.Expression, parentType, values[index]);
-            queryBuilder.Append(")");
-            if (index + 1 < values.Count)
-                queryBuilder.Append(" OR ");
+            //LambdaParser.Parse(expression, _tableDefinition, this, type, obj);
+            query.QueryBuilder.Append($" EXISTS (SELECT * FROM {parentTableDefinition.Table.TableName} AS lazy_parent WHERE ");
+            query.QueryBuilder.AppendWithAliases(relationInformation.Expression, new LambdaAlias("lazy_parent", parentTableDefinition), new LambdaAlias(query.TableAlias, childTableDefinition));
+            query.QueryBuilder.Append(")");
         }
+
+        selectQuery.SetWhereQuery(new WhereFunctionQuery(WhereAction));
 
         Delegate delegateExpression = relationInformation.Expression.Compile();
         IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
-            nameof(GetWithQuery), new object[] { relationInformation.ChildType, queryBuilder });
+            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery });
 
         IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
         foreach (object enumerableValue in enumerableChildValues)

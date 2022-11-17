@@ -11,18 +11,19 @@ internal class LambdaParser
     private readonly object _object;
     private readonly TableDefinition _tableDefinition;
     private readonly TableDefinition _parentTableDefinition;
-    private readonly  QueryBuilder _queryBuilder;
+    protected readonly  QueryBuilder _queryBuilder;
 
-    private LambdaParser(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null)
+    protected LambdaParser(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null)
     {
         _expression = expression;
         _tableDefinition = tableDefinition;
         _queryBuilder = queryBuilder;
         _type = type;
         _object = obj;
+
         if (_type != null)
             LazyClient.CheckInitialization(_type, out _parentTableDefinition);
-        ParseExpression(_expression);
+        //ParseExpression(_expression);
     }
 
     /// <summary>
@@ -34,8 +35,9 @@ internal class LambdaParser
     /// <param name="type"></param>
     /// <param name="obj"></param>
     // ReSharper disable once ObjectCreationAsStatement
-    internal static void Parse(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null) => new LambdaParser(expression, tableDefinition, queryBuilder, type, obj);
+    internal static void Parse(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null) => new LambdaParser(expression, tableDefinition, queryBuilder, type, obj).ParseExpression(expression);
 
+    
     /// <summary>
     /// Parse Expression
     /// </summary>
@@ -137,7 +139,7 @@ internal class LambdaParser
     /// Parse MemberExpression
     /// </summary>
     /// <param name="expression">Expression</param>
-    private void ParseMember(MemberExpression expression)
+    internal virtual void ParseMember(MemberExpression expression)
     {
         if (_type != null && expression.Member.DeclaringType == _type)
         {
