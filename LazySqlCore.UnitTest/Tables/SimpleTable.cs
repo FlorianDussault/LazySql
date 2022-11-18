@@ -12,10 +12,10 @@ public class SimpleTable : LazyBase
     [PrimaryKey(true)]
     public int Id { get; set; }
 
-    [LazyColumn("username", SqlType.VarChar)]
+    [LazyColumn("Username", SqlType.VarChar)]
     public string Username { get; set; }
 
-    [LazyColumn("password", SqlType.VarChar)]
+    [LazyColumn("Password", SqlType.VarChar)]
     public string Password { get; set; }
 
     [LazyColumn("extended_key", SqlType.VarChar)]
@@ -28,4 +28,15 @@ public class SimpleTable : LazyBase
         AddOneToMany<SimpleTable, ChildTable>(nameof(ChildTables), expression: (p, c) => p.Id == c.ParentId);
         AddOneToOne<SimpleTable, ExtendedTable>(nameof(Extended), (p, e) => p.ExtendedKey == e.Key);
     }
+}
+
+public record Simple_Table
+{
+    public int User_Id { get; set; }
+    public string Username { get; set; }
+    public string Password { get; set; }
+
+    public string NotInSqlFiled { get; set; }
+
+    public List<ChildTable> NotSqlType { get; set; }
 }

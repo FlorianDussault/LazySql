@@ -1,10 +1,12 @@
 using LazySql.Engine;
 using LazySql.Engine.Client;
+using LazySql.Engine.Client.Query;
+using LazySql.Engine.Enums;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
-public class InsertTest
+public class CustomQueryTest
 {
     [SetUp]
     public void Setup()
@@ -25,7 +27,7 @@ public class InsertTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new SimpleTable()
+            SimpleTable st = new SimpleTable()
             {
                 Username = $"U{i+1}",
                 Password = $"P{i + 1}"
@@ -43,32 +45,32 @@ public class InsertTest
             }
         }
         // Check
-        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
-        Assert.That(LazyClient.Select<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
+        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Select<SimpleTable>().ToList().Count());
+        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Select<ChildTable>().ToList().Count());
     }
 
     [Test]
-    public void Insert()
+    public void ExecuteNonQuery()
     {
         AddSimpleTables();
+
+        Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM child_table"), Is.EqualTo(400));
+        Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM simple_table"), Is.EqualTo(20));
+
+        LazyClient.Truncate<SimpleTable>(true);
+
+        for (int i = 0; i < 100; i++)
+        {
+            new SimpleTable() {Username = "U"}.Insert();
+        }
+
+        Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM simple_table WHERE user_id <= @IdMax", new SqlArguments().Add("@IdMax", SqlType.Int, 50)), Is.EqualTo(50));
     }
 
     [Test]
-    public void InsertNull()
+    public void ExecuteScalar()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-
-        new SimpleTable()
-        {
-
-        }.Insert();
-
-        SimpleTable item = LazyClient.Select<SimpleTable>().First();
-        Assert.That(item.Id, Is.EqualTo(1));
-        Assert.IsNull(item.Username);
-        Assert.IsNull(item.Password);
+        Assert.That(LazyClient.ExecuteScalar<string>("SELECT CONCAT('Hello', ' ', @WorldVariable)", new SqlArguments().Add("@WorldVariable", SqlType.NVarChar, "WORLD")), Is.EqualTo("Hello WORLD"));
+        Assert.That(LazyClient.ExecuteScalar<int>("SELECT 9876"), Is.EqualTo(9876));
     }
-        
 }

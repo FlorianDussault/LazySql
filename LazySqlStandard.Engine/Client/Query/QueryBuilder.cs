@@ -37,7 +37,7 @@ internal sealed class QueryBuilder
     /// </summary>
     /// <param name="sql">Sql</param>
     /// <param name="expression">Expression</param>
-    public void Append(string sql = null, LambdaExpression expression = null)
+    public void Append(string sql = null, Expression expression = null)
     {
         if (sql != null)
             _stringBuilder.Append(sql);
@@ -57,11 +57,37 @@ internal sealed class QueryBuilder
     }
 
     /// <summary>
+    /// Append expression
+    /// </summary>
+    /// <param name="expression">Expression</param>
+    /// <param name="type">Type of object</param>
+    /// <param name="obj">object</param>
+    /// <param name="alias1"></param>
+    /// <param name="alias2"></param>
+    public void AppendWithAliases(Expression expression, LambdaAlias alias1, LambdaAlias alias2)
+    {
+        if (expression == null) return;
+        LambdaAliasParser.Parse(expression, this, alias1, alias2);
+    }
+
+    /// <summary>
     /// Register new argument
     /// </summary>
     /// <param name="type">Sql Type of argument</param>
     /// <param name="obj">Value</param>
     /// <returns>SQL Variable name</returns>
     public string RegisterArgument(SqlType type, object obj) => _sqlArguments.Register(type, obj);
+    
+    /// <summary>
+    /// Add SqlArgument
+    /// </summary>
+    /// <param name="argument"></param>
+    public void AddSqlArgument(SqlArgument argument) => _sqlArguments.Add(argument);
+
+    /// <summary>
+    /// Add SqlArguments
+    /// </summary>
+    /// <param name="arguments"></param>
+    public void AddSqlArguments(SqlArguments arguments) => _sqlArguments.AddRange(arguments);
 
 }

@@ -32,12 +32,16 @@ namespace LazySql.Engine.Exceptions
                 {
                     debugQuery = debugQuery.Replace(sqlArgument.ParameterName, $"'{sqlArgument.Value?.ToString()}'");
                 }
-
             }
 
-            LazySqlExecuteException exception = new LazySqlExecuteException($"'{ex.Message} QUERY INFORMATION: {debugQuery}");
+            LazySqlExecuteException exception = new($"'{ex.Message} QUERY INFORMATION: {debugQuery}");
             exception.DebugQuery = debugQuery;
             return exception;
+        }
+
+        public static LazySqlExecuteException Generate(Exception exception, string message)
+        {
+            throw new LazySqlExecuteException(exception, message);
         }
     }
 }

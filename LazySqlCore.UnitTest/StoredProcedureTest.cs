@@ -24,7 +24,7 @@ public class StoredProcedureTest
         LazyClient.Delete<ChildTable>();
         LazyClient.Truncate<SimpleTable>(true);
         // Add values
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
@@ -46,8 +46,8 @@ public class StoredProcedureTest
             }
         }
         // Check
-        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Get<SimpleTable>().ToList().Count());
-        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Get<ChildTable>().ToList().Count());
+        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Select<SimpleTable>().ToList().Count());
+        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Select<ChildTable>().ToList().Count());
     }
 
     [Test]

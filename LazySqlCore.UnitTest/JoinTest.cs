@@ -17,11 +17,11 @@ public class JoinTest
     {
         LazyClient.Truncate<SubChildTable>(true);
         LazyClient.Truncate<ExtendedTable>();
-        Assert.IsEmpty(LazyClient.Get<ExtendedTable>());
+        Assert.IsEmpty(LazyClient.Select<ExtendedTable>());
         LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Get<ChildTable>());
+        Assert.IsEmpty(LazyClient.Select<ChildTable>());
         LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
 
         new ExtendedTable() {Key = "AA", Value = 1}.Insert();
         new ExtendedTable() {Key = "BB", Value = 2}.Insert();
@@ -33,7 +33,7 @@ public class JoinTest
         new SimpleTable() {Username = "USR_3", Password = "PWD_3", ExtendedKey = "BB"}.Insert();
         new SimpleTable() {Username = "USR_4", Password = "PWD_4", ExtendedKey = "AA"}.Insert();
 
-        List<SimpleTable>? tables = LazyClient.Get<SimpleTable>().ToList();
+        List<SimpleTable>? tables = LazyClient.Select<SimpleTable>().ToList();
         foreach (SimpleTable simpleTable in tables)
         {
             Assert.NotNull(simpleTable.Extended);
@@ -47,11 +47,11 @@ public class JoinTest
     public void Hierarchy()
     {
         LazyClient.Truncate<SubChildTable>(true);
-        Assert.IsEmpty(LazyClient.Get<SubChildTable>());
+        Assert.IsEmpty(LazyClient.Select<SubChildTable>());
         LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Get<ChildTable>());
+        Assert.IsEmpty(LazyClient.Select<ChildTable>());
         LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Get<SimpleTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
 
         int childId = 0;
         for (int i = 0; i < 5; i++)
@@ -74,7 +74,7 @@ public class JoinTest
             }
         }
 
-        List<SimpleTable>? datas = LazyClient.Get<SimpleTable>().ToList();
+        List<SimpleTable>? datas = LazyClient.Select<SimpleTable>().ToList();
 
         Assert.That(5, Is.EqualTo(datas.Count));
         foreach (SimpleTable simpleTable in datas)
