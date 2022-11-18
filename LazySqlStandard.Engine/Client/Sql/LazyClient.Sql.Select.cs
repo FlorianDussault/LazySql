@@ -23,7 +23,7 @@ public sealed partial class LazyClient
     {
         CheckInitialization(typeof(T), out TableDefinition tableDefinition);
         if (string.IsNullOrWhiteSpace(tableName) && tableDefinition.ObjectType == ObjectType.Dynamic)
-            throw new LazySqlException($"You can call the {nameof(Select)} method with a Dynamic type without a table name in argument");
+            throw new LazySqlException($"You cannot call the {nameof(Select)} method with a Dynamic type without a table name in argument");
         return new LazyEnumerable<T>(tableName);
     }
     
@@ -74,7 +74,6 @@ public sealed partial class LazyClient
         SelectQuery selectQuery = new(childTableDefinition);
         void WhereAction(SelectQuery query)
         {
-            //LambdaParser.Parse(expression, _tableDefinition, this, type, obj);
             query.QueryBuilder.Append($" EXISTS (SELECT * FROM {parentTableDefinition.Table.TableName} AS lazy_parent WHERE ");
             query.QueryBuilder.AppendWithAliases(relationInformation.Expression, new LambdaAlias("lazy_parent", parentTableDefinition), new LambdaAlias(query.TableAlias, childTableDefinition));
             query.QueryBuilder.Append(")");

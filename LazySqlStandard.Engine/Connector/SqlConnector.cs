@@ -134,7 +134,7 @@ internal sealed class SqlConnector : IDisposable
         try
         {
             int? returnValue = null;
-            using SqlDataAdapter sqlDataAdapter = new SqlDataAdapter();
+            using SqlDataAdapter sqlDataAdapter = new();
             sqlDataAdapter.SelectCommand = _sqlCommand;
             sqlDataAdapter.SelectCommand.CommandType = CommandType.StoredProcedure;
             DataSet dataSet = new();
@@ -159,6 +159,52 @@ internal sealed class SqlConnector : IDisposable
         catch (Exception ex)
         {
             throw LazySqlExecuteException.Generate(ex, procedureName, _sqlCommand.Parameters);
+        }
+    }
+
+    public void BulkInsert(string tableName, DataTable dataTable)
+    {
+        try
+        {
+            SqlBulkCopy bulkCopy = new(
+                _sqlConnection,
+                SqlBulkCopyOptions.TableLock |
+                SqlBulkCopyOptions.FireTriggers |
+                SqlBulkCopyOptions.UseInternalTransaction,
+                null
+            );
+
+            List<string> sqlColumns = new();
+            using (SqlDataAdapter sqlDataAdapter = new())
+            {
+                _sqlCommand.CommandText = $"SELECT * FROM {tableName} WHERE 1=0";
+                sqlDataAdapter.SelectCommand = _sqlCommand;
+                DataSet dataSet = new();
+                sqlDataAdapter.Fill(dataSet);
+                for (int i = 0; i < dataSet.Tables[0].Columns.Count; i++)
+                    sqlColumns.Add(dataSet.Tables[0].Columns[i].ColumnName);
+            }
+
+
+            for (int index = 0; index < dataTable.Columns.Count; index++)
+            {
+                DataColumn dataColumn = dataTable.Columns[index];
+                string columnName = sqlColumns.FirstOrDefault(column =>
+                    string.Equals(column, dataColumn.ColumnName, StringComparison.InvariantCultureIgnoreCase));
+                if (string.IsNullOrEmpty(columnName))
+                {
+                    dataTable.Columns.RemoveAt(index--);
+                    continue;
+                }
+                bulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(dataColumn.ColumnName, columnName));
+            }
+
+            bulkCopy.DestinationTableName = tableName;
+            bulkCopy.WriteToServer(dataTable);
+        }
+        catch (Exception ex)
+        {
+            throw LazySqlExecuteException.Generate(ex, $"BulkInsert in {tableName}");
         }
     }
 }

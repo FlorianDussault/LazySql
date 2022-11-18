@@ -141,7 +141,7 @@ public sealed partial class LazyClient
             LazyColumn columnAttribute = new(propertyInfo.Name, propertyInfo.PropertyType.ToSqlType());
             tableDefinition.Add(propertyInfo, columnAttribute, null);
         }
-
+        
         return tableDefinition;
     }
 

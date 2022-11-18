@@ -6,7 +6,7 @@
 internal class LambdaParser
 {
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private readonly Expression _expression;
+    protected Expression _expression;
     private readonly Type _type;
     private readonly object _object;
     private readonly TableDefinition _tableDefinition;

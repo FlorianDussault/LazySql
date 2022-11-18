@@ -12,10 +12,10 @@ public class SimpleTable : LazyBase
     [PrimaryKey(true)]
     public int Id { get; set; }
 
-    [LazyColumn("username", SqlType.VarChar)]
+    [LazyColumn("Username", SqlType.VarChar)]
     public string Username { get; set; }
 
-    [LazyColumn("password", SqlType.VarChar)]
+    [LazyColumn("Password", SqlType.VarChar)]
     public string Password { get; set; }
 
     [LazyColumn("extended_key", SqlType.VarChar)]
