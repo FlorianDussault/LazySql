@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySql.Engine.Client.Query;
 using LazySql.Engine.Enums;
 using LazySql.Engine.Exceptions;
 using LazySqlCore.UnitTest.Tables;
+using Microsoft.Data.SqlClient;
 
 namespace LazySqlCore.UnitTest;
 
@@ -234,7 +236,6 @@ public class SelectTest
         }
     }
 
-
     [Test]
     public void SelectLazyTop()
     {
@@ -252,6 +253,26 @@ public class SelectTest
         Assert.That(list.Count, Is.EqualTo(2));
         Assert.That(list[0].Id, Is.EqualTo(1000));
         Assert.That(list[1].Id, Is.EqualTo(999));
+    }
+
+    [Test]
+    public void SelectPerformanceLazy()
+    {
+        LazyClient.Truncate<SubChildTable>(true);
+        LazyClient.Delete<ChildTable>();
+        LazyClient.Truncate<SimpleTable>(true);
+
+        List<SimpleTable> simpleTables = new();
+        const int maxRows = 1000000;
+        for (int i = 0; i < maxRows; i++)
+            simpleTables.Add(new SimpleTable() {Username = $"USERNAME {i}", Password = $"PASSWORD {i}"});
+        LazyClient.BulkInsert(simpleTables);
+        Assert.That(LazyClient.ExecuteScalar<int>("SELECT count(*) FROM simple_table"), Is.EqualTo(maxRows));
+
+        Stopwatch stopwatch = Stopwatch.StartNew();
+        simpleTables = LazyClient.Select<SimpleTable>().ToList();
+        stopwatch.Stop();
+
     }
 
 }
