@@ -25,7 +25,7 @@ public class SimpleTable : LazyBase
 
     public override void InitializeTable()
     {
-        AddOneToMany<SimpleTable, ChildTable>(nameof(ChildTables), expression: (p, c) => p.Id == c.ParentId);
+        AddOneToMany<SimpleTable, ChildTable>(nameof(ChildTables), (p, c) => p.Id == c.ParentId);
         AddOneToOne<SimpleTable, ExtendedTable>(nameof(Extended), (p, e) => p.ExtendedKey == e.Key);
     }
 }
