@@ -1,6 +1,9 @@
 ﻿
 
 // ReSharper disable once CheckNamespace
+using System.Dynamic;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace LazySql.Engine.Client;
 
 // ReSharper disable once ClassCannotBeInstantiated
@@ -15,7 +18,7 @@ public sealed partial class LazyClient
     /// <param name="obj">Item</param>
     /// <param name="autoIncrementColumn"></param>
     /// <param name="excludedColumns">Excluded columns</param>
-    public static void Insert<T>(T obj, string autoIncrementColumn = null, params string[] excludedColumns) => Instance.InternalInsert(typeof(T), obj, autoIncrementColumn, excludedColumns);
+    public static void Insert(object obj, string tableName = null, string autoIncrementColumn = null, params string[] excludedColumns) => Instance.InternalInsert(obj, tableName, autoIncrementColumn, excludedColumns);
 
     /// <summary>
     /// Insert an item
@@ -24,28 +27,33 @@ public sealed partial class LazyClient
     /// <param name="obj">Item</param>
     /// <param name="autoIncrementColumn"></param>
     /// <param name="excludedColumns"></param>
-    private void InternalInsert(Type type, object obj, string autoIncrementColumn, string[] excludedColumns)
+    private void InternalInsert(object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
     {
-        if (obj is LazyBase)
-        {
-            InternalInsertLazy(type, obj);
-        }
-        else
-        {
-            InternalInsertObject(type, obj, autoIncrementColumn, excludedColumns);
-        }
+        CheckInitialization(obj.GetType(), out TableDefinition tableDefinition);
 
+        switch (tableDefinition.ObjectType)
+        {
+            case ObjectType.LazyObject:
+                InternalInsertLazy(tableDefinition, obj);
+                break;
+            case ObjectType.Object:
+                InternalInsertObject(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
+                break;
+            default:
+                InternalInsertDynamic(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
+                break;
+        }
     }
 
-    private void InternalInsertLazy(Type type, object obj)
+
+    private void InternalInsertLazy(TableDefinition tableDefinition, object obj)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _,
             out IReadOnlyList<ColumnDefinition> primaryKeys);
 
         ColumnDefinition autoIncrementColumn = primaryKeys.FirstOrDefault(c => c.PrimaryKey.AutoIncrement);
 
-        QueryBuilder queryBuilder = new QueryBuilder(tableDefinition);
+        QueryBuilder queryBuilder = new(tableDefinition);
         queryBuilder.Append($"INSERT INTO {tableDefinition.Table.TableName}");
 
         queryBuilder.Append(
@@ -70,9 +78,8 @@ public sealed partial class LazyClient
         }
     }
 
-    private void InternalInsertObject(Type type, object obj, string autoIncrementColumn, string[] excludedColumns)
+    private void InternalInsertObject(TableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> allColumns, out _, out _);
 
         ColumnDefinition autoColumnDefinition = null;
@@ -90,8 +97,8 @@ public sealed partial class LazyClient
             : allColumns.Where(column => excludedColumns.All(c =>
                 !string.Equals(c, column.Column.ColumnName, StringComparison.InvariantCultureIgnoreCase))).ToList();
         
-        QueryBuilder queryBuilder = new QueryBuilder(tableDefinition);
-        queryBuilder.Append($"INSERT INTO {tableDefinition.Table.TableName}");
+        QueryBuilder queryBuilder = new(tableDefinition);
+        queryBuilder.Append($"INSERT INTO {tableName ?? tableDefinition.Table.TableName}");
 
         queryBuilder.Append(
             $" ({string.Join(", ", columns.Select(c => c.Column.SqlColumnName))})");
@@ -113,6 +120,55 @@ public sealed partial class LazyClient
         {
             ExecuteNonQuery(queryBuilder);
         }
+    }
+
+    private void InternalInsertDynamic(TableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
+    {
+        if (tableName == null)
+            throw new LazySqlException($"{nameof(tableName)} cannot be null for dynamic object");
+
+        List<PropertyInfo> allProperties = obj.GetType().GetProperties().ToList();
+
+        PropertyInfo autoColumnDefinition = null;
+        if (!string.IsNullOrWhiteSpace(autoIncrementColumn))
+        {
+            autoColumnDefinition = allProperties.First(c =>
+                string.Equals(c.Name, autoIncrementColumn, StringComparison.InvariantCultureIgnoreCase));
+
+            excludedColumns ??= Array.Empty<string>();
+            excludedColumns = excludedColumns.Append(autoIncrementColumn).ToArray();
+        }
+
+        List<PropertyInfo> properties = excludedColumns == null
+            ? allProperties.ToList()
+            : allProperties.Where(column => excludedColumns.All(c =>
+                !string.Equals(c, column.Name, StringComparison.InvariantCultureIgnoreCase))).ToList();
+
+
+        QueryBuilder queryBuilder = new(tableDefinition);
+        queryBuilder.Append($"INSERT INTO {tableName}");
+
+        queryBuilder.Append(
+            $" ({string.Join(", ", properties.Select(c => c.Name))})");
+
+        if (autoIncrementColumn != null)
+            queryBuilder.Append($" output INSERTED.{autoIncrementColumn}");
+
+        List<string> values = properties.Select(property =>
+            queryBuilder.RegisterArgument(property.Name.GetType().ToSqlType(), property.GetValue(obj))).ToList();
+        queryBuilder.Append($" VALUES ({string.Join(", ", values)})");
+
+        if (autoColumnDefinition != null && autoColumnDefinition.CanWrite)
+        {
+            object output = ExecuteScalar(queryBuilder);
+            object value = Convert.ChangeType(output, autoColumnDefinition.PropertyType);
+            autoColumnDefinition.SetValue(this, value, null);
+        }
+        else
+        {
+            ExecuteNonQuery(queryBuilder);
+        }
+        
     }
 
     #endregion

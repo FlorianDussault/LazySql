@@ -105,7 +105,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <param name="collection">Collection of item</param>
     public new void InsertRange(int index, IEnumerable<T> collection)
     {
-        List<T> items = new List<T>();
+        List<T> items = new();
 
         foreach (T value in collection.ToList())
         {

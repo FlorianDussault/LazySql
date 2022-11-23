@@ -56,17 +56,17 @@ public class JoinTest
         int childId = 0;
         for (int i = 0; i < 5; i++)
         {
-            SimpleTable simpleTable = new SimpleTable() { };
+            SimpleTable simpleTable = new() { };
             simpleTable.Insert();
 
             for (int j = 0; j < 9; j++)
             {
-                ChildTable childTable = new ChildTable() {Id = ++childId, ParentId = simpleTable.Id};
+                ChildTable childTable = new() {Id = ++childId, ParentId = simpleTable.Id};
                 childTable.Insert();
 
                 for (int k = 0; k < 10; k++)
                 {
-                    SubChildTable subChildTable = new SubChildTable() {ParentId = childTable.Id, Value = $"{simpleTable.Id} - {childTable.Id}"};
+                    SubChildTable subChildTable = new() {ParentId = childTable.Id, Value = $"{simpleTable.Id} - {childTable.Id}"};
                     subChildTable.Insert();
                     subChildTable.Value = $"{simpleTable.Id} - {childTable.Id} - {subChildTable.Id}";
                     subChildTable.Update();

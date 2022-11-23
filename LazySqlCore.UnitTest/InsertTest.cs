@@ -1,3 +1,4 @@
+using System.Dynamic;
 using LazySql.Engine;
 using LazySql.Engine.Client;
 using LazySqlCore.UnitTest.Tables;
@@ -25,7 +26,7 @@ public class InsertTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new SimpleTable()
+            SimpleTable? st = new()
             {
                 Username = $"U{i+1}",
                 Password = $"P{i + 1}"
@@ -66,7 +67,7 @@ public class InsertTest
             Username = "Test1",
             Password = "Pass1"
         };
-        LazyClient.Insert(simpleTable, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
 
         Assert.That(simpleTable.User_Id, Is.EqualTo(1));
 
@@ -75,7 +76,7 @@ public class InsertTest
             Username = "Test2",
             Password = "Pass2"
         };
-        LazyClient.Insert(simpleTable, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
         Assert.That(simpleTable.User_Id, Is.EqualTo(2));
 
         simpleTable = new()
@@ -85,7 +86,7 @@ public class InsertTest
             Password = "Pass3"
         };
         LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
-        Assert.That(simpleTable.User_Id, Is.EqualTo(999));
+        Assert.That(simpleTable.User_Id, !Is.EqualTo(999));
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>().ToList();
         Assert.That(values[0].Id, Is.EqualTo(1));
@@ -97,6 +98,94 @@ public class InsertTest
         Assert.That(values[1].Password, Is.EqualTo("Pass2"));
 
         Assert.That(values[2].Id, Is.EqualTo(3));
+        Assert.That(values[2].Username, Is.EqualTo("Test3"));
+        Assert.That(values[2].Password, Is.EqualTo("Pass3"));
+
+
+    }
+
+    [Test]
+    public void InsertDynamic()
+    {
+        LazyClient.Truncate<SubChildTable>(true);
+        LazyClient.Delete<ChildTable>();
+        LazyClient.Truncate<SimpleTable>(true);
+
+
+        dynamic simpleTable = new
+        {//User_Id = 1000,
+            Username = "Test1",
+            Password = "Pass1"
+        };
+        LazyClient.Insert(simpleTable, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+
+
+        dynamic simpleTable2 = new
+        {
+            Username = "Test2",
+            Password = "Pass2"
+        };
+        LazyClient.Insert(simpleTable2, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+
+        dynamic simpleTable3 = new
+        {
+            Username = "Test3",
+            Password = "Pass3"
+        };
+        LazyClient.Insert(simpleTable3, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>().OrderBy(s=>s.Id).ToList();
+        Assert.That(values[0].Username, Is.EqualTo("Test1"));
+        Assert.That(values[0].Password, Is.EqualTo("Pass1"));
+
+        Assert.That(values[1].Username, Is.EqualTo("Test2"));
+        Assert.That(values[1].Password, Is.EqualTo("Pass2"));
+
+        Assert.That(values[2].Username, Is.EqualTo("Test3"));
+        Assert.That(values[2].Password, Is.EqualTo("Pass3"));
+
+
+    }
+
+    [Test]
+    [Ignore("ExpandoObject to implement")]
+    public void InsertExpandoObject()
+    {
+        LazyClient.Truncate<SubChildTable>(true);
+        LazyClient.Delete<ChildTable>();
+        LazyClient.Truncate<SimpleTable>(true);
+
+
+        dynamic simpleTable = new ExpandoObject();
+
+        simpleTable.User_Id = 999;
+        simpleTable.Username = "Test1";
+        simpleTable.Password = "Pass1";
+        
+        LazyClient.Insert(simpleTable, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        Assert.That(simpleTable.User_Id, Is.EqualTo(1));
+
+        dynamic simpleTable2 = new
+        {
+            Username = "Test2",
+            Password = "Pass2"
+        };
+        LazyClient.Insert(simpleTable2, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+
+        dynamic simpleTable3 = new
+        {
+            Username = "Test3",
+            Password = "Pass3"
+        };
+        LazyClient.Insert(simpleTable3, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>().OrderBy(s => s.Id).ToList();
+        Assert.That(values[0].Username, Is.EqualTo("Test1"));
+        Assert.That(values[0].Password, Is.EqualTo("Pass1"));
+
+        Assert.That(values[1].Username, Is.EqualTo("Test2"));
+        Assert.That(values[1].Password, Is.EqualTo("Pass2"));
+
         Assert.That(values[2].Username, Is.EqualTo("Test3"));
         Assert.That(values[2].Password, Is.EqualTo("Pass3"));
 

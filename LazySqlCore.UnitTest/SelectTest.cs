@@ -30,7 +30,7 @@ public class SelectTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable st = new SimpleTable()
+            SimpleTable st = new()
             {
                 Username = $"U{i + 1}",
                 Password = $"P{i + 1}"
@@ -100,7 +100,7 @@ public class SelectTest
     {
         AddSimpleTables();
 
-        List<int> allowedIds = new List<int> {5, 6, 7, 8, 9, 10, 20};
+        List<int> allowedIds = new() {5, 6, 7, 8, 9, 10, 20};
 
         foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>()
                      .Where(i => (i.Id > 4 && i.Id <= 10) || i.Username == "P20"))
@@ -114,7 +114,7 @@ public class SelectTest
     {
         AddSimpleTables();
 
-        List<int> allowedIds = new List<int> {5, 6, 7, 8, 9, 10, 20};
+        List<int> allowedIds = new() {5, 6, 7, 8, 9, 10, 20};
 
         foreach (Simple_Table simpleTable in LazyClient.Select<Simple_Table>()
                      .Where(i => (i.User_Id > 4 && i.User_Id <= 10) || i.Username == "P20"))
@@ -128,7 +128,7 @@ public class SelectTest
     {
         AddSimpleTables();
 
-        List<int> allowedIds = new List<int> {5, 6, 7, 8, 9, 10, 20};
+        List<int> allowedIds = new() {5, 6, 7, 8, 9, 10, 20};
         // i => (i.User_Id > 4 && i.User_Id <= 10) || i.Username == "P20"
         string p20 = "P20";
         foreach (dynamic simpleTable in LazyClient.Select<dynamic>("simple_table").Where(

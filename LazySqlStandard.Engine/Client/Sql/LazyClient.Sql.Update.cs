@@ -23,7 +23,7 @@ public sealed partial class LazyClient
 
         QueryBuilder queryBuilder = new(tableDefinition);
         queryBuilder.Append($"UPDATE {tableDefinition.Table.TableName} SET ");
-        List<string> values = new List<string>();
+        List<string> values = new();
         foreach (ColumnDefinition column in columns)
         {
             string argumentName = queryBuilder.RegisterArgument(column.Column.SqlType, column.PropertyInfo.GetValue(obj));

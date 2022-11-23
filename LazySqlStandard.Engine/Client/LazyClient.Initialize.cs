@@ -79,12 +79,13 @@ public sealed partial class LazyClient
             throw new LazySqlInitializeException($"Abstract object is not supported ({type.Name})");
         if (!type.GetTypeInfo().IsClass)
             throw new LazySqlInitializeException($"{type.Name} is not a class");
-      
+
         if (typeof(LazyBase).IsAssignableFrom(type))
             return RegisterLazyObject(type);
         if (type == typeof(object))
             return RegisterDynamicObject(type);
         return RegisterObject(type);
+
     }
 
 
@@ -130,11 +131,15 @@ public sealed partial class LazyClient
 
     private TableDefinition RegisterObject(Type type)
     {
-        TableDefinition tableDefinition = new(type, new LazyTable(type.Name), ObjectType.Object)
+        List<PropertyInfo> properties = type.GetProperties().Where(p => p.CanRead && p.CanWrite).ToList();
+
+        if (properties.Count == 0)
+            return new TableDefinition(type, new LazyTable(type.Name), ObjectType.Dynamic);
+
+        TableDefinition tableDefinition = new(type, new LazyTable(type.Name),  ObjectType.Object)
         {
             Relations = new RelationsInformation()
         };
-        IEnumerable<PropertyInfo> properties = type.GetProperties().Where(p=>p.CanRead && p.CanWrite);
 
         foreach (PropertyInfo propertyInfo in properties)
         {

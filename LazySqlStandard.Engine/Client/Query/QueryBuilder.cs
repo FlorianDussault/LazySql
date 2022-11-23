@@ -5,8 +5,8 @@
 /// </summary>
 internal sealed class QueryBuilder
 {
-    private readonly StringBuilder _stringBuilder = new StringBuilder();
-    private readonly SqlArguments _sqlArguments = new SqlArguments();
+    private readonly StringBuilder _stringBuilder = new();
+    private readonly SqlArguments _sqlArguments = new();
     private readonly TableDefinition _tableDefinition;
 
     public QueryBuilder(TableDefinition tableDefinition)

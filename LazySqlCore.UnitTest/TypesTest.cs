@@ -33,7 +33,7 @@ public class TypesTest
     {
         Reset();
         byte[] val = new byte[50];
-        Random rand = new Random(DateTime.Now.Millisecond);
+        Random rand = new(DateTime.Now.Millisecond);
         for (int i = 0; i < val.Length; i++)
         {
             val[i] = (byte)rand.Next(0, 255);
@@ -114,7 +114,7 @@ public class TypesTest
     {
         Reset();
         byte[] val = new byte[50];
-        Random rand = new Random(DateTime.Now.Millisecond);
+        Random rand = new(DateTime.Now.Millisecond);
         for (int i = 0; i < val.Length; i++)
         {
             val[i] = (byte)rand.Next(0, 255);

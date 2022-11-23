@@ -25,7 +25,7 @@ public class DeleteTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new SimpleTable()
+            SimpleTable? st = new()
             {
                 Username = "",
                 Password = ""
@@ -77,7 +77,7 @@ public class DeleteTest
     {
         AddSimpleTables();
         LazyClient.Delete<ChildTable>((i)=>i.Id <= 10 || i.Id == 20);
-        List<int> allowedIds = new List<int> {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20};
+        List<int> allowedIds = new() {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20};
         foreach (ChildTable childTable in LazyClient.Select<ChildTable>())
         {
             Assert.IsFalse((allowedIds.Any(id => childTable.Id == id)), $"{childTable.Id} not deleted");

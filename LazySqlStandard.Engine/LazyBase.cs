@@ -8,7 +8,7 @@ public abstract class LazyBase
     /// <summary>
     /// List of relations
     /// </summary>
-    internal RelationsInformation Relations { get; } = new RelationsInformation();
+    internal RelationsInformation Relations { get; } = new();
 
     /// <summary>
     /// Initialization

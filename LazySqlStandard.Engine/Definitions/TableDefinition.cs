@@ -58,10 +58,10 @@ internal sealed class TableDefinition : List<ColumnDefinition>
     /// <param name="primaryKeys">Primary Keys</param>
     public void GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out IReadOnlyList<ColumnDefinition> columnsWithoutAutoIncrement, out IReadOnlyList<ColumnDefinition> columnsWithoutPrimaryKeys, out IReadOnlyList<ColumnDefinition> primaryKeys)
     {
-        List<ColumnDefinition> listAllColumns = new List<ColumnDefinition>();
-        List<ColumnDefinition> listColumnsWithoutAutoIncrement = new List<ColumnDefinition>();
-        List<ColumnDefinition> listColumnsWithoutPrimaryKeys = new List<ColumnDefinition>();
-        List<ColumnDefinition> listPrimaryKeys = new List<ColumnDefinition>();
+        List<ColumnDefinition> listAllColumns = new();
+        List<ColumnDefinition> listColumnsWithoutAutoIncrement = new();
+        List<ColumnDefinition> listColumnsWithoutPrimaryKeys = new();
+        List<ColumnDefinition> listPrimaryKeys = new();
 
         foreach (ColumnDefinition columnDefinition in GetColumns())
         {
