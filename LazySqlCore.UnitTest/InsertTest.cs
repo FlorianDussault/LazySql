@@ -69,7 +69,7 @@ public class InsertTest
         };
         LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
 
-        Assert.That(simpleTable.User_Id, Is.EqualTo(1));
+        Assert.That(simpleTable.User_Id, Is.EqualTo(0));
 
         simpleTable = new()
         {
@@ -77,7 +77,7 @@ public class InsertTest
             Password = "Pass2"
         };
         LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
-        Assert.That(simpleTable.User_Id, Is.EqualTo(2));
+        Assert.That(simpleTable.User_Id, Is.EqualTo(1));
 
         simpleTable = new()
         {
@@ -89,15 +89,15 @@ public class InsertTest
         Assert.That(simpleTable.User_Id, !Is.EqualTo(999));
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>().ToList();
-        Assert.That(values[0].Id, Is.EqualTo(1));
+        Assert.That(values[0].Id, Is.EqualTo(0));
         Assert.That(values[0].Username, Is.EqualTo("Test1"));
         Assert.That(values[0].Password, Is.EqualTo("Pass1"));
 
-        Assert.That(values[1].Id, Is.EqualTo(2));
+        Assert.That(values[1].Id, Is.EqualTo(1));
         Assert.That(values[1].Username, Is.EqualTo("Test2"));
         Assert.That(values[1].Password, Is.EqualTo("Pass2"));
 
-        Assert.That(values[2].Id, Is.EqualTo(3));
+        Assert.That(values[2].Id, Is.EqualTo(2));
         Assert.That(values[2].Username, Is.EqualTo("Test3"));
         Assert.That(values[2].Password, Is.EqualTo("Pass3"));
 
@@ -205,7 +205,7 @@ public class InsertTest
         }.Insert();
 
         SimpleTable item = LazyClient.Select<SimpleTable>().First();
-        Assert.That(item.Id, Is.EqualTo(1));
+        Assert.That(item.Id, Is.EqualTo(0));
         Assert.IsNull(item.Username);
         Assert.IsNull(item.Password);
     }

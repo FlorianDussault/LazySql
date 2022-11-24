@@ -64,8 +64,8 @@ public class StoredProcedureTest
 
 
         Assert.That(-678, Is.EqualTo(result.ReturnValue));
-        Assert.That(20, Is.EqualTo(result.Output.IdMin));
-        Assert.That(30, Is.EqualTo(result.Output.IdMax));
+        Assert.That(19, Is.EqualTo(result.Output.IdMin));
+        Assert.That(29, Is.EqualTo(result.Output.IdMax));
 
         List<dynamic> values = result.Tables[0].Parse().ToList();
             

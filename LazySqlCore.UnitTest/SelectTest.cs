@@ -70,7 +70,7 @@ public class SelectTest
 
         for (int i = 0; i < simpleTables.Count; i++)
         {
-            Assert.That(simpleTables[i].User_Id, Is.EqualTo(i + 1));
+            Assert.That(simpleTables[i].User_Id, Is.EqualTo(i));
             Assert.That(simpleTables[i].Username, Is.EqualTo($"U{i + 1}"));
             Assert.That(simpleTables[i].Password, Is.EqualTo($"P{i + 1}"));
             Assert.IsNull(simpleTables[i].NotInSqlFiled);
@@ -88,7 +88,7 @@ public class SelectTest
 
         for (int i = 0; i < simpleTables.Count; i++)
         {
-            Assert.That(simpleTables[i].user_id, Is.EqualTo(i + 1));
+            Assert.That(simpleTables[i].user_id, Is.EqualTo(i));
             Assert.That(simpleTables[i].username, Is.EqualTo($"U{i + 1}"));
             Assert.That(simpleTables[i].password, Is.EqualTo($"P{i + 1}"));
             Assert.IsNull(simpleTables[i].extended_key);
@@ -251,8 +251,8 @@ public class SelectTest
 
         List<SimpleTable> list = LazyClient.Select<SimpleTable>().OrderByDesc(s => s.Id).Top(2).ToList();
         Assert.That(list.Count, Is.EqualTo(2));
-        Assert.That(list[0].Id, Is.EqualTo(1000));
-        Assert.That(list[1].Id, Is.EqualTo(999));
+        Assert.That(list[0].Id, Is.EqualTo(999));
+        Assert.That(list[1].Id, Is.EqualTo(998));
     }
 
     [Test]
