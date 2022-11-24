@@ -9,8 +9,8 @@ internal static class ClientTest
 {
 #if APPVEYOR
     private const string DatabaseName = "LazySql";
-    private const string DbConnectionString = "Server=(local)\\SQL2016;Database=LazySql;User ID=sa;Password=Password12!";
-    private const string MasterConnectionString = "Server=(local)\\SQL2016;Database=master;User ID=sa;Password=Password12!";
+    private const string DbConnectionString = "Server=(local)\\SQL2019;Database=LazySql;User ID=sa;Password=Password12!";
+    private const string MasterConnectionString = "Server=(local)\\SQL2019;Database=master;User ID=sa;Password=Password12!";
 #else
     private const string DatabaseName = "LazySql2";
     private const string DbConnectionString = "Server=localhost\\sqlexpress;Database=LazySql2;TrustServerCertificate=Yes;Trusted_Connection=True";
