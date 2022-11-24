@@ -1,4 +1,6 @@
-test: off
+test: on
 image: Visual Studio 2022
+services:
+  - mssql2016
 before_build:
 - cmd: nuget restore "LazySql.sln"
