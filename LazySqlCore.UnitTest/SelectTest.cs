@@ -9,6 +9,7 @@ using Microsoft.Data.SqlClient;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture, Category("SELECT")]
 public class SelectTest
 {
     [SetUp]
@@ -54,13 +55,13 @@ public class SelectTest
             Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE));
     }
 
-    [Test]
+    [Test(Description = "Select with LazyObject"), Category("LazyObject")]
     public void SelectLazy()
     {
         AddSimpleTables();
     }
 
-    [Test]
+    [Test, Category("Object")]
     public void SelectObject()
     {
         AddSimpleTables();
@@ -79,7 +80,7 @@ public class SelectTest
 
     }
 
-    [Test]
+    [Test, Category("Dynamic")]
     public void SelectDynamic()
     {
         AddSimpleTables();
