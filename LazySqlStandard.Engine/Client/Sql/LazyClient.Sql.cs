@@ -39,7 +39,7 @@ public sealed partial class LazyClient
         using SqlConnector sqlConnector = Open();
         using SqlDataReader sqlDataReader =
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
-        TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
+        ITableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 
         
 

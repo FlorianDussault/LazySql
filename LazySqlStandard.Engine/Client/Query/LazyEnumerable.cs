@@ -8,7 +8,7 @@ namespace LazySql.Engine.Client.Query;
 /// <typeparam name="T"></typeparam>
 internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
 {
-    private readonly TableDefinition _tableDefinition;
+    private readonly ITableDefinition _tableDefinition;
     private readonly SelectQuery _selectQuery;
 
     internal LazyEnumerable(string tableName)
@@ -115,7 +115,7 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     /// <returns></returns>
     private IEnumerable Execute()
     {
-        if (_tableDefinition.Relations.Count == 0)
+        if (!_tableDefinition.HasRelations)
         {
             foreach (object o in LazyClient.GetWithQuery(typeof(T), _selectQuery))
                 yield return o;

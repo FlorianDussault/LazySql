@@ -14,7 +14,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <param name="loadAllData">if true, all the data will be load from the database</param>
     public DataLive(bool loadAllData = false)
     {
-        LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+        LazyClient.CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
         tableDefinition.GetColumns(out _, out _, out _, out _primaryKeys);
         if(loadAllData) Load();
     }
@@ -25,7 +25,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <param name="expression">Expression</param>
     public DataLive(Expression<Func<T, bool>> expression)
     {
-        LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+        LazyClient.CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
         tableDefinition.GetColumns(out _, out _, out _, out _primaryKeys);
         Load(expression);
     }

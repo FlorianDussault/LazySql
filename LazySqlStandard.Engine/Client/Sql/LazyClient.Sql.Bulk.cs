@@ -28,7 +28,7 @@ public sealed partial class LazyClient
     /// <exception cref="LazySqlException"></exception>
     private void InternalBulkInsert<T>(string tableName, IEnumerable<T> values)
     {
-        CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+        CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
 
         switch (tableDefinition.ObjectType)
         {
@@ -52,7 +52,7 @@ public sealed partial class LazyClient
     /// <param name="tableName">Table Name</param>
     /// <param name="tableDefinition">Table Definition</param>
     /// <param name="values">Values</param>
-    private void BulkInsertObject<T>(string tableName, TableDefinition tableDefinition, IEnumerable<T> values)
+    private void BulkInsertObject<T>(string tableName, ITableDefinition tableDefinition, IEnumerable<T> values)
     {
         DataTable dataTable = new();
 
@@ -74,7 +74,7 @@ public sealed partial class LazyClient
         }
         #endregion
 
-        BulkInsert(tableName ?? tableDefinition.Table.TableName, dataTable);
+        BulkInsert(tableDefinition.GetTableName(tableName), dataTable);
     }
 
     /// <summary>

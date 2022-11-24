@@ -13,7 +13,7 @@ internal sealed class SelectQuery
     /// <summary>
     /// Table Definition
     /// </summary>
-    private TableDefinition TableDefinition { get; }
+    private ITableDefinition TableDefinition { get; }
 
     /// <summary>
     /// Alias Name
@@ -25,12 +25,12 @@ internal sealed class SelectQuery
     private readonly List<IOrderByQuery> _orderByQueries;
     private int? _top;
 
-    public SelectQuery(TableDefinition tableDefinition, string tableName = null)
+    public SelectQuery(ITableDefinition tableDefinition, string tableName = null)
     {
         TableDefinition = tableDefinition;
         QueryBuilder = new QueryBuilder(tableDefinition);
         _orderByQueries = new List<IOrderByQuery>();
-        _tableName = tableName ?? TableDefinition.Table.TableName;
+        _tableName = tableDefinition.GetTableName(tableName);
         TableAlias = $"{_tableName}_{Guid.NewGuid().ToString().Substring(0, 4)}";
     }
 

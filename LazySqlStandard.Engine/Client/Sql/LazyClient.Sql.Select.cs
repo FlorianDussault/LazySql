@@ -21,7 +21,7 @@ public sealed partial class LazyClient
     /// <exception cref="LazySqlException"></exception>
     private ILazyEnumerable<T> InternalSelect<T>(string tableName)
     {
-        CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+        CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
         if (string.IsNullOrWhiteSpace(tableName) && tableDefinition.ObjectType == ObjectType.Dynamic)
             throw new LazySqlException($"You cannot call the {nameof(Select)} method with a Dynamic type without a table name in argument");
         return new LazyEnumerable<T>(tableName);
@@ -35,8 +35,8 @@ public sealed partial class LazyClient
     /// <returns>IEnumerable</returns>
     internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
-        if (tableDefinition.Relations.Count == 0)
+        CheckInitialization(type, out ITableDefinition tableDefinition);
+        if (!tableDefinition.HasRelations)
         {
             foreach (object value in ExecuteReader(selectQuery.BuildQuery()))
                 yield return value;
@@ -63,8 +63,8 @@ public sealed partial class LazyClient
     internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
     {
         if (values.Count == 0) return;
-        CheckInitialization(parentType, out TableDefinition parentTableDefinition);
-        CheckInitialization(relationInformation.ChildType, out TableDefinition childTableDefinition);
+        CheckInitialization(parentType, out ITableDefinition parentTableDefinition);
+        CheckInitialization(relationInformation.ChildType, out ITableDefinition childTableDefinition);
 
         // SELECT * FROM T1
         // WHERE EXISTS
@@ -74,7 +74,7 @@ public sealed partial class LazyClient
         SelectQuery selectQuery = new(childTableDefinition);
         void WhereAction(SelectQuery query)
         {
-            query.QueryBuilder.Append($" EXISTS (SELECT * FROM {parentTableDefinition.Table.TableName} AS lazy_parent WHERE ");
+            query.QueryBuilder.Append($" EXISTS (SELECT * FROM {parentTableDefinition.GetTableName()} AS lazy_parent WHERE ");
             query.QueryBuilder.AppendWithAliases(relationInformation.Expression, new LambdaAlias("lazy_parent", parentTableDefinition), new LambdaAlias(query.TableAlias, childTableDefinition));
             query.QueryBuilder.Append(")");
         }

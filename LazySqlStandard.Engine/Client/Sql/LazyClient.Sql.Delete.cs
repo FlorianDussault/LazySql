@@ -20,17 +20,17 @@ public sealed partial class LazyClient
     /// <param name="reseed">Execute RESEED (DBCC CHECKIDENT) for a table with relations</param>
     private void InternalTruncate(Type type, bool reseed = false)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
+        CheckInitialization(type, out ITableDefinition tableDefinition);
 
         using SqlConnector sqlConnector = Open();
         if (reseed)
         {
             InternalDelete(type);
-            sqlConnector.ExecuteNonQuery($"DBCC CHECKIDENT ('{tableDefinition.Table.TableName}', RESEED, 0)");
+            sqlConnector.ExecuteNonQuery($"DBCC CHECKIDENT ('{tableDefinition.GetTableName()}', RESEED, 0)");
         }
         else
         {
-            sqlConnector.ExecuteNonQuery($"TRUNCATE TABLE {tableDefinition.Table.TableName}");
+            sqlConnector.ExecuteNonQuery($"TRUNCATE TABLE {tableDefinition.GetTableName()}");
         }
     }
 
@@ -52,10 +52,10 @@ public sealed partial class LazyClient
     /// <param name="expression">Filter Expression</param>
     private void InternalDelete(Type type, LambdaExpression expression = null)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
+        CheckInitialization(type, out ITableDefinition tableDefinition);
 
         QueryBuilder queryBuilder = new(tableDefinition);
-        queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName}");
+        queryBuilder.Append($"DELETE FROM {tableDefinition.GetTableName()}");
 
         if (expression != null)
             queryBuilder.Append(" WHERE ", expression);
@@ -76,7 +76,7 @@ public sealed partial class LazyClient
     /// <param name="obj">Item</param>
     private void InternalDelete(object obj)
     {
-        CheckInitialization(obj.GetType(), out TableDefinition tableDefinition);
+        CheckInitialization(obj.GetType(), out ITableDefinition tableDefinition);
 
         tableDefinition.GetColumns(out _, out _, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
@@ -96,7 +96,7 @@ public sealed partial class LazyClient
         }
 
         QueryBuilder queryBuilder = new(tableDefinition);
-        queryBuilder.Append($"DELETE FROM {tableDefinition.Table.TableName} WHERE ");
+        queryBuilder.Append($"DELETE FROM {tableDefinition.GetTableName()} WHERE ");
         queryBuilder.Append(binaryExpression, obj.GetType(), obj);
 
         using SqlConnector sqlConnector = Open();

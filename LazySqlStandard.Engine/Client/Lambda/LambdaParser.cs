@@ -9,11 +9,11 @@ internal class LambdaParser
     protected Expression _expression;
     private readonly Type _type;
     private readonly object _object;
-    private readonly TableDefinition _tableDefinition;
-    private readonly TableDefinition _parentTableDefinition;
+    private readonly ITableDefinition _tableDefinition;
+    private readonly ITableDefinition _parentTableDefinition;
     protected readonly  QueryBuilder _queryBuilder;
 
-    protected LambdaParser(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null)
+    protected LambdaParser(Expression expression, ITableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null)
     {
         _expression = expression;
         _tableDefinition = tableDefinition;
@@ -35,7 +35,7 @@ internal class LambdaParser
     /// <param name="type"></param>
     /// <param name="obj"></param>
     // ReSharper disable once ObjectCreationAsStatement
-    internal static void Parse(Expression expression, TableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null) => new LambdaParser(expression, tableDefinition, queryBuilder, type, obj).ParseExpression(expression);
+    internal static void Parse(Expression expression, ITableDefinition tableDefinition, QueryBuilder queryBuilder, Type type = null, object obj = null) => new LambdaParser(expression, tableDefinition, queryBuilder, type, obj).ParseExpression(expression);
 
     
     /// <summary>

@@ -7,9 +7,9 @@ internal sealed class QueryBuilder
 {
     private readonly StringBuilder _stringBuilder = new();
     private readonly SqlArguments _sqlArguments = new();
-    private readonly TableDefinition _tableDefinition;
+    private readonly ITableDefinition _tableDefinition;
 
-    public QueryBuilder(TableDefinition tableDefinition)
+    public QueryBuilder(ITableDefinition tableDefinition)
     {
         _tableDefinition = tableDefinition;
     }
@@ -30,7 +30,7 @@ internal sealed class QueryBuilder
     /// Get Current Table Definition
     /// </summary>
     /// <returns></returns>
-    public TableDefinition GetTableDefinition() => _tableDefinition;
+    public ITableDefinition GetTableDefinition() => _tableDefinition;
 
     /// <summary>
     /// Append Sql

@@ -17,12 +17,12 @@ public sealed partial class LazyClient
 
     private void InternalUpdate(Type type, object obj)
     {
-        CheckInitialization(type, out TableDefinition tableDefinition);
+        CheckInitialization(type, out ITableDefinition tableDefinition);
 
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
         QueryBuilder queryBuilder = new(tableDefinition);
-        queryBuilder.Append($"UPDATE {tableDefinition.Table.TableName} SET ");
+        queryBuilder.Append($"UPDATE {tableDefinition.GetTableName()} SET ");
         List<string> values = new();
         foreach (ColumnDefinition column in columns)
         {
