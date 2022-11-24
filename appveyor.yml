@@ -1,6 +1,6 @@
 test: on
 image: Visual Studio 2022
-services:
-  - mssql2016
+init:
+- net start MSSQL$SQL2019
 before_build:
 - cmd: nuget restore "LazySql.sln"
