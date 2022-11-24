@@ -3,6 +3,7 @@ using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Bulk Insert")]
 public class BulkInsertTest
 {
     [SetUp]

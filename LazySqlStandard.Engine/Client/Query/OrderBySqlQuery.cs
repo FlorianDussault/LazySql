@@ -13,9 +13,9 @@ internal sealed class OrderBySqlQuery : IOrderByQuery
         _columnName = columnName;
         _orderByDirection = orderByDirection;
     }
-    public void Build(SelectQuery selectQuery)
+    public void Build(QueryBase queryBase)
     {
-        selectQuery.QueryBuilder.Append(_columnName);
-        selectQuery.QueryBuilder.Append(_orderByDirection == OrderByDirection.Asc ? " ASC " : " DESC ");
+        queryBase.QueryBuilder.Append(_columnName);
+        queryBase.QueryBuilder.Append(_orderByDirection == OrderByDirection.Asc ? " ASC " : " DESC ");
     }
 }

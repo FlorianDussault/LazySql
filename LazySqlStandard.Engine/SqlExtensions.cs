@@ -27,14 +27,20 @@ public static class SqlExtensions
     /// </summary>
     /// <typeparam name="T">Type of object</typeparam>
     /// <param name="obj">Object</param>
-    public static void Update<T>(this T obj) where T : LazyBase => LazyClient.Update(obj);
+    /// <param name="where"></param>
+    /// <param name="excludedColumns"></param>
+    public static int Update<T>(this T obj, Expression<Func<T, bool>> where = null, params string[] excludedColumns) => LazyClient.Update(obj, where,excludedColumns );
+
+    public static int Update<T>(this T obj, string where = null, params string[] excludedColumns) => LazyClient.Update(obj, where, excludedColumns);
+
+    public static int Update<T>(this T obj) => LazyClient.Update(obj, string.Empty, new string[]{});
 
     /// <summary>
     /// Update list of object
     /// </summary>
     /// <typeparam name="T">Type of object</typeparam>
     /// <param name="list"></param>
-    public static void Update<T>(this IEnumerable<T> list) where T : LazyBase
+    public static void Update<T>(this IEnumerable<T> list)
     {
         foreach (T obj in list) obj.Update();
     }

@@ -6,6 +6,7 @@ using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Lambda Expression")]
 public class LambdaTest
 {
     [SetUp]
@@ -27,7 +28,7 @@ public class LambdaTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new()
+            SimpleTable st = new()
             {
                 Username = $"U{i + 1}",
                 Password = $"P{i + 1}"
@@ -80,8 +81,8 @@ public class LambdaTest
             List<SimpleTable> simpleTables =
                 LazyClient.Select<SimpleTable>().Where(s => s.Username == valString + "10").ToList();
 
-            Assert.That(1, Is.EqualTo(simpleTables.Count));
-            Assert.That("U10", Is.EqualTo(simpleTables[0].Username));
+            Assert.That(simpleTables.Count, Is.EqualTo(1));
+            Assert.That(simpleTables[0].Username, Is.EqualTo("U10"));
         }
     }
 
@@ -127,7 +128,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
             Assert.IsEmpty(values);
         }
 
@@ -138,7 +139,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where(s => LzFunctions.IsDate(s.Username) == 1);
             Assert.That(1, Is.EqualTo(values.Count()));
         }
     }
@@ -157,7 +158,7 @@ public class LambdaTest
         simpleTable.Insert();
 
         {
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.IsDate(LzFunctions.GetDate()) == 1);
             Assert.IsNotEmpty(values);
         }
     }
@@ -177,7 +178,7 @@ public class LambdaTest
 
         {
             int day = DateTime.Now.Day;
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Day(LzFunctions.GetDate()) == day);
             Assert.IsNotEmpty(values);
         }
     }
@@ -199,7 +200,7 @@ public class LambdaTest
 
         {
             int month = DateTime.Now.Month;
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Month(LzFunctions.GetDate()) == month);
             Assert.IsNotEmpty(values);
         }
     }
@@ -219,7 +220,7 @@ public class LambdaTest
 
         {
             int year = DateTime.Now.Year;
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.Year(LzFunctions.GetDate()) == year);
             Assert.IsNotEmpty(values);
         }
     }
@@ -239,12 +240,12 @@ public class LambdaTest
 
         {
             int year = DateTime.Now.Year + 1;
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) =>
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) =>
                 LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, 1, LzFunctions.GetDate())) == year);
             Assert.IsNotEmpty(values);
 
             year = DateTime.Now.Year - 1;
-            ILazyEnumerable<SimpleTable>? values2 = LazyClient.Select<SimpleTable>().Where((s) =>
+            ILazyEnumerable<SimpleTable> values2 = LazyClient.Select<SimpleTable>().Where((s) =>
                 LzFunctions.Year(LzFunctions.DateAdd(LzDatePart.Year, -1, LzFunctions.GetDate())) == year);
             Assert.IsNotEmpty(values2);
         }
@@ -266,7 +267,7 @@ public class LambdaTest
         {
             DateTime start = DateTime.Now;
             DateTime end = start.AddYears(8);
-            ILazyEnumerable<SimpleTable>? values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
+            ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.DateDiff(LzDatePart.Year, start, end) == 8);
             Assert.IsNotEmpty(values);
             values = LazyClient.Select<SimpleTable>().Where((s) => LzFunctions.DateDiff(LzDatePart.Year, end, start) == -8);
             Assert.IsNotEmpty(values);

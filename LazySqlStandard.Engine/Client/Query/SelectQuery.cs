@@ -3,42 +3,15 @@
 /// <summary>
 /// Select Query
 /// </summary>
-internal sealed class SelectQuery
+internal sealed class SelectQuery : QueryBase
 {
-    /// <summary>
-    /// Query Builder
-    /// </summary>
-    internal QueryBuilder QueryBuilder { get; }
-    
-    /// <summary>
-    /// Table Definition
-    /// </summary>
-    private ITableDefinition TableDefinition { get; }
-
-    /// <summary>
-    /// Alias Name
-    /// </summary>
-    public string TableAlias { get; }
-
-    private readonly string _tableName;
-    private IWhereQuery _whereQuery;
     private readonly List<IOrderByQuery> _orderByQueries;
     private int? _top;
 
-    public SelectQuery(ITableDefinition tableDefinition, string tableName = null)
+    public SelectQuery(ITableDefinition tableDefinition, string tableName = null) : base(tableDefinition, tableName)
     {
-        TableDefinition = tableDefinition;
-        QueryBuilder = new QueryBuilder(tableDefinition);
         _orderByQueries = new List<IOrderByQuery>();
-        _tableName = tableDefinition.GetTableName(tableName);
-        TableAlias = $"{_tableName}_{Guid.NewGuid().ToString().Substring(0, 4)}";
     }
-
-    /// <summary>
-    /// Set WHERE
-    /// </summary>
-    /// <param name="whereQuery"></param>
-    public void SetWhereQuery(IWhereQuery whereQuery) => _whereQuery = whereQuery;
 
     /// <summary>
     /// Set ORDER BY
@@ -56,7 +29,7 @@ internal sealed class SelectQuery
     /// Build Query
     /// </summary>
     /// <returns></returns>
-    public QueryBuilder BuildQuery()
+    public override QueryBuilder BuildQuery()
     {
         QueryBuilder.Append("SELECT ");
 
@@ -80,15 +53,15 @@ internal sealed class SelectQuery
         #endregion
 
         #region FROM
-        QueryBuilder.Append($"FROM {_tableName} AS {TableAlias} ");
+        QueryBuilder.Append($"FROM {TableName} AS {TableAlias} ");
         #endregion
 
         #region WHERE
 
-        if (_whereQuery != null)
+        if (WhereQuery != null)
         {
             QueryBuilder.Append("WHERE ");
-            _whereQuery.Build(this);
+            WhereQuery.Build(this);
         }
 
         #endregion

@@ -5,6 +5,7 @@ using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Insert")]
 public class InsertTest
 {
     [SetUp]
@@ -26,7 +27,7 @@ public class InsertTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new()
+            SimpleTable st = new()
             {
                 Username = $"U{i+1}",
                 Password = $"P{i + 1}"

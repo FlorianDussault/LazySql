@@ -11,7 +11,15 @@ public sealed partial class LazyClient
     /// </summary>
     /// <typeparam name="T">Type of item</typeparam>
     /// <param name="reseed">Execute RESEED (DBCC CHECKIDENT) for a table with relations</param>
-    public static void Truncate<T>(bool reseed = false) where T : LazyBase => Instance.InternalTruncate(typeof(T), reseed);
+    [Obsolete("reseed argument will be remove")]
+    public static void Truncate<T>(bool reseed) where T : LazyBase => Instance.InternalTruncate(typeof(T), reseed);
+
+    /// <summary>
+    /// Truncate table
+    /// </summary>
+    /// <typeparam name="T">Type of item</typeparam>
+    public static void Truncate<T>() where T : LazyBase => Instance.InternalTruncate(typeof(T));
+
 
     /// <summary>
     /// Truncate table

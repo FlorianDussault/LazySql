@@ -5,5 +5,5 @@
 /// </summary>
 internal interface IQuery
 {
-    void Build(SelectQuery selectQuery);
+    void Build(QueryBase queryBase);
 }

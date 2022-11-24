@@ -4,6 +4,7 @@ using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Delete")]
 public class DeleteTest
 {
     [SetUp]
@@ -25,7 +26,7 @@ public class DeleteTest
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
         {
-            SimpleTable? st = new()
+            SimpleTable st = new()
             {
                 Username = "",
                 Password = ""

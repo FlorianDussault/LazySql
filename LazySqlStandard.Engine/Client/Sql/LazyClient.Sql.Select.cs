@@ -72,7 +72,7 @@ public sealed partial class LazyClient
         //    WHERE T1.a= T2.a and T1.b= T2.b)
 
         SelectQuery selectQuery = new(childTableDefinition);
-        void WhereAction(SelectQuery query)
+        void WhereAction(QueryBase query)
         {
             query.QueryBuilder.Append($" EXISTS (SELECT * FROM {parentTableDefinition.GetTableName()} AS lazy_parent WHERE ");
             query.QueryBuilder.AppendWithAliases(relationInformation.Expression, new LambdaAlias("lazy_parent", parentTableDefinition), new LambdaAlias(query.TableAlias, childTableDefinition));

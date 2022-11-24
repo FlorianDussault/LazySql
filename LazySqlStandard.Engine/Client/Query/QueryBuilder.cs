@@ -88,6 +88,9 @@ internal sealed class QueryBuilder
     /// Add SqlArguments
     /// </summary>
     /// <param name="arguments"></param>
-    public void AddSqlArguments(SqlArguments arguments) => _sqlArguments.AddRange(arguments);
-
+    public void AddSqlArguments(SqlArguments arguments)
+    {
+        if (arguments == null) return;
+        _sqlArguments.AddRange(arguments);
+    }
 }

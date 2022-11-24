@@ -59,7 +59,7 @@ internal static class ClientTest
                 {
                     Execute(sqlConnection, $"IF OBJECT_ID('{table}', 'U') IS NOT NULL \r\n  DROP TABLE {table};");
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     hasFailed = true;
                 }

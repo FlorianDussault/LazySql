@@ -5,11 +5,10 @@ using LazySql.Engine.Client.Query;
 using LazySql.Engine.Enums;
 using LazySql.Engine.Exceptions;
 using LazySqlCore.UnitTest.Tables;
-using Microsoft.Data.SqlClient;
 
 namespace LazySqlCore.UnitTest;
 
-[TestFixture, Category("SELECT")]
+[TestFixture(TestName = "Select")]
 public class SelectTest
 {
     [SetUp]
@@ -55,13 +54,13 @@ public class SelectTest
             Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE));
     }
 
-    [Test(Description = "Select with LazyObject"), Category("LazyObject")]
+    [Test]
     public void SelectLazy()
     {
         AddSimpleTables();
     }
 
-    [Test, Category("Object")]
+    [Test]
     public void SelectObject()
     {
         AddSimpleTables();
@@ -80,7 +79,7 @@ public class SelectTest
 
     }
 
-    [Test, Category("Dynamic")]
+    [Test]
     public void SelectDynamic()
     {
         AddSimpleTables();
@@ -130,8 +129,6 @@ public class SelectTest
         AddSimpleTables();
 
         List<int> allowedIds = new() {5, 6, 7, 8, 9, 10, 20};
-        // i => (i.User_Id > 4 && i.User_Id <= 10) || i.Username == "P20"
-        string p20 = "P20";
         foreach (dynamic simpleTable in LazyClient.Select<dynamic>("simple_table").Where(
                      "(user_id > 4 AND user_id <= 10) OR username = @p20",
                      new SqlArguments().Add("@p20", SqlType.NVarChar, "P20")))
@@ -153,7 +150,7 @@ public class SelectTest
             new SimpleTable {Username = rand.Next(0, 50).ToString("00")}.Insert();
         }
 
-        IEnumerable<SimpleTable>? list = LazyClient.Select<SimpleTable>().OrderByAsc(s => s.Username);
+        IEnumerable<SimpleTable> list = LazyClient.Select<SimpleTable>().OrderByAsc(s => s.Username);
         int lastNumber = -1;
         foreach (SimpleTable simpleTable in list)
         {
@@ -185,7 +182,7 @@ public class SelectTest
             new SimpleTable {Username = rand.Next(0, 50).ToString("00")}.Insert();
         }
 
-        IEnumerable<Simple_Table>? list = LazyClient.Select<Simple_Table>().OrderByAsc(s => s.Username);
+        IEnumerable<Simple_Table> list = LazyClient.Select<Simple_Table>().OrderByAsc(s => s.Username);
         int lastNumber = -1;
         foreach (Simple_Table simpleTable in list)
         {
@@ -218,7 +215,7 @@ public class SelectTest
             new SimpleTable {Username = rand.Next(0, 50).ToString("00")}.Insert();
         }
 
-        IEnumerable<dynamic>? list = LazyClient.Select<dynamic>("simple_table").OrderByAsc("username");
+        IEnumerable<dynamic> list = LazyClient.Select<dynamic>("simple_table").OrderByAsc("username");
         int lastNumber = -1;
         foreach (dynamic simpleTable in list)
         {

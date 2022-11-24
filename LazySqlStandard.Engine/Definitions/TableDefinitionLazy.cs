@@ -7,7 +7,7 @@ internal sealed class TableDefinitionLazy : TableDefinitionBase, ITableDefinitio
 {
     public ObjectType ObjectType => ObjectType.LazyObject;
     public bool HasRelations => Relations != null && Relations.Any();
-    public string GetTableName(string tableName) => tableName ?? Table.TableName;
+    public string GetTableName(string tableName = null) => tableName ?? Table.TableName;
 
     public TableDefinitionLazy(Type type, LazyTable table) : base(type, table)
     {

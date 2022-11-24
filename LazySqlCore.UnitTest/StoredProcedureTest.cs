@@ -7,6 +7,7 @@ using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Stored Procedure")]
 public class StoredProcedureTest
 {
     [SetUp]
@@ -63,13 +64,13 @@ public class StoredProcedureTest
         );
 
 
-        Assert.That(-678, Is.EqualTo(result.ReturnValue));
+        Assert.That(result.ReturnValue, Is.EqualTo(-678));
         Assert.That(19, Is.EqualTo(result.Output.IdMin));
         Assert.That(29, Is.EqualTo(result.Output.IdMax));
 
         List<dynamic> values = result.Tables[0].Parse().ToList();
             
-        Assert.That(10, Is.EqualTo(values.Count));
+        Assert.That(values.Count, Is.EqualTo(10));
         int lastId = int.MinValue;
         foreach (dynamic value in values)
         {
@@ -85,7 +86,7 @@ public class StoredProcedureTest
 
 
         List<SimpleTable> list = result.Tables[1].Parse<SimpleTable>().ToList();
-        Assert.That(10, Is.EqualTo(list.Count));
+        Assert.That(list.Count, Is.EqualTo(10));
         lastId = int.MaxValue;
         foreach (SimpleTable value in list)
         {
@@ -110,7 +111,7 @@ public class StoredProcedureTest
                 .AddOut("@IdMin", SqlType.Int)
         );
 
-        Assert.That(0, Is.EqualTo(result.ReturnValue));
+        Assert.That(result.ReturnValue, Is.EqualTo(0));
         Assert.IsNull(result.Output.IdMin);
         Assert.IsNull(result.Output.IdMax);
         Assert.IsEmpty(result.Tables);

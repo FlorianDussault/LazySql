@@ -14,9 +14,9 @@ internal sealed class WhereSqlQuery : IWhereQuery
         _sqlArguments = sqlArguments;
     }
 
-    public void Build(SelectQuery selectQuery)
+    public void Build(QueryBase queryBase)
     {
-        selectQuery.QueryBuilder.Append(_whereSql);
-        selectQuery.QueryBuilder.AddSqlArguments(_sqlArguments);
+        queryBase.QueryBuilder.Append(_whereSql);
+        queryBase.QueryBuilder.AddSqlArguments(_sqlArguments);
     }
 }

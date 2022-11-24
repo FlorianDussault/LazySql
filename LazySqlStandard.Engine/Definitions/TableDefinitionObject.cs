@@ -4,7 +4,7 @@ internal sealed class TableDefinitionObject : TableDefinitionBase, ITableDefinit
 {
     public ObjectType ObjectType => ObjectType.Object;
     public bool HasRelations => false;
-    public string GetTableName(string tableName) => tableName ?? Table.TableName;
+    public string GetTableName(string tableName = null) => tableName ?? Table.TableName;
 
     public TableDefinitionObject(Type type, LazyTable table) : base(type, table)
     {

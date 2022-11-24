@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using static System.Single;
 
 namespace LazySqlCore.UnitTest;
-
+[TestFixture(TestName = "SQL Types")]
 public class TypesTest
 {
     [SetUp]
@@ -201,7 +201,7 @@ public class TypesTest
     public void TypeSqlVariant()
     {
         Reset();
-        string? val ="VARIANT";
+        string val ="VARIANT";
         new TypesTable() { TypeSqlVariant = val }.Insert();
         Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeSqlVariant));
     }
@@ -209,7 +209,7 @@ public class TypesTest
     public void TypeText()
     {
         Reset();
-        string? val = "TYPE TEXT";
+        string val = "TYPE TEXT";
         new TypesTable() { TypeText = val }.Insert();
         Assert.That(val, Is.EqualTo(LazyClient.Select<TypesTable>().First().TypeText));
     }

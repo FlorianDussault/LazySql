@@ -3,7 +3,7 @@ using LazySql.Engine;
 using LazySql.Engine.Client;
 
 namespace LazySqlCore.UnitTest;
-
+[TestFixture(TestName = "Table Join")]
 public class JoinTest
 {
     [SetUp]
@@ -33,7 +33,7 @@ public class JoinTest
         new SimpleTable() {Username = "USR_3", Password = "PWD_3", ExtendedKey = "BB"}.Insert();
         new SimpleTable() {Username = "USR_4", Password = "PWD_4", ExtendedKey = "AA"}.Insert();
 
-        List<SimpleTable>? tables = LazyClient.Select<SimpleTable>().ToList();
+        List<SimpleTable> tables = LazyClient.Select<SimpleTable>().ToList();
         foreach (SimpleTable simpleTable in tables)
         {
             Assert.NotNull(simpleTable.Extended);
@@ -41,8 +41,7 @@ public class JoinTest
         }
     }
 
-        
-
+  
     [Test]
     public void Hierarchy()
     {
@@ -74,15 +73,15 @@ public class JoinTest
             }
         }
 
-        List<SimpleTable>? datas = LazyClient.Select<SimpleTable>().ToList();
+        List<SimpleTable> datas = LazyClient.Select<SimpleTable>().ToList();
 
-        Assert.That(5, Is.EqualTo(datas.Count));
+        Assert.That(datas.Count, Is.EqualTo(5));
         foreach (SimpleTable simpleTable in datas)
         {
-            Assert.That(9, Is.EqualTo(simpleTable.ChildTables.Count));
+            Assert.That(simpleTable.ChildTables.Count, Is.EqualTo(9));
             foreach (ChildTable childTable in simpleTable.ChildTables)
             {
-                Assert.That(10, Is.EqualTo(childTable.SubChildTables.Count));
+                Assert.That(childTable.SubChildTables.Count, Is.EqualTo(10));
                 foreach (SubChildTable subChildTable in childTable.SubChildTables)
                 {
                     Assert.That($"{simpleTable.Id} - {childTable.Id} - {subChildTable.Id}", Is.EqualTo(subChildTable.Value));

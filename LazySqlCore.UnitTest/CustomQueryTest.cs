@@ -5,7 +5,7 @@ using LazySql.Engine.Enums;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
-
+[TestFixture(TestName = "Custom Queries")]
 public class CustomQueryTest
 {
     [SetUp]
