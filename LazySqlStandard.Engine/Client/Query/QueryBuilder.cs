@@ -66,7 +66,6 @@ internal sealed class QueryBuilder
     /// <param name="alias2"></param>
     public void AppendWithAliases(Expression expression, LambdaAlias alias1, LambdaAlias alias2)
     {
-        if (expression == null) return;
         LambdaAliasParser.Parse(expression, this, alias1, alias2);
     }
 
@@ -77,20 +76,10 @@ internal sealed class QueryBuilder
     /// <param name="obj">Value</param>
     /// <returns>SQL Variable name</returns>
     public string RegisterArgument(SqlType type, object obj) => _sqlArguments.Register(type, obj);
-    
-    /// <summary>
-    /// Add SqlArgument
-    /// </summary>
-    /// <param name="argument"></param>
-    public void AddSqlArgument(SqlArgument argument) => _sqlArguments.Add(argument);
 
     /// <summary>
     /// Add SqlArguments
     /// </summary>
     /// <param name="arguments"></param>
-    public void AddSqlArguments(SqlArguments arguments)
-    {
-        if (arguments == null) return;
-        _sqlArguments.AddRange(arguments);
-    }
+    public void AddSqlArguments(SqlArguments arguments) => _sqlArguments.AddRange(arguments);
 }

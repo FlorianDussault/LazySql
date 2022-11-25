@@ -28,10 +28,10 @@ public class UpdateTest
         for (int index = 0; index < updated.Count; index++)
         {
             SimpleTable simpleTable = updated[index];
-            Assert.That(simpleTable.Username.Split(" ")[0], Is.EqualTo("USERNAME"));
-            Assert.That(int.Parse(simpleTable.Username.Split(" ")[1]), Is.EqualTo(index));
-            Assert.That(simpleTable.Password.Split(" ")[0], Is.EqualTo("Password"));
-            Assert.That(int.Parse(simpleTable.Password.Split(" ")[1]), Is.EqualTo(index));
+            Assert.That(simpleTable.Username.Split(' ')[0], Is.EqualTo("USERNAME"));
+            Assert.That(int.Parse(simpleTable.Username.Split(' ')[1]), Is.EqualTo(index));
+            Assert.That(simpleTable.Password.Split(' ')[0], Is.EqualTo("Password"));
+            Assert.That(int.Parse(simpleTable.Password.Split(' ')[1]), Is.EqualTo(index));
         }
 
         SimpleTable updateSimpleTable = new() {Username = "UPDATE 1", Password = null};
@@ -73,10 +73,10 @@ public class UpdateTest
         for (int index = 0; index < updated.Count; index++)
         {
             SimpleTable simpleTable = updated[index];
-            Assert.That(simpleTable.Username.Split(" ")[0], Is.EqualTo("USERNAME"));
-            Assert.That(int.Parse(simpleTable.Username.Split(" ")[1]), Is.EqualTo(index));
-            Assert.That(simpleTable.Password.Split(" ")[0], Is.EqualTo("Password"));
-            Assert.That(int.Parse(simpleTable.Password.Split(" ")[1]), Is.EqualTo(index));
+            Assert.That(simpleTable.Username.Split(' ')[0], Is.EqualTo("USERNAME"));
+            Assert.That(int.Parse(simpleTable.Username.Split(' ')[1]), Is.EqualTo(index));
+            Assert.That(simpleTable.Password.Split(' ')[0], Is.EqualTo("Password"));
+            Assert.That(int.Parse(simpleTable.Password.Split(' ')[1]), Is.EqualTo(index));
         }
 
         Simple_Table updateSimpleTable = new() { Username = "UPDATE 1", Password = null };

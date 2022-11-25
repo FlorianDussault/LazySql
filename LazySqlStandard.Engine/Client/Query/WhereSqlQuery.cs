@@ -11,7 +11,7 @@ internal sealed class WhereSqlQuery : IWhereQuery
     public WhereSqlQuery(SqlQuery sqlQuery)
     {
         _whereSql = sqlQuery.Query;
-        _sqlArguments = sqlQuery.SqlArguments;
+        _sqlArguments = sqlQuery.SqlArguments ?? new SqlArguments();
     }
 
     public void Build(QueryBase queryBase)

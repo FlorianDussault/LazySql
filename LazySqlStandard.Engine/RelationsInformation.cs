@@ -13,5 +13,5 @@ internal class RelationsInformation : List<RelationInformation>
     /// <param name="column">Column in Parent</param>
     /// <param name="childType">Child Type</param>
     /// <param name="expression">Join expression</param>
-    public void Add(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression) => Add(new RelationInformation(relationType, parentType, column, childType, expression));
+    public void Add(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression) => Add(new RelationInformation(relationType, column, childType, expression));
 }

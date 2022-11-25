@@ -29,7 +29,7 @@ internal sealed class SelectQuery : QueryBase
     /// Build Query
     /// </summary>
     /// <returns></returns>
-    public override QueryBuilder BuildQuery()
+    public QueryBuilder BuildQuery()
     {
         QueryBuilder.Append("SELECT ");
 

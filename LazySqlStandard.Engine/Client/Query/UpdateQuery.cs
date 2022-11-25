@@ -16,7 +16,7 @@
             _columnsToUpdate.Add(columnDefinition);
         }
 
-        public override QueryBuilder BuildQuery()
+        public virtual QueryBuilder BuildQuery()
         {
             QueryBuilder.Append($"UPDATE {TableName} SET ");
 

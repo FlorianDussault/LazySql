@@ -35,8 +35,5 @@
         /// </summary>
         /// <param name="whereQuery"></param>
         public void SetWhereQuery(IWhereQuery whereQuery) => WhereQuery = whereQuery;
-
-        public virtual QueryBuilder BuildQuery() => throw new NotImplementedException();
-
     }
 }

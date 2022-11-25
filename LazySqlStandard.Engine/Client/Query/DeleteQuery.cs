@@ -7,7 +7,7 @@ internal class DeleteQuery : QueryBase
     }
 
 
-    public override QueryBuilder BuildQuery()
+    public virtual QueryBuilder BuildQuery()
     {
         QueryBuilder.Append($"DELETE FROM {TableName}");
 
