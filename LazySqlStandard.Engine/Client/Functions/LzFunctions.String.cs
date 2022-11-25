@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Functions;
+﻿namespace LazySql;
 
 public partial class LzFunctions
 {
@@ -139,7 +139,7 @@ public partial class LzFunctions
     /// <param name="obj">An expression of any data type</param>
     /// <returns>Length</returns>
     /// <exception cref="NotSupportedException"></exception>
-    public static int DataLength(object? obj) => throw new NotSupportedException();
+    public static int? DataLength(object obj) => throw new NotSupportedException();
 
     /// <summary>
     /// Convert DataLength to Sql

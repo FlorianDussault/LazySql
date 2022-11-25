@@ -1,16 +1,16 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// Where with Action
 /// </summary>
 internal sealed class WhereFunctionQuery : IWhereQuery
 {
-    private readonly Action<SelectQuery> _action;
+    private readonly Action<QueryBase> _action;
 
-    public WhereFunctionQuery(Action<SelectQuery> action) => _action = action;
+    public WhereFunctionQuery(Action<QueryBase> action) => _action = action;
 
-    public void Build(SelectQuery selectQuery)
+    public void Build(QueryBase queryBase)
     {
-        _action(selectQuery);
+        _action(queryBase);
     }
 }

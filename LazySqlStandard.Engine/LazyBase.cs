@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine;
+﻿namespace LazySql;
 
 /// <summary>
 /// Base class (abstract) used to declare supported object.
@@ -8,7 +8,7 @@ public abstract class LazyBase
     /// <summary>
     /// List of relations
     /// </summary>
-    internal RelationsInformation Relations { get; } = new RelationsInformation();
+    internal RelationsInformation Relations { get; } = new();
 
     /// <summary>
     /// Initialization

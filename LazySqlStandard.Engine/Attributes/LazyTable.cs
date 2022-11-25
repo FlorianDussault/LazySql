@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Attributes;
+﻿namespace LazySql;
 
 /// <summary>
 /// Attribute to declare a class compatible with LazySql

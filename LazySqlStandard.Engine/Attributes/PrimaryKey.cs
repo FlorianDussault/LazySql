@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Attributes;
+﻿namespace LazySql;
 
 /// <summary>
 /// Primary key attribute

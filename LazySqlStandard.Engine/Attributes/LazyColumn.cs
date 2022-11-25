@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Attributes;
+﻿namespace LazySql;
 
 /// <summary>
 /// Attribute for a column

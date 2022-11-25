@@ -1,6 +1,6 @@
-﻿using LazySql.Engine.Definitions;
+﻿using System.Security;
 
-namespace LazySql.Engine.Client;
+namespace LazySql;
 
 /// <summary>
 /// LazyClient
@@ -22,15 +22,26 @@ public sealed partial class LazyClient
     /// </summary>
     /// <param name="connectionString">Connection String</param>
     /// <param name="types">Type of supported item</param>
-    public static void Initialize(string connectionString, params Type[] types) => Instance.InternalInitialize(connectionString, types);
+    public static void Initialize(string connectionString, params Type[] types) => Instance.InternalInitialize(connectionString, null, null, types);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="sqlUserId"></param>
+    /// <param name="sqlPassword"></param>
+    /// <param name="types"></param>
+    public static void Initialize(string connectionString, string sqlUserId, SecureString sqlPassword, params Type[] types) => Instance.InternalInitialize(connectionString, sqlUserId, sqlPassword, types);
 
     /// <summary>
     /// Initialize LazyClient
     /// </summary>
     /// <param name="connectionString">Connection String</param>
+    /// <param name="sqlPassword"></param>
     /// <param name="types">Type of supported item</param>
+    /// <param name="sqlUserId"></param>
     /// <exception cref="LazySqlInitializeException"></exception>
-    private void InternalInitialize(string connectionString, Type[] types)
+    private void InternalInitialize(string connectionString, string sqlUserId, SecureString sqlPassword, Type[] types)
     {
         if (_initialized)
             throw new LazySqlInitializeException("SqlClient already initialized");
@@ -39,7 +50,11 @@ public sealed partial class LazyClient
             throw new LazySqlInitializeException("Connection string cannot be null or empty");
 
         RegisterTableObjects(types);
-        ConnectionString = connectionString;
+        _connectionString = connectionString;
+
+        if (sqlUserId != null)
+            _sqlCredential = new SqlCredential(sqlUserId, sqlPassword);
+
         _initialized = true;
 
     }
@@ -54,7 +69,7 @@ public sealed partial class LazyClient
     /// <exception cref="LazySqlInitializeException"></exception>
     private void RegisterTableObjects(Type[] types)
     {
-        List<TableDefinition> tables = new();
+        List<ITableDefinition> tables = new();
 
         foreach (Type type in types) 
             tables.Add(RegisterTableObject(type));
@@ -71,7 +86,7 @@ public sealed partial class LazyClient
     /// <param name="type">Type of the item</param>
     /// <returns></returns>
     /// <exception cref="LazySqlInitializeException"></exception>
-    private TableDefinition RegisterTableObject(Type type)
+    private ITableDefinition RegisterTableObject(Type type)
     {
         if (type == null)
             throw new LazySqlInitializeException($"Type of supported table cannot be null");
@@ -79,19 +94,26 @@ public sealed partial class LazyClient
             throw new LazySqlInitializeException($"Abstract object is not supported ({type.Name})");
         if (!type.GetTypeInfo().IsClass)
             throw new LazySqlInitializeException($"{type.Name} is not a class");
-      
-        if (typeof(LazyBase).IsAssignableFrom(type))
-            return RegisterLazyObject(type);
-        if (type == typeof(object))
-            return RegisterDynamicObject(type);
-        return RegisterObject(type);
+
+        switch (GetObjectType(type))
+        {
+            case ObjectType.LazyObject:
+                return RegisterLazyObject(type);
+            case ObjectType.Object:
+                return RegisterObject(type);
+            case ObjectType.Dynamic:
+                return RegisterDynamicObject(type);
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
     }
 
 
 
     #endregion
 
-    private TableDefinition RegisterLazyObject(Type type)
+    private TableDefinitionLazy RegisterLazyObject(Type type)
     {
         if (Attribute.GetCustomAttribute(type, typeof(LazyTable)) is not LazyTable tableAttribute)
             throw new LazySqlInitializeException($"{nameof(LazyTable)} attribute is missing in class {type.FullName}");
@@ -99,7 +121,7 @@ public sealed partial class LazyClient
         if (string.IsNullOrWhiteSpace(tableAttribute.TableName))
             throw new LazySqlInitializeException($"The table name is missing in the attribute {nameof(LazyTable)} in class {type.FullName}");
 
-        TableDefinition tableDefinition = new(type, tableAttribute, ObjectType.LazyObject);
+        TableDefinitionLazy tableDefinition = new(type, tableAttribute);
 
         LazyBase obj = (LazyBase)Activator.CreateInstance(type);
 
@@ -128,45 +150,33 @@ public sealed partial class LazyClient
         return tableDefinition;
     }
 
-    private TableDefinition RegisterObject(Type type)
+    private TableDefinitionObject RegisterObject(Type type)
     {
-        TableDefinition tableDefinition = new(type, new LazyTable(type.Name), ObjectType.Object)
-        {
-            Relations = new RelationsInformation()
-        };
-        IEnumerable<PropertyInfo> properties = type.GetProperties().Where(p=>p.CanRead && p.CanWrite);
+        List<PropertyInfo> properties = type.GetProperties().Where(p => p.CanRead).ToList();
+
+        if (properties.Count == 0)
+            throw new NotImplementedException(); // TODO : to remove ?
+        //return new TableDefinition(type, new LazyTable(type.Name), ObjectType.Dynamic);
+
+        TableDefinitionObject tableDefinition = new(type, new LazyTable(type.Name));
 
         foreach (PropertyInfo propertyInfo in properties)
         {
             LazyColumn columnAttribute = new(propertyInfo.Name, propertyInfo.PropertyType.ToSqlType());
             tableDefinition.Add(propertyInfo, columnAttribute, null);
         }
-        
+
         return tableDefinition;
     }
 
-    private TableDefinition RegisterDynamicObject(Type type)
-    {
-        TableDefinition tableDefinition = new(type, new LazyTable(type.Name), ObjectType.Dynamic)
-        {
-            Relations = new RelationsInformation()
-        };
-        return tableDefinition;
-    }
-
-    /// <summary>
-    /// Check initialization and get information about the table
-    /// </summary>
-    /// <typeparam name="T">Type of item</typeparam>
-    /// <param name="tableDefinition">Table definition</param>
-    private void CheckInitialization<T>(out TableDefinition tableDefinition) where T : LazyBase => InternalCheckInitialization(typeof(T), out tableDefinition);
+    private ITableDefinition RegisterDynamicObject(Type type) => new TableDefinitionDynamic(type, new LazyTable(type.Name));
 
     /// <summary>
     /// Check initialization and get information about the table
     /// </summary>
     /// <param name="type">Type of item</param>
     /// <param name="tableDefinition">Table definition</param>
-    internal static void CheckInitialization(Type type, out TableDefinition tableDefinition) => Instance.InternalCheckInitialization(type, out tableDefinition);
+    internal static void CheckInitialization(Type type, out ITableDefinition tableDefinition) => Instance.InternalCheckInitialization(type, out tableDefinition);
 
     /// <summary>
     /// Check initialization and get information about the table
@@ -174,14 +184,30 @@ public sealed partial class LazyClient
     /// <param name="type">Type of item</param>
     /// <param name="tableDefinition">Table definition</param>
     /// <exception cref="LazySqlInitializeException"></exception>
-    private void InternalCheckInitialization(Type type, out TableDefinition tableDefinition)
+    private void InternalCheckInitialization(Type type, out ITableDefinition tableDefinition)
     {
         if (!_initialized)
             throw new LazySqlInitializeException($"Call method {nameof(Initialize)} first.");
+
+        if (GetObjectType(type) == ObjectType.Dynamic)
+        {
+            tableDefinition = RegisterTableObject(type);
+            return;
+        }
+
         tableDefinition = _tables.FirstOrDefault(t => t.TableType == type);
         if (tableDefinition != null) return;
 
         tableDefinition = RegisterTableObject(type);
         _tables.Add(tableDefinition);
+    }
+
+    private ObjectType GetObjectType(Type type)
+    {
+        if (typeof(LazyBase).IsAssignableFrom(type))
+            return ObjectType.LazyObject;
+        if (type.GetProperties().Any(p => p.CanRead))
+            return ObjectType.Object;
+        return ObjectType.Dynamic;
     }
 }

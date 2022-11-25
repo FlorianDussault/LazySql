@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Connector;
+﻿namespace LazySql;
 
 /// <summary>
 /// Sql Connector
@@ -10,7 +10,12 @@ internal sealed class SqlConnector : IDisposable
 
     public SqlConnector()
     {
-        _sqlConnection = new SqlConnection(LazyClient.ConnectionString);
+        
+    }
+
+    public SqlConnector(string connectionString, SqlCredential sqlCredential)
+    {
+        _sqlConnection = sqlCredential != null ? new SqlConnection(connectionString, sqlCredential) : new SqlConnection(connectionString);
         _sqlCommand = new SqlCommand();
         _sqlCommand.Connection = _sqlConnection;
     }

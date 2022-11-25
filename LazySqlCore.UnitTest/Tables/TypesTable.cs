@@ -1,7 +1,5 @@
 ﻿
-using LazySql.Engine;
-using LazySql.Engine.Attributes;
-using LazySql.Engine.Enums;
+using LazySql;
 
 namespace LazySqlCore.UnitTest.Tables;
 
@@ -16,13 +14,13 @@ public class TypesTable : LazyBase
     public long? TypeBigint { get; set; }
 
     [LazyColumn("type_binary", SqlType.Binary)]
-    public Byte[]? TypeBinary { get; set; }
+    public Byte[] TypeBinary { get; set; }
 
     [LazyColumn("type_bit", SqlType.Bit)]
     public bool? TypeBit { get; set; }
 
     [LazyColumn("type_char", SqlType.Char)]
-    public string? TypeChar { get; set; }
+    public string TypeChar { get; set; }
 
     [LazyColumn("type_date", SqlType.Date)]
     public DateTime? TypeDate { get; set; }
@@ -46,7 +44,7 @@ public class TypesTable : LazyBase
     //public long TypeHierarchyid { get; set; }
 
     [LazyColumn("type_image", SqlType.Binary)]
-    public byte[]? TypeImage { get; set; }
+    public byte[] TypeImage { get; set; }
 
     [LazyColumn("type_int", SqlType.Int)]
     public int? TypeInt { get; set; }
@@ -55,7 +53,7 @@ public class TypesTable : LazyBase
     public decimal? TypeMoney { get; set; }
 
     [LazyColumn("type_ntext", SqlType.NText)]
-    public string? TypeNtext { get; set; }
+    public string TypeNtext { get; set; }
 
     [LazyColumn("type_numeric", SqlType.Decimal)]
     public decimal? TypeNumeric { get; set; }
@@ -73,10 +71,10 @@ public class TypesTable : LazyBase
     public decimal? TypeSmallmoney { get; set; }
 
     [LazyColumn("type_sql_variant", SqlType.Variant)]
-    public string? TypeSqlVariant { get; set; }
+    public string TypeSqlVariant { get; set; }
 
     [LazyColumn("type_text", SqlType.Text)]
-    public string? TypeText { get; set; }
+    public string TypeText { get; set; }
 
     [LazyColumn("type_time", SqlType.Time)]
     public TimeSpan? TypeTime { get; set; }

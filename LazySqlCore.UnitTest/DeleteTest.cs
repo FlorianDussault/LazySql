@@ -1,9 +1,9 @@
-using LazySql.Engine;
-using LazySql.Engine.Client;
+using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 
+[TestFixture(TestName = "Delete")]
 public class DeleteTest
 {
     [SetUp]
@@ -12,75 +12,60 @@ public class DeleteTest
         ClientTest.Initialize();
     }
 
-    private void AddSimpleTables()
-    {
-        const int COUNT_SIMPLE_TABLE = 20;
-        const int COUNT_CHILD_TABLE = 20;
-        // Clear Table
-        LazyClient.Truncate<SubChildTable>();
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-        // Add values
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
-        int bot_id = 0;
-        for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
-        {
-            SimpleTable? st = new SimpleTable()
-            {
-                Username = "",
-                Password = ""
-            };
-            st.Insert();
-
-            for (int j = 0; j < COUNT_CHILD_TABLE; j++)
-            {
-                new ChildTable()
-                {
-                    Id = ++bot_id,
-                    ParentId = st.Id,
-                    TypeChar = "hello"
-                }.Insert();
-            }
-        }
-        // Check
-        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
-        Assert.That(LazyClient.Select<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
-    }
-
-    [Test]
-    public void Truncate()
-    {
-        AddSimpleTables();
-        LazyClient.Truncate<SubChildTable>();
-        LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Select<ChildTable>());
-        LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
-    }
-
     [Test]
     public void Delete()
     {
-        AddSimpleTables();
-            
-        // Clear data
-        foreach (ChildTable childTable in LazyClient.Select<ChildTable>())
-            childTable.Delete();
-        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>())
-            simpleTable.Delete();
+        ClientTest.AddSimpleTables();
+
+        LazyClient.Delete<ChildTable>();
+        LazyClient.Delete<SimpleTable>();
+
         Assert.IsEmpty(LazyClient.Select<ChildTable>());
         Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+        LazyClient.Delete<Simple_Table>();
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<object>("child_table");
+        LazyClient.Delete<object>("simple_table");
+        Assert.IsEmpty(LazyClient.Select<ChildTable>());
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+
+        ClientTest.AddSimpleTables();
+        Assert.That(LazyClient.Delete<object>("child_table", new SqlQuery("Id = @Id2 OR Id = @Id3").Add("@Id2", 2).Add("@Id3", 3)), Is.EqualTo(2));
+        Assert.IsEmpty(LazyClient.Select<ChildTable>(c=>c.Id == 2  || c.Id == 3));
+        Assert.IsNotEmpty(LazyClient.Select<ChildTable>());
+
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>(null, SqlQuery.Empty);
+        Assert.That(LazyClient.Delete<Simple_Table>(null, c => c.User_Id == 2 || c.User_Id == 3), Is.EqualTo(2));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(c => c.Id == 2 || c.Id == 3));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>());
     }
 
     [Test]
-    public void DeleteWithArgs()
+    public void DeleteLazy()
     {
-        AddSimpleTables();
-        LazyClient.Delete<ChildTable>((i)=>i.Id <= 10 || i.Id == 20);
-        List<int> allowedIds = new List<int> {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20};
-        foreach (ChildTable childTable in LazyClient.Select<ChildTable>())
-        {
-            Assert.IsFalse((allowedIds.Any(id => childTable.Id == id)), $"{childTable.Id} not deleted");
-        }
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+
+        SimpleTable simpleTable = LazyClient.Select<SimpleTable>(s => s.Id == 2).First();
+        Assert.That(simpleTable.Delete(), Is.EqualTo(1));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(c => c.Id == 2));
+        Assert.IsNotEmpty(LazyClient.Select<SimpleTable>());
+    }
+
+    [Test]
+    public void DeleteList()
+    {
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>(s=>s.Id >= 2 && s.Id <= 10).ToList();
+        Assert.That(values.Delete(), Is.EqualTo(9));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id >= 2 && s.Id <= 10));
     }
 }

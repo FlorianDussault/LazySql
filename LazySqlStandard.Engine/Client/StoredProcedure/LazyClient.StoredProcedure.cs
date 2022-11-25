@@ -1,7 +1,4 @@
-﻿using LazySql.Engine.Client.StoredProcedure;
-
-// ReSharper disable once CheckNamespace
-namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 public sealed partial class LazyClient
 {

@@ -1,32 +1,23 @@
-﻿namespace LazySql.Engine.Definitions;
+﻿namespace LazySql;
 
-/// <summary>
-/// Table Definition
-/// </summary>
-internal sealed class TableDefinition : List<ColumnDefinition>
+internal abstract class TableDefinitionBase : List<ColumnDefinition>
 {
     /// <summary>
     /// Type of object
     /// </summary>
     public Type TableType { get; }
 
-    /// <summary>
-    /// LazyTable attribute
-    /// </summary>
     public LazyTable Table { get; }
-
-    public ObjectType ObjectType { get; }
 
     /// <summary>
     /// Relations with other objects
     /// </summary>
     public RelationsInformation Relations { get; set; } = null;
 
-    public TableDefinition(Type type, LazyTable table, ObjectType objectType)
+    protected TableDefinitionBase(Type type, LazyTable table)
     {
         TableType = type;
         Table = table;
-        ObjectType = objectType;
     }
 
     /// <summary>
@@ -58,10 +49,10 @@ internal sealed class TableDefinition : List<ColumnDefinition>
     /// <param name="primaryKeys">Primary Keys</param>
     public void GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out IReadOnlyList<ColumnDefinition> columnsWithoutAutoIncrement, out IReadOnlyList<ColumnDefinition> columnsWithoutPrimaryKeys, out IReadOnlyList<ColumnDefinition> primaryKeys)
     {
-        List<ColumnDefinition> listAllColumns = new List<ColumnDefinition>();
-        List<ColumnDefinition> listColumnsWithoutAutoIncrement = new List<ColumnDefinition>();
-        List<ColumnDefinition> listColumnsWithoutPrimaryKeys = new List<ColumnDefinition>();
-        List<ColumnDefinition> listPrimaryKeys = new List<ColumnDefinition>();
+        List<ColumnDefinition> listAllColumns = new();
+        List<ColumnDefinition> listColumnsWithoutAutoIncrement = new();
+        List<ColumnDefinition> listColumnsWithoutPrimaryKeys = new();
+        List<ColumnDefinition> listPrimaryKeys = new();
 
         foreach (ColumnDefinition columnDefinition in GetColumns())
         {
@@ -89,11 +80,6 @@ internal sealed class TableDefinition : List<ColumnDefinition>
     {
         return this.FirstOrDefault(c => string.Equals(c.PropertyInfo.Name, propertyName, StringComparison.InvariantCultureIgnoreCase));
     }
-}
 
-internal enum ObjectType
-{
-    LazyObject,
-    Object,
-    Dynamic
+
 }

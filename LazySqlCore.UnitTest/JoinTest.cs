@@ -1,9 +1,8 @@
-﻿using LazySqlCore.UnitTest.Tables;
-using LazySql.Engine;
-using LazySql.Engine.Client;
+﻿using LazySql;
+using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
-
+[TestFixture(TestName = "Table Join")]
 public class JoinTest
 {
     [SetUp]
@@ -15,13 +14,7 @@ public class JoinTest
     [Test]
     public void OneToOne()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Truncate<ExtendedTable>();
-        Assert.IsEmpty(LazyClient.Select<ExtendedTable>());
-        LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Select<ChildTable>());
-        LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+        ClientTest.CleanTables();
 
         new ExtendedTable() {Key = "AA", Value = 1}.Insert();
         new ExtendedTable() {Key = "BB", Value = 2}.Insert();
@@ -33,7 +26,7 @@ public class JoinTest
         new SimpleTable() {Username = "USR_3", Password = "PWD_3", ExtendedKey = "BB"}.Insert();
         new SimpleTable() {Username = "USR_4", Password = "PWD_4", ExtendedKey = "AA"}.Insert();
 
-        List<SimpleTable>? tables = LazyClient.Select<SimpleTable>().ToList();
+        List<SimpleTable> tables = LazyClient.Select<SimpleTable>().ToList();
         foreach (SimpleTable simpleTable in tables)
         {
             Assert.NotNull(simpleTable.Extended);
@@ -41,32 +34,26 @@ public class JoinTest
         }
     }
 
-        
-
+  
     [Test]
     public void Hierarchy()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SubChildTable>());
-        LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Select<ChildTable>());
-        LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+        ClientTest.CleanTables();
 
         int childId = 0;
         for (int i = 0; i < 5; i++)
         {
-            SimpleTable simpleTable = new SimpleTable() { };
+            SimpleTable simpleTable = new() { };
             simpleTable.Insert();
 
             for (int j = 0; j < 9; j++)
             {
-                ChildTable childTable = new ChildTable() {Id = ++childId, ParentId = simpleTable.Id};
+                ChildTable childTable = new() {Id = ++childId, ParentId = simpleTable.Id};
                 childTable.Insert();
 
                 for (int k = 0; k < 10; k++)
                 {
-                    SubChildTable subChildTable = new SubChildTable() {ParentId = childTable.Id, Value = $"{simpleTable.Id} - {childTable.Id}"};
+                    SubChildTable subChildTable = new() {ParentId = childTable.Id, Value = $"{simpleTable.Id} - {childTable.Id}"};
                     subChildTable.Insert();
                     subChildTable.Value = $"{simpleTable.Id} - {childTable.Id} - {subChildTable.Id}";
                     subChildTable.Update();
@@ -74,15 +61,15 @@ public class JoinTest
             }
         }
 
-        List<SimpleTable>? datas = LazyClient.Select<SimpleTable>().ToList();
+        List<SimpleTable> datas = LazyClient.Select<SimpleTable>().ToList();
 
-        Assert.That(5, Is.EqualTo(datas.Count));
+        Assert.That(datas.Count, Is.EqualTo(5));
         foreach (SimpleTable simpleTable in datas)
         {
-            Assert.That(9, Is.EqualTo(simpleTable.ChildTables.Count));
+            Assert.That(simpleTable.ChildTables.Count, Is.EqualTo(9));
             foreach (ChildTable childTable in simpleTable.ChildTables)
             {
-                Assert.That(10, Is.EqualTo(childTable.SubChildTables.Count));
+                Assert.That(childTable.SubChildTables.Count, Is.EqualTo(10));
                 foreach (SubChildTable subChildTable in childTable.SubChildTables)
                 {
                     Assert.That($"{simpleTable.Id} - {childTable.Id} - {subChildTable.Id}", Is.EqualTo(subChildTable.Value));

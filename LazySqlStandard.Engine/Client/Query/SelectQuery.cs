@@ -1,44 +1,17 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// Select Query
 /// </summary>
-internal sealed class SelectQuery
+internal sealed class SelectQuery : QueryBase
 {
-    /// <summary>
-    /// Query Builder
-    /// </summary>
-    internal QueryBuilder QueryBuilder { get; }
-    
-    /// <summary>
-    /// Table Definition
-    /// </summary>
-    private TableDefinition TableDefinition { get; }
-
-    /// <summary>
-    /// Alias Name
-    /// </summary>
-    public string TableAlias { get; }
-
-    private readonly string _tableName;
-    private IWhereQuery _whereQuery;
     private readonly List<IOrderByQuery> _orderByQueries;
     private int? _top;
 
-    public SelectQuery(TableDefinition tableDefinition, string tableName = null)
+    public SelectQuery(ITableDefinition tableDefinition, string tableName = null) : base(tableDefinition, tableName)
     {
-        TableDefinition = tableDefinition;
-        QueryBuilder = new QueryBuilder(tableDefinition);
         _orderByQueries = new List<IOrderByQuery>();
-        _tableName = tableName ?? TableDefinition.Table.TableName;
-        TableAlias = $"{_tableName}_{Guid.NewGuid().ToString().Substring(0, 4)}";
     }
-
-    /// <summary>
-    /// Set WHERE
-    /// </summary>
-    /// <param name="whereQuery"></param>
-    public void SetWhereQuery(IWhereQuery whereQuery) => _whereQuery = whereQuery;
 
     /// <summary>
     /// Set ORDER BY
@@ -80,15 +53,15 @@ internal sealed class SelectQuery
         #endregion
 
         #region FROM
-        QueryBuilder.Append($"FROM {_tableName} AS {TableAlias} ");
+        QueryBuilder.Append($"FROM {TableName} AS {TableAlias} ");
         #endregion
 
         #region WHERE
 
-        if (_whereQuery != null)
+        if (WhereQuery != null)
         {
             QueryBuilder.Append("WHERE ");
-            _whereQuery.Build(this);
+            WhereQuery.Build(this);
         }
 
         #endregion

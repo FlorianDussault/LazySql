@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Lambda;
+﻿namespace LazySql;
 
 /// <summary>
 /// Lambda Alias
@@ -7,10 +7,10 @@ internal sealed class LambdaAlias
 {
     public string SqlAlias { get;  }
 
-    public TableDefinition TableDefinition { get;  }
+    public ITableDefinition TableDefinition { get;  }
 
 
-    public LambdaAlias(string sqlAlias, TableDefinition tableDefinition)
+    public LambdaAlias(string sqlAlias, ITableDefinition tableDefinition)
     {
         SqlAlias = sqlAlias;
         TableDefinition = tableDefinition;

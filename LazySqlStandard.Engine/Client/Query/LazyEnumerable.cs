@@ -1,6 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-
-namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyEnumerable
@@ -8,36 +6,17 @@ namespace LazySql.Engine.Client.Query;
 /// <typeparam name="T"></typeparam>
 internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
 {
-    private readonly TableDefinition _tableDefinition;
+    private readonly ITableDefinition _tableDefinition;
     private readonly SelectQuery _selectQuery;
 
-    internal LazyEnumerable(string tableName)
+    internal LazyEnumerable(string tableName, Expression whereExpression, SqlQuery sqlQuery)
     {
         LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
         _selectQuery = new SelectQuery(_tableDefinition, tableName);
-    }
-
-    /// <summary>
-    /// Where with expression
-    /// </summary>
-    /// <param name="whereExpression">Expression</param>
-    /// <returns>IEnumerable</returns>
-    public ILazyEnumerable<T> Where(Expression<Func<T, bool>> whereExpression)
-    {
-        _selectQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
-        return this;
-    }
-
-    /// <summary>
-    /// Where in SQL
-    /// </summary>
-    /// <param name="whereSql">SQL</param>
-    /// <param name="sqlArguments">Arguments</param>
-    /// <returns>IEnumerable</returns>
-    public ILazyEnumerable<T> Where(string whereSql, SqlArguments sqlArguments)
-    {
-        _selectQuery.SetWhereQuery(new WhereSqlQuery(whereSql, sqlArguments));
-        return this;
+        if (whereExpression != null)
+            _selectQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
+        if (!SqlQuery.IsEmpty(sqlQuery))
+            _selectQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
     }
 
     /// <summary>
@@ -115,7 +94,7 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     /// <returns></returns>
     private IEnumerable Execute()
     {
-        if (_tableDefinition.Relations.Count == 0)
+        if (!_tableDefinition.HasRelations)
         {
             foreach (object o in LazyClient.GetWithQuery(typeof(T), _selectQuery))
                 yield return o;

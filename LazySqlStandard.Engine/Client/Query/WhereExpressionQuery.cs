@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// Where with Expression
@@ -8,5 +8,5 @@ internal sealed class WhereExpressionQuery : IWhereQuery
     private readonly Expression _expression;
     public WhereExpressionQuery(Expression expression) => _expression = expression;
 
-    public void Build(SelectQuery selectQuery) => selectQuery.QueryBuilder.Append(_expression);
+    public void Build(QueryBase queryBase) => queryBase.QueryBuilder.Append(_expression);
 }

@@ -1,12 +1,10 @@
 ﻿#if NETCORE
 using Microsoft.Data.SqlClient;
 #elif NETSTANDARD
-using Microsoft.Data.SqlClient;
 #else
-using System.Data.SqlClient;
 #endif
 
-namespace LazySql.Engine.Exceptions
+namespace LazySql
 {
     public class LazySqlExecuteException : LazySqlException
     {

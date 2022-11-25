@@ -1,13 +1,8 @@
-﻿namespace LazySql.Engine.Client.StoredProcedure;
+﻿namespace LazySql;
 
 public class StoredProcedureOutputTable
 {
     public DataTable DataTable { get; }
-
-    internal StoredProcedureOutputTable()
-    {
-
-    }
 
     internal StoredProcedureOutputTable(DataTable dataTable)
     {

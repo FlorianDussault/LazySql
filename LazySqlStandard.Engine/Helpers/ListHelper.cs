@@ -1,4 +1,10 @@
-﻿namespace LazySql.Engine.Helpers;
+﻿
+
+#if DEBUG || APPVEYOR
+using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("LazySqlCore.UnitTest")]
+#endif
+namespace LazySql;
 
 /// <summary>
 /// List Helper

@@ -1,7 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-using System.Data;
-
-namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyClient
@@ -9,7 +6,8 @@ namespace LazySql.Engine.Client;
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
-    internal static string ConnectionString { get; private set; }
+    private static string _connectionString;
+    private static SqlCredential _sqlCredential;
 
     /// <summary>
     /// Open connection to database
@@ -17,7 +15,7 @@ public sealed partial class LazyClient
     /// <returns></returns>
     private SqlConnector Open()
     {
-        SqlConnector sqlConnector = new();
+        SqlConnector sqlConnector = new(_connectionString, _sqlCredential);
         sqlConnector.Open();
         return sqlConnector;
     }
@@ -39,7 +37,7 @@ public sealed partial class LazyClient
         using SqlConnector sqlConnector = Open();
         using SqlDataReader sqlDataReader =
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
-        TableDefinition tableDefinition = queryBuilder.GetTableDefinition();
+        ITableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 
         
 
@@ -97,9 +95,9 @@ public sealed partial class LazyClient
     /// ExecuteNonQuery
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
-    internal void ExecuteNonQuery(QueryBuilder queryBuilder)
+    internal int ExecuteNonQuery(QueryBuilder queryBuilder)
     {
         using SqlConnector sqlConnector = Open();
-        sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+        return sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
     }
 }

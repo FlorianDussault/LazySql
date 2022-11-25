@@ -1,9 +1,9 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// Query
 /// </summary>
 internal interface IQuery
 {
-    void Build(SelectQuery selectQuery);
+    void Build(QueryBase queryBase);
 }

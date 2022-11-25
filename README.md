@@ -1,24 +1,22 @@
 # LazySql
 
-[![Build status](https://ci.appveyor.com/api/projects/status/q5mj8574x62xi1o5/branch/master?svg=true)](https://ci.appveyor.com/project/FlorianDussault/lazysql/branch/master) ![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)
+LazySql is a micro ORM to simplify the interfacing between an application and a Sql Server Database.
 
-![Nuget](https://img.shields.io/nuget/v/LazySqlStandard.Engine)
+# Whats new in 2.1.0-preview?
 
-LazySql is a micro ORM to simplify the interfacing between an application and a database.
+* Support of ``object`` and ``dynamic`` types!
+* Namespace fixed
+* Support of SqlCredential
 
-:star: Star me on GitHub — it motivates me a lot!
+# Packages
 
-# Compatibility
+[![Build status](https://ci.appveyor.com/api/projects/status/q5mj8574x62xi1o5/branch/master?svg=true)](https://ci.appveyor.com/project/FlorianDussault/lazysql/branch/master)
 
-## .NET
 
-|             | **.NET** | **.NET Framework** | **.NET Standard** |
-|-------------|:-------------:|:------------------:|:-----------------:|
-| **Version** |      6.0      |         4.8        |        2.0        |
+| Package | NuGet |  Downloads | **.NET** | **.NET Framework** | **.NET Standard** | **Sql Server** |
+| ------- | ----- | ---------- |:--------:| ------------------:|:-----------------:|:----------:|
+| [LazySqlStandard.Engine](https://www.nuget.org/packages/LazySqlStandard.Engine/) | [![LazySqlStandard.Engine](https://img.shields.io/nuget/v/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | [![LazySqlStandard.Engine](https://img.shields.io/nuget/dt/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | 6.0 | 4.8 | 2.0 | > Sql Server 2012 |
 
-## Sql Server
-
-Minimum version: Sql Server 2012
 
 # How to use it?
 
@@ -37,12 +35,8 @@ foreach (Car car in LazyClient.Select<Car>()) {
    Console.WriteLine(car.Name);
 }
 ```
-This automatically generates the following SQL query in the background:
-```sql
-SELECT Id, Name, ... FROM Cars
-```
 
-## Select some data in a table (with Expression)
+## Select some data in a table with Expression (WHERE)
 
 ```cs
 foreach (Car car in LazyClient.Select<Car>().Where(c=>c.Country == "FR" && c.Enabled).OrderBy(c=>c.Name)) {
@@ -65,18 +59,23 @@ Car car = new Car() {Id = 1, Name = "Second Car"};
 car.Update();
 ```
 
-Or (if your object doesn't derive from LazyBase):
-```cs
-Car car = new Car() {Id = 1, Name = "Second Car"};
-car.Update(c=>c.Id == car.Id);
-```
-
-These two methods will generate the following SQL query:
+This will generate the following SQL query:
 
 ```sql
 UPDATE Cars SET Name = 'Second Car' WHERE id = 1
 ```
 
+## Update multiple rows in database
+
+```cs
+Car updateCar = new Car() {Name = "New Name"};
+LazyClient.Update<Car>(updateCar, c=>c.Name == null || Id = 0);
+```
+This will generate the following SQL query:
+
+```sql
+UPDATE Cars SET Name = 'New Name' WHERE Name IS NULL OR Id = 0
+```
 ## Delete in database
 
 If your object is derived from LazyBase, you can easily delete it:
@@ -86,18 +85,23 @@ Car car = new Car() {Id = 1};
 car.Delete();
 ```
 
-Or (if your object doesn't derive from LazyBase):
-```cs
-Car car = new Car() {Id = 1};
-car.Delete(c=>c.Id == car.Id);
-```
-
-These two methods will generate the following SQL query:
+This will generate will generate the following SQL query:
 
 ```sql
 DELETE Cars WHERE id = 1
 ```
 
+## Delete multiple rows in database
+
+```cs
+LazyClient.Delete<Car>(c=>!c.Enabled);
+```
+
+This will generate will generate the following SQL query:
+
+```sql
+DELETE Cars WHERE Enabled = 0
+```
 ## And more...
 
 ### Stored Procedure
@@ -138,10 +142,6 @@ int affectedRows = LazyClient.ExecuteNonQuery("DELETE FROM web_users");
 ```cs
 string firstName = LazyClient.ExecuteNonQuery<string>("SELECT firstname FROM web_users WHERE Id = @Id", new SqlArgument("@Id", SqlType.Int, 50));
 ```
-
-![Et voilà](https://media1.giphy.com/media/uLYTKQE2cftpLFMpEG/giphy.gif?cid=ecf05e47a8j3vm5qxa15yj2us0en0ne34qunwsjp7d4vnrgn&rid=giphy.gif&ct=g)
-()
-
 
 # Documentation
 

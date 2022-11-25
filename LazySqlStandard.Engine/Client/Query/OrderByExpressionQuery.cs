@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// OrderBy With Expression
@@ -14,9 +14,9 @@ internal sealed class OrderByExpressionQuery : IOrderByQuery
         _orderByDirection = orderByDirection;
     }
 
-    public void Build(SelectQuery selectQuery)
+    public void Build(QueryBase queryBase)
     {
-        selectQuery.QueryBuilder.Append(_expression);
-        selectQuery.QueryBuilder.Append(_orderByDirection == OrderByDirection.Asc ? " ASC " : " DESC ");
+        queryBase.QueryBuilder.Append(_expression);
+        queryBase.QueryBuilder.Append(_orderByDirection == OrderByDirection.Asc ? " ASC " : " DESC ");
     }
 }

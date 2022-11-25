@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Helpers
+﻿namespace LazySql
 {
     internal static class DataTableHelper
     {
@@ -16,7 +16,7 @@
 
         public static IEnumerable<T> ToLazyObject<T>(this DataTable dataTable)
         {
-            LazyClient.CheckInitialization(typeof(T), out TableDefinition tableDefinition);
+            LazyClient.CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
             tableDefinition.GetColumns(out IReadOnlyList<ColumnDefinition> allColumns, out _, out _, out _);
 
             List<ColumnDefinition> columnDefinitions = dataTable.Columns.Cast<DataColumn>()

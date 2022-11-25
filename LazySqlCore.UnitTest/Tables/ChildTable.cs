@@ -1,7 +1,5 @@
 ﻿
-using LazySql.Engine;
-using LazySql.Engine.Attributes;
-using LazySql.Engine.Enums;
+using LazySql;
 
 namespace LazySqlCore.UnitTest.Tables;
 

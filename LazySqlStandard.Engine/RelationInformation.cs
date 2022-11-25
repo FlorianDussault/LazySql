@@ -1,15 +1,10 @@
-﻿namespace LazySql.Engine;
+﻿namespace LazySql;
 
 /// <summary>
 /// Relation information
 /// </summary>
 internal class RelationInformation
 {
-    /// <summary>
-    /// Type of parent
-    /// </summary>
-    public Type ParentType { get; }
-
     /// <summary>
     /// Parent column
     /// </summary>
@@ -30,10 +25,9 @@ internal class RelationInformation
     /// </summary>
     public RelationType RelationType { get; }
 
-    public RelationInformation(RelationType relationType, Type parentType, string column, Type childType, LambdaExpression expression)
+    public RelationInformation(RelationType relationType, string column, Type childType, LambdaExpression expression)
     {
         RelationType = relationType;
-        ParentType = parentType;
         Column = column;
         ChildType = childType;
         Expression = expression;

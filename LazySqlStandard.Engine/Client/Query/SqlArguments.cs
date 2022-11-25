@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 public sealed class SqlArguments : List<SqlArgument>
 {
