@@ -12,20 +12,10 @@ public class BulkInsertTest
         ClientTest.Initialize();
     }
 
-    private void ClearTables()
-    {
-        // Clear Table
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-        // Add values
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
-    }
-
     [Test]
     public void BulkLazyObjects()
     {
-        ClearTables();
+        ClientTest.CleanTables();
 
         List<SimpleTable> simpleTables = new();
         for (int i = 0; i < 100; i++) simpleTables.Add(new SimpleTable() {Username = "U" + i});
@@ -57,7 +47,7 @@ public class BulkInsertTest
     [Test]
     public void BulkObjects()
     {
-        ClearTables();
+        ClientTest.CleanTables();
 
         List<Simple_Table> simpleTables = new();
         for (int i = 0; i < 100; i++) simpleTables.Add(new Simple_Table() { Username = "U" + i });
@@ -70,7 +60,7 @@ public class BulkInsertTest
     [Test]
     public void BulkDynamic()
     {
-        ClearTables();
+        ClientTest.CleanTables();
 
         List<dynamic> simpleTables = new();
         for (int i = 0; i < 600; i++) simpleTables.Add(new {aNotInSql = 1, Username = "U" + i, NotInSql = i });

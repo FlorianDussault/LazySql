@@ -11,33 +11,14 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     private readonly ITableDefinition _tableDefinition;
     private readonly SelectQuery _selectQuery;
 
-    internal LazyEnumerable(string tableName)
+    internal LazyEnumerable(string tableName, Expression whereExpression, SqlQuery sqlQuery)
     {
         LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
         _selectQuery = new SelectQuery(_tableDefinition, tableName);
-    }
-
-    /// <summary>
-    /// Where with expression
-    /// </summary>
-    /// <param name="whereExpression">Expression</param>
-    /// <returns>IEnumerable</returns>
-    public ILazyEnumerable<T> Where(Expression<Func<T, bool>> whereExpression)
-    {
-        _selectQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
-        return this;
-    }
-
-    /// <summary>
-    /// Where in SQL
-    /// </summary>
-    /// <param name="whereSql">SQL</param>
-    /// <param name="sqlArguments">Arguments</param>
-    /// <returns>IEnumerable</returns>
-    public ILazyEnumerable<T> Where(string whereSql, SqlArguments sqlArguments)
-    {
-        _selectQuery.SetWhereQuery(new WhereSqlQuery(whereSql, sqlArguments));
-        return this;
+        if (whereExpression != null)
+            _selectQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
+        if (!SqlQuery.IsEmpty(sqlQuery))
+            _selectQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
     }
 
     /// <summary>

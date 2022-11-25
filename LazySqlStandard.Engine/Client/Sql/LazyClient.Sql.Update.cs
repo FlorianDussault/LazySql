@@ -1,6 +1,9 @@
 ﻿
 
 // ReSharper disable once CheckNamespace
+
+using System.Diagnostics.CodeAnalysis;
+
 namespace LazySql.Engine.Client;
 
 // ReSharper disable once ClassCannotBeInstantiated
@@ -8,47 +11,23 @@ public sealed partial class LazyClient
 {
     #region Update
 
-    /// <summary>
-    /// Update an item
-    /// </summary>
-    /// <typeparam name="T">Type of Item</typeparam>
-    /// <param name="obj">Item</param>
-    /// <param name="where"></param>
-    /// <param name="excludedColumns"></param>
-    public static int Update<T>(T obj, Expression<Func<T,bool>> where = null, params string[] excludedColumns) => Instance.InternalUpdate(typeof(T), obj, null, where, null, excludedColumns);
+    public static int Update(object obj) => Instance.InternalUpdate(obj.GetType(), obj, null, null, null, null);
 
-    public static int Update<T>(T obj, string tableName = null, Expression<Func<T, bool>> where = null, params string[] excludedColumns) => Instance.InternalUpdate(typeof(T), obj, null, where, null, excludedColumns);
+    public static int Update<T>(object obj, Expression<Func<T,bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, null, where, null, excludedColumns);
 
+    public static int Update(object obj, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, null, null, where, excludedColumns);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
-    /// <param name="where"></param>
-    /// <param name="excludedColumns"></param>
-    /// <returns></returns>
-    public static int Update<T>(T obj, string whereSql = null, params string[] excludedColumns) => Instance.InternalUpdate(typeof(T), obj, null, null, whereSql, excludedColumns);
+    public static int Update<T>(object obj, string tableName, Expression<Func<T, bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, tableName, where, null, excludedColumns);
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="obj"></param>
-    /// <param name="tableName"></param>
-    /// <param name="where"></param>
-    /// <param name="excludedColumns"></param>
-    /// <returns></returns>
-    public static int Update<T>(T obj, string tableName = null, string whereSql = null, params string[] excludedColumns) => Instance.InternalUpdate(typeof(T), obj, tableName, null, whereSql, excludedColumns);
+    public static int Update(object obj, string tableName, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, tableName, null, where, excludedColumns);
 
-
-    private int InternalUpdate(Type type, object obj, string tableName, Expression whereExpression, string whereSql, params string[] excludedColumns)
+    private int InternalUpdate(Type type, object obj, string tableName, Expression whereExpression, SqlQuery whereSql, params string[] excludedColumns)
     {
         CheckInitialization(type, out ITableDefinition tableDefinition);
         return InternalUpdateLazy(tableDefinition, obj, tableName, whereExpression, whereSql, excludedColumns);
     }
 
-    private int InternalUpdateLazy(ITableDefinition tableDefinition,  object obj, string tableName, Expression whereExpression, string whereSql, params string[] excludedColumns)
+    private int InternalUpdateLazy(ITableDefinition tableDefinition,  object obj, string tableName, Expression whereExpression, SqlQuery sqlQuery, params string[] excludedColumns)
     {
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
@@ -59,7 +38,7 @@ public sealed partial class LazyClient
                      c.Column.ColumnName, StringComparison.InvariantCultureIgnoreCase))))
             updateQuery.AddUpdatedValue(column);
         
-        if (whereExpression == null && string.IsNullOrWhiteSpace(whereSql))
+        if (whereExpression == null && SqlQuery.IsEmpty(sqlQuery))
         {
             BinaryExpression binaryExpression = null;
             foreach (ColumnDefinition primaryKey in primaryKeys)
@@ -81,12 +60,10 @@ public sealed partial class LazyClient
         {
             updateQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
         }
-        else if (!string.IsNullOrWhiteSpace(whereSql))
+        else if (!SqlQuery.IsEmpty(sqlQuery))
         {
-            updateQuery.SetWhereQuery(new WhereSqlQuery(whereSql, null));
+            updateQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
         }
-
-        
 
         QueryBuilder query = updateQuery.BuildQuery();
         using SqlConnector sqlConnector = Open();

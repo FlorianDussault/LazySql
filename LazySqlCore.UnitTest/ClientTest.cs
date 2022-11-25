@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
+using LazySql.Engine;
 using LazySql.Engine.Client;
+using LazySql.Engine.Client.Query;
 using LazySqlCore.UnitTest.Tables;
 using Microsoft.Data.SqlClient;
 
@@ -110,6 +112,52 @@ internal static class ClientTest
         Execute(sqlConnection, $"IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{DatabaseName}') BEGIN CREATE DATABASE {DatabaseName}; END;");
     }
 
-    
+    internal static void AddSimpleTables()
+    {
+        const int COUNT_SIMPLE_TABLE = 20;
+        const int COUNT_CHILD_TABLE = 20;
+        // Clear Table
+        CleanTables();
+        // Add values
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+        int bot_id = 0;
+        for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
+        {
+            SimpleTable st = new()
+            {
+                Username = $"U{i + 1}",
+                Password = $"P{i + 1}"
+            };
+            st.Insert();
+
+            for (int j = 0; j < COUNT_CHILD_TABLE; j++)
+            {
+                new ChildTable()
+                {
+                    Id = ++bot_id,
+                    ParentId = st.Id,
+                    TypeChar = "hello"
+                }.Insert();
+            }
+        }
+        // Check
+        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Select<SimpleTable>().ToList().Count());
+        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Select<ChildTable>().ToList().Count());
+    }
+
+    internal static void CleanSimpleTable()
+    {
+        LazyClient.Delete<ChildTable>(null, SqlQuery.Empty);
+        LazyClient.Delete<SimpleTable>(null, SqlQuery.Empty);
+        LazyClient.ExecuteNonQuery("DBCC CHECKIDENT ('simple_table', RESEED, 0);");
+    }
+
+    internal static void CleanTables()
+    {
+        CleanSimpleTable();
+        LazyClient.Delete<SubChildTable>(null, SqlQuery.Empty);
+        LazyClient.ExecuteNonQuery("DBCC CHECKIDENT ('subchild_table', RESEED, 0);");
+        LazyClient.Truncate<ExtendedTable>();
+    }
 
 }

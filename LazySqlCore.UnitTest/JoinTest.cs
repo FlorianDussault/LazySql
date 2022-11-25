@@ -15,13 +15,7 @@ public class JoinTest
     [Test]
     public void OneToOne()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Truncate<ExtendedTable>();
-        Assert.IsEmpty(LazyClient.Select<ExtendedTable>());
-        LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Select<ChildTable>());
-        LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+        ClientTest.CleanTables();
 
         new ExtendedTable() {Key = "AA", Value = 1}.Insert();
         new ExtendedTable() {Key = "BB", Value = 2}.Insert();
@@ -45,12 +39,7 @@ public class JoinTest
     [Test]
     public void Hierarchy()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SubChildTable>());
-        LazyClient.Delete<ChildTable>();
-        Assert.IsEmpty(LazyClient.Select<ChildTable>());
-        LazyClient.Truncate<SimpleTable>(true);
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
+        ClientTest.CleanTables();
 
         int childId = 0;
         for (int i = 0; i < 5; i++)

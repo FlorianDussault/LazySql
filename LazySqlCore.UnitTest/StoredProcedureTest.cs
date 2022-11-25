@@ -16,45 +16,11 @@ public class StoredProcedureTest
         ClientTest.Initialize();
     }
 
-    private void AddSimpleTables()
-    {
-        const int COUNT_SIMPLE_TABLE = 20;
-        const int COUNT_CHILD_TABLE = 20;
-        // Clear Table
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-        // Add values
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
-        int bot_id = 0;
-        for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
-        {
-            SimpleTable st = new()
-            {
-                Username = $"U{i+1}",
-                Password = $"P{i + 1}"
-            };
-            st.Insert();
-
-            for (int j = 0; j < COUNT_CHILD_TABLE; j++)
-            {
-                new ChildTable()
-                {
-                    Id = ++bot_id,
-                    ParentId = st.Id,
-                    TypeChar = "hello"
-                }.Insert();
-            }
-        }
-        // Check
-        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Select<SimpleTable>().ToList().Count());
-        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Select<ChildTable>().ToList().Count());
-    }
 
     [Test]
     public void SimpleProcedure()
     {
-        AddSimpleTables();
+        ClientTest.AddSimpleTables();
 
         StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure",
             new SqlArguments().Add("@Count", SqlType.Int, 10)

@@ -4,11 +4,6 @@ public class StoredProcedureOutputTable
 {
     public DataTable DataTable { get; }
 
-    internal StoredProcedureOutputTable()
-    {
-
-    }
-
     internal StoredProcedureOutputTable(DataTable dataTable)
     {
         DataTable = dataTable;

@@ -4,13 +4,17 @@ namespace LazySql.Engine.Client;
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
-    /// <summary>
-    /// Select in database
-    /// </summary>
-    /// <typeparam name="T">Object type</typeparam>
-    /// <param name="tableName">Table name (mandatory for dynamic type)</param>
-    /// <returns>Enumerable</returns>
-    public static ILazyEnumerable<T> Select<T>(string tableName = null) => Instance.InternalSelect<T>(tableName);
+
+    public static ILazyEnumerable<T> Select<T>() => Instance.InternalSelect<T>(null, null, null);
+    public static ILazyEnumerable<T> Select<T>(string tableName) => Instance.InternalSelect<T>(tableName, null, null);
+
+    public static ILazyEnumerable<T> Select<T>(Expression<Func<T, bool>> where) => Instance.InternalSelect<T>(null, where, null);
+
+    public static ILazyEnumerable<T> Select<T>(string tableName, Expression<Func<T, bool>> where) =>
+        Instance.InternalSelect<T>(tableName, where, null);
+
+    public static ILazyEnumerable<T> Select<T>(SqlQuery sqlQuery) => Instance.InternalSelect<T>(null, null, sqlQuery);
+    public static ILazyEnumerable<T> Select<T>(string tableName, SqlQuery sqlQuery) => Instance.InternalSelect<T>(tableName, null, sqlQuery);
 
     /// <summary>
     /// Select in database
@@ -19,12 +23,12 @@ public sealed partial class LazyClient
     /// <param name="tableName">Table name (mandatory for dynamic type)</param>
     /// <returns>Enumerable</returns>
     /// <exception cref="LazySqlException"></exception>
-    private ILazyEnumerable<T> InternalSelect<T>(string tableName)
+    private ILazyEnumerable<T> InternalSelect<T>(string tableName, Expression whereExpression, SqlQuery sqlQuery)
     {
         CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
         if (string.IsNullOrWhiteSpace(tableName) && tableDefinition.ObjectType == ObjectType.Dynamic)
             throw new LazySqlException($"You cannot call the {nameof(Select)} method with a Dynamic type without a table name in argument");
-        return new LazyEnumerable<T>(tableName);
+        return new LazyEnumerable<T>(tableName, whereExpression, sqlQuery);
     }
     
     /// <summary>

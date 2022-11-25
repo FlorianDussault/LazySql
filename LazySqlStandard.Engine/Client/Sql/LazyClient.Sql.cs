@@ -97,9 +97,9 @@ public sealed partial class LazyClient
     /// ExecuteNonQuery
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
-    internal void ExecuteNonQuery(QueryBuilder queryBuilder)
+    internal int ExecuteNonQuery(QueryBuilder queryBuilder)
     {
         using SqlConnector sqlConnector = Open();
-        sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+        return sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
     }
 }

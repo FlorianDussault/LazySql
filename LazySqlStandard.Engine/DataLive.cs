@@ -54,7 +54,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <param name="expression">Lambda expression to filter data</param>
     public void LoadAdditional(Expression<Func<T, bool>> expression = null)
     {
-        foreach (T item in LazyClient.Select<T>().Where(expression))
+        foreach (T item in LazyClient.Select(expression))
         {
             if (this.Any(i => AreEquals(i, item)))
                 continue;

@@ -14,61 +14,24 @@ public class InsertTest
         ClientTest.Initialize();
     }
 
-    private void AddSimpleTables()
-    {
-        const int COUNT_SIMPLE_TABLE = 20;
-        const int COUNT_CHILD_TABLE = 20;
-        // Clear Table
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-        // Add values
-        Assert.IsEmpty(LazyClient.Select<SimpleTable>());
-        int bot_id = 0;
-        for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)
-        {
-            SimpleTable st = new()
-            {
-                Username = $"U{i+1}",
-                Password = $"P{i + 1}"
-            };
-            st.Insert();
-
-            for (int j = 0; j < COUNT_CHILD_TABLE; j++)
-            {
-                new ChildTable()
-                {
-                    Id = ++bot_id,
-                    ParentId = st.Id,
-                    TypeChar = "hello"
-                }.Insert();
-            }
-        }
-        // Check
-        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
-        Assert.That(LazyClient.Select<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE ));
-    }
-
     [Test]
     public void InsertLazy()
     {
-        AddSimpleTables();
+        ClientTest.AddSimpleTables();
     }
 
     [Test]
     public void InsertObject()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
+        ClientTest.CleanTables();
 
-        
         Simple_Table simpleTable = new()
         {
             Username = "Test1",
             Password = "Pass1"
         };
-        LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+            nameof(Simple_Table.NotSqlType));
 
         Assert.That(simpleTable.User_Id, Is.EqualTo(0));
 
@@ -77,8 +40,10 @@ public class InsertTest
             Username = "Test2",
             Password = "Pass2"
         };
-        LazyClient.Insert(simpleTable,null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+            nameof(Simple_Table.NotSqlType));
         Assert.That(simpleTable.User_Id, Is.EqualTo(1));
+
 
         simpleTable = new()
         {
@@ -86,7 +51,8 @@ public class InsertTest
             Username = "Test3",
             Password = "Pass3"
         };
-        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+            nameof(Simple_Table.NotSqlType));
         Assert.That(simpleTable.User_Id, !Is.EqualTo(999));
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>().ToList();
@@ -101,17 +67,12 @@ public class InsertTest
         Assert.That(values[2].Id, Is.EqualTo(2));
         Assert.That(values[2].Username, Is.EqualTo("Test3"));
         Assert.That(values[2].Password, Is.EqualTo("Pass3"));
-
-
     }
 
     [Test]
     public void InsertDynamic()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-
+        ClientTest.CleanTables();
 
         dynamic simpleTable = new
         {//User_Id = 1000,
@@ -152,10 +113,7 @@ public class InsertTest
     [Ignore("ExpandoObject to implement")]
     public void InsertExpandoObject()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
-
+        ClientTest.CleanTables();
 
         dynamic simpleTable = new ExpandoObject();
 
@@ -196,9 +154,7 @@ public class InsertTest
     [Test]
     public void InsertNull()
     {
-        LazyClient.Truncate<SubChildTable>(true);
-        LazyClient.Delete<ChildTable>();
-        LazyClient.Truncate<SimpleTable>(true);
+        ClientTest.CleanTables();
 
         new SimpleTable()
         {
@@ -210,5 +166,26 @@ public class InsertTest
         Assert.IsNull(item.Username);
         Assert.IsNull(item.Password);
     }
-        
+
+    [Test]
+    public void InsertList()
+    {
+        ClientTest.CleanTables();
+
+        List<SimpleTable> values = new()
+        {
+            new SimpleTable{Username = "U1"},
+            new SimpleTable{Username = "U2"},
+            new SimpleTable{Username = "U3"}
+        };
+
+        Assert.That(values.Insert(), Is.EqualTo(3));
+
+        values = LazyClient.Select<SimpleTable>().OrderByAsc(s => s.Id).ToList();
+
+        Assert.That(values[0].Username, Is.EqualTo("U1"));
+        Assert.That(values[1].Username, Is.EqualTo("U2"));
+        Assert.That(values[2].Username, Is.EqualTo("U3"));
+    }
+
 }

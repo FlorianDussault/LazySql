@@ -1,9 +1,4 @@
-﻿
-
-// ReSharper disable once CheckNamespace
-using System.Dynamic;
-using static System.Net.Mime.MediaTypeNames;
-
+﻿// ReSharper disable once CheckNamespace
 namespace LazySql.Engine.Client;
 
 // ReSharper disable once ClassCannotBeInstantiated
@@ -16,37 +11,36 @@ public sealed partial class LazyClient
     /// </summary>
     /// <typeparam name="T">Type of the item</typeparam>
     /// <param name="obj">Item</param>
+    /// <param name="tableName"></param>
     /// <param name="autoIncrementColumn"></param>
     /// <param name="excludedColumns">Excluded columns</param>
-    public static void Insert(object obj, string tableName = null, string autoIncrementColumn = null, params string[] excludedColumns) => Instance.InternalInsert(obj, tableName, autoIncrementColumn, excludedColumns);
+    public static int Insert(object obj, string tableName = null, string autoIncrementColumn = null, params string[] excludedColumns) => Instance.InternalInsert(obj, tableName, autoIncrementColumn, excludedColumns);
 
     /// <summary>
     /// Insert an item
     /// </summary>
     /// <param name="type">Type of the item</param>
     /// <param name="obj">Item</param>
+    /// <param name="tableName"></param>
     /// <param name="autoIncrementColumn"></param>
     /// <param name="excludedColumns"></param>
-    private void InternalInsert(object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
+    private int InternalInsert(object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
     {
         CheckInitialization(obj.GetType(), out ITableDefinition tableDefinition);
 
         switch (tableDefinition.ObjectType)
         {
             case ObjectType.LazyObject:
-                InternalInsertLazy(tableDefinition, obj);
-                break;
+                return InternalInsertLazy(tableDefinition, obj);
             case ObjectType.Object:
-                InternalInsertObject(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
-                break;
+                return InternalInsertObject(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
             default:
-                InternalInsertDynamic(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
-                break;
+                return InternalInsertDynamic(tableDefinition, obj, tableName, autoIncrementColumn, excludedColumns);
         }
     }
 
 
-    private void InternalInsertLazy(ITableDefinition tableDefinition, object obj)
+    private int InternalInsertLazy(ITableDefinition tableDefinition, object obj)
     {
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _,
             out IReadOnlyList<ColumnDefinition> primaryKeys);
@@ -71,14 +65,15 @@ public sealed partial class LazyClient
         {
             object output = ExecuteScalar(queryBuilder);
             autoIncrementColumn.PropertyInfo.SetValue(obj, output);
+            return 1;
         }
         else
         {
-            ExecuteNonQuery(queryBuilder);
+            return ExecuteNonQuery(queryBuilder);
         }
     }
 
-    private void InternalInsertObject(ITableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
+    private int InternalInsertObject(ITableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
     {
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> allColumns, out _, out _);
 
@@ -115,14 +110,15 @@ public sealed partial class LazyClient
         {
             object output = ExecuteScalar(queryBuilder);
             autoColumnDefinition.PropertyInfo.SetValue(obj, output);
+            return 1;
         }
         else
         {
-            ExecuteNonQuery(queryBuilder);
+            return ExecuteNonQuery(queryBuilder);
         }
     }
 
-    private void InternalInsertDynamic(ITableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
+    private int InternalInsertDynamic(ITableDefinition tableDefinition, object obj, string tableName, string autoIncrementColumn, string[] excludedColumns)
     {
         if (tableName == null)
             throw new LazySqlException($"{nameof(tableName)} cannot be null for dynamic object");
@@ -163,10 +159,11 @@ public sealed partial class LazyClient
             object output = ExecuteScalar(queryBuilder);
             object value = Convert.ChangeType(output, autoColumnDefinition.PropertyType);
             autoColumnDefinition.SetValue(this, value, null);
+            return 1;
         }
         else
         {
-            ExecuteNonQuery(queryBuilder);
+            return ExecuteNonQuery(queryBuilder);
         }
         
     }

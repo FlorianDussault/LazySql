@@ -8,10 +8,10 @@ internal sealed class WhereSqlQuery : IWhereQuery
     private readonly string _whereSql;
     private readonly SqlArguments _sqlArguments;
 
-    public WhereSqlQuery(string whereSql, SqlArguments sqlArguments)
+    public WhereSqlQuery(SqlQuery sqlQuery)
     {
-        _whereSql = whereSql;
-        _sqlArguments = sqlArguments;
+        _whereSql = sqlQuery.Query;
+        _sqlArguments = sqlQuery.SqlArguments;
     }
 
     public void Build(QueryBase queryBase)
