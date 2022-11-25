@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// OrderBy With Expression

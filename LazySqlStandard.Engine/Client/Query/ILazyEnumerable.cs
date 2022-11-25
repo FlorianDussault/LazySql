@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 public interface ILazyEnumerable<T> : IEnumerable<T>
 {

@@ -1,6 +1,5 @@
-﻿using LazySqlCore.UnitTest.Tables;
-using LazySql.Engine;
-using LazySql.Engine.Client;
+﻿using LazySql;
+using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
 [TestFixture(TestName = "Table Join")]

@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Connector;
+﻿namespace LazySql;
 
 /// <summary>
 /// Sql Connector

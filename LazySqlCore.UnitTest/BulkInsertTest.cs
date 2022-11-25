@@ -1,4 +1,4 @@
-using LazySql.Engine.Client;
+using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;
@@ -16,7 +16,7 @@ public class BulkInsertTest
     public void BulkLazyObjects()
     {
         ClientTest.CleanTables();
-
+        
         List<SimpleTable> simpleTables = new();
         for (int i = 0; i < 100; i++) simpleTables.Add(new SimpleTable() {Username = "U" + i});
         LazyClient.BulkInsert(simpleTables);

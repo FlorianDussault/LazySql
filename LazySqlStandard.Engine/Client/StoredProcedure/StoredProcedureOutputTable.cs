@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.StoredProcedure;
+﻿namespace LazySql;
 
 public class StoredProcedureOutputTable
 {

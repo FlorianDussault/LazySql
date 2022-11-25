@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyClient

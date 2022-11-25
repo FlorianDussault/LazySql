@@ -1,9 +1,5 @@
 using System.Diagnostics;
-using LazySql.Engine;
-using LazySql.Engine.Client;
-using LazySql.Engine.Client.Query;
-using LazySql.Engine.Enums;
-using LazySql.Engine.Exceptions;
+using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;

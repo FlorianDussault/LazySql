@@ -1,7 +1,6 @@
-using LazySql.Engine;
-using LazySql.Engine.Client;
 using LazySqlCore.UnitTest.Tables;
 using System.Xml.Linq;
+using LazySql;
 using static System.Single;
 
 namespace LazySqlCore.UnitTest;

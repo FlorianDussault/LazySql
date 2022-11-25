@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Definitions;
+﻿namespace LazySql;
 
 internal abstract class TableDefinitionBase : List<ColumnDefinition>
 {

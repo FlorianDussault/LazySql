@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Functions;
+﻿namespace LazySql;
 
 public partial class LzFunctions
 {

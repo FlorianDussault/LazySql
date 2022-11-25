@@ -1,6 +1,4 @@
-﻿using LazySql.Engine.Definitions;
-
-namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyClient

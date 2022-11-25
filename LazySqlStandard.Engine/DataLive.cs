@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine;
+﻿namespace LazySql;
 
 /// <summary>
 /// DataLive object to retrieve or update data in database.

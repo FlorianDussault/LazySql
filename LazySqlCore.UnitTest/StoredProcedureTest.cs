@@ -1,8 +1,4 @@
-using LazySql.Engine;
-using LazySql.Engine.Client;
-using LazySql.Engine.Client.Query;
-using LazySql.Engine.Client.StoredProcedure;
-using LazySql.Engine.Enums;
+using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
 namespace LazySqlCore.UnitTest;

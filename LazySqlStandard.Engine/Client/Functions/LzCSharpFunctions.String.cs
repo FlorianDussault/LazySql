@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Functions;
+﻿namespace LazySql;
 
 /// <summary>
 /// C# Parser to SQL

@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine;
+﻿namespace LazySql;
 
 /// <summary>
 /// Relation information

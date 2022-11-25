@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Client.Lambda;
+﻿namespace LazySql;
 
 /// <summary>
 /// Lambda Parser for Alias

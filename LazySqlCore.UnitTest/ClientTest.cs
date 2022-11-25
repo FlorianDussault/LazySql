@@ -1,7 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using LazySql.Engine;
-using LazySql.Engine.Client;
-using LazySql.Engine.Client.Query;
+﻿using LazySql;
 using LazySqlCore.UnitTest.Tables;
 using Microsoft.Data.SqlClient;
 

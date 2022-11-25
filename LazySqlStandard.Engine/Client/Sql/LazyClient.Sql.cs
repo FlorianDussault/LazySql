@@ -1,7 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-using System.Data;
-
-namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyClient

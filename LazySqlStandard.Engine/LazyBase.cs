@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine;
+﻿namespace LazySql;
 
 /// <summary>
 /// Base class (abstract) used to declare supported object.

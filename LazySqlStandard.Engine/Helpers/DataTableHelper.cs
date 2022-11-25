@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Helpers
+﻿namespace LazySql
 {
     internal static class DataTableHelper
     {

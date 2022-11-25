@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Enums;
+﻿namespace LazySql;
 
 /// <summary>
 /// Sql Type

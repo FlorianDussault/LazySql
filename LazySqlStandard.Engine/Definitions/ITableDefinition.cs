@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Definitions;
+﻿namespace LazySql;
 
 internal interface ITableDefinition : IList<ColumnDefinition>
 {

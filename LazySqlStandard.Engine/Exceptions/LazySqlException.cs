@@ -1,4 +1,4 @@
-﻿namespace LazySql.Engine.Exceptions;
+﻿namespace LazySql;
 
 public class LazySqlException : Exception
 {

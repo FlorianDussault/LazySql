@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace LazySql.Engine.Client.Query
+﻿namespace LazySql
 {
     internal class UpdateQuery : QueryBase
     {

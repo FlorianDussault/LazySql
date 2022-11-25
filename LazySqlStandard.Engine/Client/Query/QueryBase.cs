@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LazySql.Engine.Client.Query
+﻿namespace LazySql
 {
     internal abstract class QueryBase
     {

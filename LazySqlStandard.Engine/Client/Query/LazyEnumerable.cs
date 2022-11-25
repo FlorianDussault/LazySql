@@ -1,6 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
-
-namespace LazySql.Engine.Client.Query;
+﻿namespace LazySql;
 
 /// <summary>
 /// LazyEnumerable

@@ -1,10 +1,4 @@
-﻿
-
-// ReSharper disable once CheckNamespace
-
-using System.Diagnostics.CodeAnalysis;
-
-namespace LazySql.Engine.Client;
+﻿namespace LazySql;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
