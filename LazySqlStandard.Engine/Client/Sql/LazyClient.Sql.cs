@@ -6,7 +6,8 @@
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
-    internal static string ConnectionString { get; private set; }
+    private static string _connectionString;
+    private static SqlCredential _sqlCredential;
 
     /// <summary>
     /// Open connection to database
@@ -14,7 +15,7 @@ public sealed partial class LazyClient
     /// <returns></returns>
     private SqlConnector Open()
     {
-        SqlConnector sqlConnector = new();
+        SqlConnector sqlConnector = new(_connectionString, _sqlCredential);
         sqlConnector.Open();
         return sqlConnector;
     }

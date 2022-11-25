@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using System.Security;
+
+namespace LazySql;
 
 /// <summary>
 /// LazyClient
@@ -20,15 +22,26 @@ public sealed partial class LazyClient
     /// </summary>
     /// <param name="connectionString">Connection String</param>
     /// <param name="types">Type of supported item</param>
-    public static void Initialize(string connectionString, params Type[] types) => Instance.InternalInitialize(connectionString, types);
+    public static void Initialize(string connectionString, params Type[] types) => Instance.InternalInitialize(connectionString, null, null, types);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="connectionString"></param>
+    /// <param name="sqlUserId"></param>
+    /// <param name="sqlPassword"></param>
+    /// <param name="types"></param>
+    public static void Initialize(string connectionString, string sqlUserId, SecureString sqlPassword, params Type[] types) => Instance.InternalInitialize(connectionString, sqlUserId, sqlPassword, types);
 
     /// <summary>
     /// Initialize LazyClient
     /// </summary>
     /// <param name="connectionString">Connection String</param>
+    /// <param name="sqlPassword"></param>
     /// <param name="types">Type of supported item</param>
+    /// <param name="sqlUserId"></param>
     /// <exception cref="LazySqlInitializeException"></exception>
-    private void InternalInitialize(string connectionString, Type[] types)
+    private void InternalInitialize(string connectionString, string sqlUserId, SecureString sqlPassword, Type[] types)
     {
         if (_initialized)
             throw new LazySqlInitializeException("SqlClient already initialized");
@@ -37,7 +50,11 @@ public sealed partial class LazyClient
             throw new LazySqlInitializeException("Connection string cannot be null or empty");
 
         RegisterTableObjects(types);
-        ConnectionString = connectionString;
+        _connectionString = connectionString;
+
+        if (sqlUserId != null)
+            _sqlCredential = new SqlCredential(sqlUserId, sqlPassword);
+
         _initialized = true;
 
     }
