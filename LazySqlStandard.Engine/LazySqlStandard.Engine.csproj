@@ -7,15 +7,15 @@
     <SignAssembly>False</SignAssembly>
     <Title>LazySql (.NET Standard)</Title>
     <Authors>Florian Dussault</Authors>
-    <AssemblyVersion>0.2.1.0</AssemblyVersion>
-    <FileVersion>0.2.1.0</FileVersion>
+    <AssemblyVersion>0.2.1.1</AssemblyVersion>
+    <FileVersion>0.2.1.1</FileVersion>
     <LangVersion>preview</LangVersion>
     <Description>Micro ORM for C# .NET</Description>
     <Copyright>Florian Dussault © 2022</Copyright>
     <PackageProjectUrl>https://github.com/FlorianDussault/LazySql</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FlorianDussault/LazySql</RepositoryUrl>
     <PackageTags>C# ORM;Sqlserver;Database;ORM</PackageTags>
-    <Version>2.1.0-preview</Version>
+    <Version>2.1.1-preview</Version>
     <RootNamespace>LazySql</RootNamespace>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -79,7 +79,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.4" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
   </ItemGroup>
 
 </Project>

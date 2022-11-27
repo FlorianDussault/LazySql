@@ -2,8 +2,9 @@
 
 LazySql is a micro ORM to simplify the interfacing between an application and a Sql Server Database.
 
-# Whats new in 2.1.0-preview?
+# Whats new in 2.1.1-preview?
 
+* System.Data.SqlClient from 4.8.4 to 4.8.5 (Security)
 * Support of ``object`` and ``dynamic`` types!
 * Namespace fixed
 * Support of SqlCredential
@@ -13,9 +14,9 @@ LazySql is a micro ORM to simplify the interfacing between an application and a 
 [![Build status](https://ci.appveyor.com/api/projects/status/q5mj8574x62xi1o5/branch/master?svg=true)](https://ci.appveyor.com/project/FlorianDussault/lazysql/branch/master)
 
 
-| Package | NuGet |  Downloads | **.NET** | **.NET Framework** | **.NET Standard** | **Sql Server** |
-| ------- | ----- | ---------- |:--------:| ------------------:|:-----------------:|:----------:|
-| [LazySqlStandard.Engine](https://www.nuget.org/packages/LazySqlStandard.Engine/) | [![LazySqlStandard.Engine](https://img.shields.io/nuget/v/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | [![LazySqlStandard.Engine](https://img.shields.io/nuget/dt/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | 6.0 | 4.8 | 2.0 | > Sql Server 2012 |
+|  NuGet |  Downloads | **.NET** | **.NET Framework** | **.NET Standard** | **Sql Server** |
+|  ----- | ---------- |:--------:|:------------------:|:-----------------:|:----------:|
+| [![LazySqlStandard.Engine](https://img.shields.io/nuget/v/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | [![LazySqlStandard.Engine](https://img.shields.io/nuget/dt/LazySqlStandard.Engine.svg)](https://www.nuget.org/packages/LazySqlStandard.Engine/) | 6.0 | 4.8 | 2.0 | > Sql Server 2012 |
 
 
 # How to use it?
