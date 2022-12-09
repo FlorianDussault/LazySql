@@ -43,4 +43,12 @@ public static class SqlExtensions
 
     public static int Delete<T>(this IEnumerable<T> list) where T : LazyBase => list.Sum(obj => obj.Delete());
 
+    public static SqlQuery Bind(this string query, string paramName, SqlType sqlType, object value) => new SqlQuery(query).Bind(paramName, sqlType, value);
+
+    public static SqlQuery Bind(this string query, string paramName, object value) => new SqlQuery(query).Bind(paramName, value);
+
+    public static StoredQuery BindIn(this string procedureName, string paramName, SqlType  sqlType, object value) => new StoredQuery(procedureName).BindIn(paramName, sqlType, value);
+    public static StoredQuery BindIn(this string procedureName, string paramName, object value) => new StoredQuery(procedureName).BindIn(paramName, value);
+
+    public static StoredQuery BindOut(this string procedureName, string paramName, SqlType sqlType) => new StoredQuery(procedureName).BindOut(paramName, sqlType);
 }

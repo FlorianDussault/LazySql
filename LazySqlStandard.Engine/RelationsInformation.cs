@@ -6,7 +6,7 @@
 internal class RelationsInformation : List<RelationInformation>
 {
     /// <summary>
-    /// Add relation
+    /// Bind relation
     /// </summary>
     /// <param name="relationType">Type of relation</param>
     /// <param name="parentType">Parent Type</param>

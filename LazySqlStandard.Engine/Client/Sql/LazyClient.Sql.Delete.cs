@@ -68,7 +68,7 @@ public sealed partial class LazyClient
             deleteQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
 
         QueryBuilder queryBuilder = deleteQuery.BuildQuery();
-        return ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+        return ExecuteNonQuery(queryBuilder);
     }
 
 

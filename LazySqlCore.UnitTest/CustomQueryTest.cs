@@ -18,7 +18,7 @@ public class CustomQueryTest
 
         Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM child_table"), Is.EqualTo(400));
         Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM simple_table"), Is.EqualTo(20));
-
+        
         ClientTest.CleanSimpleTable();
 
         for (int i = 0; i < 100; i++)
@@ -26,13 +26,13 @@ public class CustomQueryTest
             new SimpleTable() {Username = "U"}.Insert();
         }
 
-        Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM simple_table WHERE user_id <= @IdMax", new SqlArguments().Add("@IdMax", SqlType.Int, 50)), Is.EqualTo(50));
+        Assert.That(LazyClient.ExecuteNonQuery("DELETE FROM simple_table WHERE user_id <= @IdMax".Bind("@IdMax", SqlType.Int, 50)), Is.EqualTo(50));
     }
 
     [Test]
     public void ExecuteScalar()
     {
-        Assert.That(LazyClient.ExecuteScalar<string>("SELECT CONCAT('Hello', ' ', @WorldVariable)", new SqlArguments().Add("@WorldVariable", SqlType.NVarChar, "WORLD")), Is.EqualTo("Hello WORLD"));
+        Assert.That(LazyClient.ExecuteScalar<string>("SELECT CONCAT('Hello', ' ', @WorldVariable)".Bind("@WorldVariable", SqlType.NVarChar, "WORLD")), Is.EqualTo("Hello WORLD"));
         Assert.That(LazyClient.ExecuteScalar<int>("SELECT 9876"), Is.EqualTo(9876));
     }
 }

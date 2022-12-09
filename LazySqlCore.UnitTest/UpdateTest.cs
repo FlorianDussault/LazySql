@@ -45,7 +45,7 @@ public class UpdateTest
             Assert.That(simpleTable.Username, Is.Not.EqualTo("UPDATE 1"));
         }
 
-        Assert.That(updateSimpleTable.Update(new SqlQuery("User_Id = @Id").Add("@Id",4), nameof(SimpleTable.Password)), Is.EqualTo(1));
+        Assert.That(updateSimpleTable.Update(new SqlQuery("User_Id = @Id").Bind("@Id",4), nameof(SimpleTable.Password)), Is.EqualTo(1));
          updatedList = LazyClient.Select<SimpleTable>(s => s.Id == 4).ToList();
         Assert.That(updatedList[0].Username, Is.EqualTo("UPDATE 1"));
         Assert.That(updatedList[0].Password, Is.Not.Null);
@@ -54,6 +54,10 @@ public class UpdateTest
             Assert.That(simpleTable.Username, !Is.EqualTo("UPDATE 1"));
             Assert.That(simpleTable.Username, !Is.EqualTo("UPDATE 1"));
         }
+
+
+        //LazyClient.Update<SimpleTable>(new {car.Enabled, car.Name}, "Id > @Id".Bind("@Id", 10));
+        throw new NotImplementedException();
     }
 
     [Test]

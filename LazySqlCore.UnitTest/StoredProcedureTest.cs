@@ -18,12 +18,14 @@ public class StoredProcedureTest
     {
         ClientTest.AddSimpleTables();
 
-        StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure",
-            new SqlArguments().Add("@Count", SqlType.Int, 10)
-                .Add("@Prefix", SqlType.NVarChar, "UT_")
-                .AddOut("@IdMax", SqlType.Int)
-                .AddOut("@IdMin", SqlType.Int)
-        );
+        //StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure",
+        //    new SqlArguments().Add("@Count", SqlType.Int, 10)
+        //        .Add("@Prefix", SqlType.NVarChar, "UT_")
+        //        .AddOut("@IdMax", SqlType.Int)
+        //        .AddOut("@IdMin", SqlType.Int)
+        //);
+
+        StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure".BindIn("@Count", 10).BindIn("@Prefix", "UT_").BindOut("@IdMax", SqlType.Int).BindOut("@IdMin", SqlType.Int));
 
 
         Assert.That(result.ReturnValue, Is.EqualTo(-678));
@@ -66,11 +68,10 @@ public class StoredProcedureTest
     [Test]
     public void SimpleProcedureWithNull()
     {
-        StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure",
-            new SqlArguments().Add("@Count", SqlType.Int, null)
-                .Add("@Prefix", SqlType.NVarChar, "UT_")
-                .AddOut("@IdMax", SqlType.Int)
-                .AddOut("@IdMin", SqlType.Int)
+        StoredProcedureResult result = LazyClient.StoredProcedure("simple_procedure".BindIn("@Count", SqlType.Int, null)
+                .BindIn("@Prefix", SqlType.NVarChar, "UT_")
+                .BindOut("@IdMax", SqlType.Int)
+                .BindOut("@IdMin", SqlType.Int)
         );
 
         Assert.That(result.ReturnValue, Is.EqualTo(0));

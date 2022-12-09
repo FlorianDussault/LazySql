@@ -124,7 +124,7 @@ public sealed partial class LazyClient
         TableDefinitionLazy tableDefinition = new(type, tableAttribute);
 
         LazyBase obj = (LazyBase)Activator.CreateInstance(type);
-
+        
         obj.Initialize();
         if (obj.Relations != null)
             tableDefinition.Relations = obj.Relations;

@@ -16,7 +16,7 @@ internal static class ClientTest
     private const string MasterConnectionString = "Server=localhost\\sqlexpress;Database=master;TrustServerCertificate=Yes;Trusted_Connection=True";
 #endif
 
-    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types"};
+    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types", "dbo.hierarchy_table" };
 
     public static void Initialize()
     {
@@ -87,6 +87,10 @@ internal static class ClientTest
 
         Execute(sqlConnection, "CREATE TABLE [dbo].[types](\r\n\t[id] [int] IDENTITY(1,1) NOT NULL,\r\n\t[type_bigint] [bigint] NULL,\r\n\t[type_binary] [binary](50) NULL,\r\n\t[type_bit] [bit] NULL,\r\n\t[type_char] [char](10) NULL,\r\n\t[type_date] [date] NULL,\r\n\t[type_datetime2] [datetime2](7) NULL,\r\n\t[type_datetimeoffset] [datetimeoffset](7) NULL,\r\n\t[type_decimal] [decimal](18, 2) NULL,\r\n\t[type_float] [float] NULL,\r\n\t[type_geography] [geography] NULL,\r\n\t[type_hierarchyid] [hierarchyid] NULL,\r\n\t[type_image] [image] NULL,\r\n\t[type_int] [int] NULL,\r\n\t[type_money] [money] NULL,\r\n\t[type_ntext] [ntext] NULL,\r\n\t[type_numeric] [numeric](18, 4) NULL,\r\n\t[type_real] [real] NULL,\r\n\t[type_smalldatime] [smalldatetime] NULL,\r\n\t[type_smallint] [smallint] NULL,\r\n\t[type_smallmoney] [smallmoney] NULL,\r\n\t[type_sql_variant] [sql_variant] NULL,\r\n\t[type_text] [text] NULL,\r\n\t[type_time] [time](7) NULL,\r\n\t[type_timestamp] [timestamp] NULL,\r\n\t[type_tinyint] [tinyint] NULL,\r\n\t[type_uniqueidentifier] [uniqueidentifier] NULL,\r\n\t[type_xml] [xml] NULL,\r\n CONSTRAINT [PK_types] PRIMARY KEY CLUSTERED \r\n(\r\n\t[id] ASC\r\n))");
 
+        Execute(sqlConnection, "CREATE TABLE [dbo].[hierarchy_table](\r\n\t[id] [int] IDENTITY(1,1) NOT NULL,\r\n\t[parent_id] [int] NULL,\r\n\t[Name] [nvarchar](50) NULL,\r\n CONSTRAINT [PK_hierarchy_table_1] PRIMARY KEY CLUSTERED \r\n(\r\n\t[id] ASC\r\n)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\r\n) ON [PRIMARY]");
+        Execute(sqlConnection, "ALTER TABLE [dbo].[hierarchy_table]  WITH CHECK ADD  CONSTRAINT [FK_hierarchy_table_hierarchy_table] FOREIGN KEY([parent_id])\r\nREFERENCES [dbo].[hierarchy_table] ([id])");
+        Execute(sqlConnection, "ALTER TABLE [dbo].[hierarchy_table] CHECK CONSTRAINT [FK_hierarchy_table_hierarchy_table]");
+
         Execute(sqlConnection, "ALTER TABLE [dbo].[child_table]  WITH NOCHECK ADD  CONSTRAINT [FK_child_table_simple_table] FOREIGN KEY([simple_table_id]) REFERENCES [dbo].[simple_table] ([user_id])");
         Execute(sqlConnection, "ALTER TABLE [dbo].[child_table] CHECK CONSTRAINT [FK_child_table_simple_table]");
         Execute(sqlConnection, "ALTER TABLE [dbo].[subchild_table]  WITH CHECK ADD  CONSTRAINT [FK_subchild_table_child_table] FOREIGN KEY([parent_id]) REFERENCES [dbo].[child_table] ([id])");
@@ -95,7 +99,7 @@ internal static class ClientTest
 
     private static void CreateStoredProcedures(SqlConnection sqlConnection)
     {
-        Execute(sqlConnection, "CREATE PROCEDURE [dbo].[simple_procedure] \r\n\t-- Add the parameters for the stored procedure here\r\n\t@Count INT, \r\n\t@Prefix NVARCHAR(MAX),\r\n\t@IdMax INT OUTPUT,\r\n\t@IdMin INT OUTPUT\r\nAS\r\nBEGIN\r\n\t-- SET NOCOUNT ON added to prevent extra result sets from\r\n\t-- interfering with SELECT statements.\r\n\tSET NOCOUNT ON;\r\n\r\n\tIF @Count IS NULL\r\n\tBEGIN\r\n\t\tgoto eos;\r\n\tEND\r\n\r\n\tDECLARE @cnt INT = 0;\r\n\r\n\tSELECT @IdMin = MAX(User_id) FROM simple_table\r\n\r\n\tWHILE @cnt < @Count\r\n\tBEGIN\r\n\t   INSERT INTO dbo.simple_table (username, [password]) VALUES (CONCAT(@Prefix, CAST(NEWID() AS NVARCHAR(36))), 'pwd')\r\n\t   SET @cnt = @cnt + 1\r\n\tEND\r\n\tSELECT @idMax = MAX(User_id) FROM simple_table\r\n    -- Insert statements for procedure here\r\n\tSELECT * FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] ASC\r\n\tSELECT [user_id], username FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] DESC\r\n\treturn -678\r\n\teos:\r\n\treturn null\r\nEND");
+        Execute(sqlConnection, "CREATE PROCEDURE [dbo].[simple_procedure] \r\n\t-- Bind the parameters for the stored procedure here\r\n\t@Count INT, \r\n\t@Prefix NVARCHAR(MAX),\r\n\t@IdMax INT OUTPUT,\r\n\t@IdMin INT OUTPUT\r\nAS\r\nBEGIN\r\n\t-- SET NOCOUNT ON added to prevent extra result sets from\r\n\t-- interfering with SELECT statements.\r\n\tSET NOCOUNT ON;\r\n\r\n\tIF @Count IS NULL\r\n\tBEGIN\r\n\t\tgoto eos;\r\n\tEND\r\n\r\n\tDECLARE @cnt INT = 0;\r\n\r\n\tSELECT @IdMin = MAX(User_id) FROM simple_table\r\n\r\n\tWHILE @cnt < @Count\r\n\tBEGIN\r\n\t   INSERT INTO dbo.simple_table (username, [password]) VALUES (CONCAT(@Prefix, CAST(NEWID() AS NVARCHAR(36))), 'pwd')\r\n\t   SET @cnt = @cnt + 1\r\n\tEND\r\n\tSELECT @idMax = MAX(User_id) FROM simple_table\r\n    -- Insert statements for procedure here\r\n\tSELECT * FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] ASC\r\n\tSELECT [user_id], username FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] DESC\r\n\treturn -678\r\n\teos:\r\n\treturn null\r\nEND");
     }
 
     private static void Execute(SqlConnection sqlConnection, string sql)
@@ -115,7 +119,7 @@ internal static class ClientTest
         const int COUNT_CHILD_TABLE = 20;
         // Clear Table
         CleanTables();
-        // Add values
+        // Bind values
         Assert.IsEmpty(LazyClient.Select<SimpleTable>());
         int bot_id = 0;
         for (int i = 0; i < COUNT_SIMPLE_TABLE; i++)

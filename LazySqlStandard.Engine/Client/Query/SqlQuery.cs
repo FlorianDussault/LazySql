@@ -15,13 +15,13 @@
 
         }
 
-        public SqlQuery Add(string name, SqlType sqlType, object value)
+        public SqlQuery Bind(string name, SqlType sqlType, object value)
         {
             SqlArguments.Add(name, sqlType, value);
             return this;
         }
 
-        public SqlQuery Add(string name, object value)
+        public SqlQuery Bind(string name, object value)
         {
             SqlArguments.Add(name, value.GetType().ToSqlType(), value);
             return this;

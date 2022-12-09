@@ -150,17 +150,17 @@ internal class LambdaParser
             return;
         }
 
-        ColumnDefinition columnDefinition = _tableDefinition.GetColumn(expression.Member.Name);
-        if (columnDefinition == null)
+        if (expression.Member.DeclaringType == _tableDefinition.TableType && _tableDefinition.GetColumn(expression.Member.Name) is { } columnDefinition)
+        {
+            _queryBuilder.Append($" {columnDefinition.Column.SqlColumnName}");
+        }
+        else
         {
             object value = Expression.Lambda(expression).Compile().DynamicInvoke();
             string argumentName = _queryBuilder.RegisterArgument(value.GetType().ToSqlType(), value);
             _queryBuilder.Append(argumentName);
         }
-        else
-        {
-            _queryBuilder.Append($" {columnDefinition.Column.SqlColumnName}");
-        }
+       
     }
 
     /// <summary>

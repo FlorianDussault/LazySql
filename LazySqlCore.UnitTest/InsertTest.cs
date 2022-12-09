@@ -78,22 +78,24 @@ public class InsertTest
             Username = "Test1",
             Password = "Pass1"
         };
-        LazyClient.Insert(simpleTable, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
-
-
+        LazyClient.Insert(simpleTable, "simple_table");
+        
         dynamic simpleTable2 = new
         {
             Username = "Test2",
             Password = "Pass2"
         };
-        LazyClient.Insert(simpleTable2, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable2, "simple_table");
 
         dynamic simpleTable3 = new
         {
             Username = "Test3",
-            Password = "Pass3"
+            Password = "Pass3",
+            NotSqlType = 87
         };
-        LazyClient.Insert(simpleTable3, "simple_table", null, nameof(Simple_Table.NotInSqlFiled), nameof(Simple_Table.NotSqlType));
+        LazyClient.Insert(simpleTable3, "simple_table", null, "NotSqlType");
+
+        throw new NotImplementedException("With Autoincrement");
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>().OrderBy(s=>s.Id).ToList();
         Assert.That(values[0].Username, Is.EqualTo("Test1"));

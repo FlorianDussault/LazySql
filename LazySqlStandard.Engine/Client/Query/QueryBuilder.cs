@@ -78,7 +78,7 @@ internal sealed class QueryBuilder
     public string RegisterArgument(SqlType type, object obj) => _sqlArguments.Register(type, obj);
 
     /// <summary>
-    /// Add SqlArguments
+    /// Bind SqlArguments
     /// </summary>
     /// <param name="arguments"></param>
     public void AddSqlArguments(SqlArguments arguments) => _sqlArguments.AddRange(arguments);

@@ -26,8 +26,19 @@ public abstract class LazyBase
             
     }
 
+    public virtual void OnBeforeLoad()
+    {
+
+    }
+
+    public virtual void OnLoaded()
+    {
+
+    }
+
+
     /// <summary>
-    /// Add relation of type One to Many (0,1=>0,n)
+    /// Bind relation of type One to Many (0,1=>0,n)
     /// </summary>
     /// <typeparam name="T">Parent table</typeparam>
     /// <typeparam name="C">Child table</typeparam>
@@ -37,7 +48,7 @@ public abstract class LazyBase
     public void AddOneToMany<T,C>(string column, Expression<Func<T,C, bool>> expression) where T : LazyBase where C : LazyBase => Relations.Add(RelationType.OneToMany, typeof(T), column, typeof(C), expression);
 
     /// <summary>
-    /// Add relation of type One to One (0,1=>0,1)
+    /// Bind relation of type One to One (0,1=>0,1)
     /// </summary>
     /// <typeparam name="T">Parent table</typeparam>
     /// <typeparam name="C">Child table</typeparam>

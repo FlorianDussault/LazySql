@@ -35,7 +35,7 @@ public class DeleteTest
         Assert.IsEmpty(LazyClient.Select<SimpleTable>());
 
         ClientTest.AddSimpleTables();
-        Assert.That(LazyClient.Delete<object>("child_table", new SqlQuery("Id = @Id2 OR Id = @Id3").Add("@Id2", 2).Add("@Id3", 3)), Is.EqualTo(2));
+        Assert.That(LazyClient.Delete<object>("child_table", new SqlQuery("Id = @Id2 OR Id = @Id3").Bind("@Id2", 2).Bind("@Id3", 3)), Is.EqualTo(2));
         Assert.IsEmpty(LazyClient.Select<ChildTable>(c=>c.Id == 2  || c.Id == 3));
         Assert.IsNotEmpty(LazyClient.Select<ChildTable>());
 

@@ -49,7 +49,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     }
 
     /// <summary>
-    /// Add additional items
+    /// Bind additional items
     /// </summary>
     /// <param name="expression">Lambda expression to filter data</param>
     public void LoadAdditional(Expression<Func<T, bool>> expression = null)
@@ -63,7 +63,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     }
 
     /// <summary>
-    /// Add item in list and database
+    /// Bind item in list and database
     /// </summary>
     /// <param name="item">Item to add</param>
     public new void Add(T item)
@@ -73,7 +73,7 @@ public class DataLive<T> : List<T>  where T : LazyBase
     }
 
     /// <summary>
-    /// Add a collection of items in list and database
+    /// Bind a collection of items in list and database
     /// </summary>
     /// <param name="collection">Collection of items</param>
     public new void AddRange(IEnumerable<T> collection)

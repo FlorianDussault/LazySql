@@ -1,6 +1,6 @@
 ﻿namespace LazySql;
 
-public sealed class SqlArguments : List<SqlArgument>
+internal sealed class SqlArguments : List<SqlArgument>
 {
     internal string Register(SqlType type,  object obj)
     {

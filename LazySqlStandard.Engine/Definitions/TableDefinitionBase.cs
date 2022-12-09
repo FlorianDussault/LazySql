@@ -21,7 +21,7 @@ internal abstract class TableDefinitionBase : List<ColumnDefinition>
     }
 
     /// <summary>
-    /// Add column
+    /// Bind column
     /// </summary>
     /// <param name="propertyInfo">Object property</param>
     /// <param name="column">Column attribute</param>

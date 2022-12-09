@@ -36,7 +36,7 @@ internal sealed class SqlConnector : IDisposable
     }
 
     /// <summary>
-    /// Add values to SqlCommand
+    /// Bind values to SqlCommand
     /// </summary>
     /// <param name="sqlArguments">Arguments</param>
     private void AddValues(SqlArguments sqlArguments)
@@ -46,7 +46,7 @@ internal sealed class SqlConnector : IDisposable
     }
 
     /// <summary>
-    /// Add value to SqlCommand
+    /// Bind value to SqlCommand
     /// </summary>
     /// <param name="sqlArgument">Argument</param>
     private void AddValue(SqlArgument sqlArgument)

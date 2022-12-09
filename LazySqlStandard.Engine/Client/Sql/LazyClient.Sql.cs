@@ -39,8 +39,6 @@ public sealed partial class LazyClient
             sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         ITableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 
-        
-
         List<(int Index, ColumnDefinition ColumnDefinition)> columns = new();
         for (int i = 0; i < sqlDataReader.FieldCount; i++)
         {
@@ -65,7 +63,7 @@ public sealed partial class LazyClient
         while (sqlDataReader.Read())
         {
             object instance = Activator.CreateInstance(tableDefinition.TableType);
-
+            if (tableDefinition.ObjectType == ObjectType.LazyObject) ((LazyBase)instance).OnBeforeLoad();
             foreach ((int Index, ColumnDefinition ColumnDefinition) column in columns)
             {
                 object value = null;
@@ -73,7 +71,8 @@ public sealed partial class LazyClient
                     value = sqlDataReader.GetValue(column.Index);
                 column.ColumnDefinition.PropertyInfo.SetValue(instance, value);
             }
-            
+            if (tableDefinition.ObjectType == ObjectType.LazyObject) ((LazyBase)instance).OnLoaded();
+
             yield return instance;
         }
 

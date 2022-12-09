@@ -23,8 +23,7 @@ public class SelectTest
     public void SelectObject()
     {
         ClientTest.AddSimpleTables();
-
-        List<Simple_Table> simpleTables = LazyClient.Select<Simple_Table>().ToList();
+        List <Simple_Table> simpleTables = LazyClient.Select<Simple_Table>().ToList();
         Assert.That(simpleTables.Count, Is.EqualTo(20));
 
         for (int i = 0; i < simpleTables.Count; i++)
@@ -86,7 +85,7 @@ public class SelectTest
         ClientTest.AddSimpleTables();
 
         List<int> allowedIds = new() {5, 6, 7, 8, 9, 10, 20};
-        foreach (dynamic simpleTable in LazyClient.Select<dynamic>("simple_table", new SqlQuery("(user_id > 4 AND user_id <= 10) OR username = @p20").Add("@p20", "P20")))
+        foreach (dynamic simpleTable in LazyClient.Select<dynamic>("simple_table", "(user_id > 4 AND user_id <= 10) OR username = @p20".Bind("@p20", "P20")))
         {
             Assert.IsTrue(allowedIds.Contains(simpleTable.user_id));
         }
@@ -216,6 +215,79 @@ public class SelectTest
         simpleTables = LazyClient.Select<SimpleTable>().ToList();
         stopwatch.Stop();
 
+    }
+
+    [Test]
+    public void SelectHierarchy()
+    {
+        
+
+
+        LazyClient.Delete<HierarchyTable>();
+
+ 
+        for (int i = 0; i < 10; i++)
+        {
+            HierarchyTable root = new() {Name = "?"};
+            root.Insert();
+            root.Name = root.Id.ToString();
+            root.Update();
+            for (int j = 0; j < 5; j++)
+            {
+                HierarchyTable sub1 = new() { Name = "?", ParentId = root.Id };
+                sub1.Insert();
+                sub1.Name = $"{root.Id}/{sub1.Id}";
+                sub1.Update();
+
+                for (int k = 0; k < 7; k++)
+                {
+                    HierarchyTable sub2 = new() { Name = "?", ParentId = sub1.Id};
+                    sub2.Insert();
+                    sub2.Name = $"{root.Id}/{sub1.Id}/{sub2.Id}";
+                    sub2.Update();
+
+                    for (int l = 0; l < 5; l++)
+                    {
+                        HierarchyTable sub3 = new() { Name = "?", ParentId = sub2.Id};
+                        sub3.Insert();
+                        sub3.Name = $"{root.Id}/{sub1.Id}/{sub2.Id}/{sub3.Id}";
+                        sub3.Update();
+                    }
+
+                }
+            }
+        }
+
+        List<HierarchyTable> roots = LazyClient.Select<HierarchyTable>(h=>h.ParentId == null).ToList();
+        Assert.That(roots.Count, Is.EqualTo(10));
+
+        foreach (HierarchyTable t in roots)
+        {
+            Assert.That(t.ParentId, Is.Null);
+            Assert.That(t.Children.Count, Is.EqualTo(5));
+            Assert.That(t.Name, Is.EqualTo(t.Id.ToString()));
+
+            foreach (HierarchyTable t1 in t.Children)
+            {
+                Assert.That(t1.ParentId, Is.EqualTo(t.Id));
+                Assert.That(t1.Children.Count, Is.EqualTo(7));
+                Assert.That(t1.Name, Is.EqualTo($"{t.Id}/{t1.Id}"));
+
+                foreach (HierarchyTable t2 in t1.Children)
+                {
+                    Assert.That(t2.ParentId, Is.EqualTo(t1.Id));
+                    Assert.That(t2.Children.Count, Is.EqualTo(5));
+                    Assert.That(t2.Name, Is.EqualTo($"{t.Id}/{t1.Id}/{t2.Id}"));
+
+                    foreach (HierarchyTable t3 in t2.Children)
+                    {
+                        Assert.That(t3.ParentId, Is.EqualTo(t2.Id));
+                        Assert.That(t3.Children.Count, Is.EqualTo(0));
+                        Assert.That(t3.Name, Is.EqualTo($"{t.Id}/{t1.Id}/{t2.Id}/{t3.Id}"));
+                    }
+                }
+            }
+        }
     }
 
 }

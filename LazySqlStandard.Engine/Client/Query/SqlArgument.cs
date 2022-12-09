@@ -3,7 +3,7 @@
 /// <summary>
 /// Sql Argument
 /// </summary>
-public sealed class SqlArgument
+internal sealed class SqlArgument
 {
     /// <summary>
     /// Name

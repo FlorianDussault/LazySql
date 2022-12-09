@@ -107,17 +107,13 @@ DELETE Cars WHERE Enabled = 0
 ### Stored Procedure
 
 ```cs
-StoredProcedureResult result = LazyClient.StoredProcedure("my_procedure",
-            new SqlArguments()
-               .Add("@FirstName", SqlType.NVarChar, "Florian")
-               .Add("@Age", SqlType.Int, 40)
-               .AddOut("@Id", SqlType.Int) // OUTPUT PARAMETER
-        );
+StoredProcedureResult result = LazyClient.StoredProcedure("my_procedure".BindIn("@Count", 10).BindIn("@Prefix", "UT_").BindOut("@IdMax", SqlType.Int).BindOut("@IdMin", SqlType.Int));
 
 // Get return value (RETURN)
 Console.WriteLine($"Result: {result.ReturnValue}");
 // Get Output value
-Console.WriteLine($"Result: {result.Output.Id}");
+Console.WriteLine($"Result Max: {result.Output.IdMax}");
+Console.WriteLine($"Result Min: {result.Output.IdMin}");
 
 // Get first table with dynamic types
 IEnumerable<dynamic> dynamicValues = result.Tables[0].Parse();
@@ -149,7 +145,7 @@ string firstName = LazyClient.ExecuteNonQuery<string>("SELECT firstname FROM web
 
 # License
 
-LazySql is licensed under the terms of the [MIT](https://choosealicense.com/licenses/mit/) license and is available for free.
+LazySql is licenced under Apache 2.0: http://www.apache.org/licenses/LICENSE-2.0
 
 # Links
 
