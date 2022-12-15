@@ -16,9 +16,13 @@ internal partial class LzCSharpFunctions : LambdaFunctionParser
     {
         MethodInfo method = GetType().GetTypeInfo()
             .GetDeclaredMethod($"{expression.Method.DeclaringType.Name}_{expression.Method.Name}");
-        if (method == null)
-            throw new NotSupportedException(
-                $"Function '{expression.Method.DeclaringType.Name}.{expression.Method.Name}' is not supported");
-        method.Invoke(this, new object[] {expression, lambdaParser, queryBuilder});
+
+        if (method != null)
+            method.Invoke(this, new object[] { expression, lambdaParser, queryBuilder });
+        else
+        {
+            Other(expression, lambdaParser, queryBuilder);
+        }
+       
     }
 }

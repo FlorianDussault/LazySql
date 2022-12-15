@@ -20,6 +20,24 @@ public class SelectTest
     }
 
     [Test]
+    public void SelectLazyOnSchema()
+    {
+        LazyClient.Delete<PrimaryValue>();
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>());
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(new PrimaryValue { Value = "U_" + i }.Insert(), Is.EqualTo(1));
+            LazyClient.Insert(new PrimaryValue { Value = "F_" + i });
+        }
+        Assert.That(LazyClient.Select<PrimaryValue>().Count(), Is.EqualTo(40));
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(LazyClient.Select<PrimaryValue>(p => p.Value == $"U_{i}").Count(), Is.EqualTo(1));
+            Assert.That(LazyClient.Select<PrimaryValue>(p => p.Value == $"F_{i}").Count(), Is.EqualTo(1));
+        }
+    }
+
+    [Test]
     public void SelectObject()
     {
         ClientTest.AddSimpleTables();
@@ -34,7 +52,25 @@ public class SelectTest
             Assert.IsNull(simpleTables[i].NotInSqlFiled);
             Assert.IsNull(simpleTables[i].NotSqlType);
         }
+    }
 
+    [Test]
+    public void SelectObjectOnSchema()
+    {
+        LazyClient.Delete<dynamic>("lazys", "tablePrimary");
+        Assert.IsEmpty(LazyClient.Select<TablePrimary>("lazys", "tableprimary"));
+
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(LazyClient.Insert("lazys", "tableprimary", new TablePrimary { Value = "U_" + i }, nameof(TablePrimary.Id)), Is.EqualTo(1));
+        }
+
+        for (int i = 1; i < 21; i++)
+        {
+            List<TablePrimary> uValues = LazyClient.Select<TablePrimary>("lazys", "tableprimary", p => p.Id == i).ToList();
+            Assert.That(uValues.Count, Is.EqualTo(1));
+            Assert.That(uValues[0].Value, Is.EqualTo($"U_{i - 1}"));
+        }
     }
 
     [Test]
@@ -50,6 +86,20 @@ public class SelectTest
             Assert.That(simpleTables[i].username, Is.EqualTo($"U{i + 1}"));
             Assert.That(simpleTables[i].password, Is.EqualTo($"P{i + 1}"));
             Assert.IsNull(simpleTables[i].extended_key);
+        }
+    }
+
+    [Test]
+    public void SelectDynamicOnSchema()
+    {
+        ClientTest.AddSchemaRows();
+        
+        List<dynamic> values = LazyClient.Select<dynamic>("lazys", "WithoutKeys").ToList();
+
+        for (int i = 0; i < values.Count; i++)
+        {
+            Assert.That(values[i].Age, Is.EqualTo(i));
+            Assert.That(values[i].Name, Is.EqualTo($"N_{i}"));
         }
     }
 
@@ -220,9 +270,6 @@ public class SelectTest
     [Test]
     public void SelectHierarchy()
     {
-        
-
-
         LazyClient.Delete<HierarchyTable>();
 
  
@@ -280,6 +327,76 @@ public class SelectTest
                     Assert.That(t2.Name, Is.EqualTo($"{t.Id}/{t1.Id}/{t2.Id}"));
 
                     foreach (HierarchyTable t3 in t2.Children)
+                    {
+                        Assert.That(t3.ParentId, Is.EqualTo(t2.Id));
+                        Assert.That(t3.Children.Count, Is.EqualTo(0));
+                        Assert.That(t3.Name, Is.EqualTo($"{t.Id}/{t1.Id}/{t2.Id}/{t3.Id}"));
+                    }
+                }
+            }
+        }
+    }
+
+    [Test]
+    public void SelectHierarchyOnSchema()
+    {
+        LazyClient.Delete<HierarchySchema>();
+
+
+        for (int i = 0; i < 10; i++)
+        {
+            HierarchySchema root = new() { Name = "?" };
+            root.Insert();
+            root.Name = root.Id.ToString();
+            root.Update();
+            for (int j = 0; j < 5; j++)
+            {
+                HierarchySchema sub1 = new() { Name = "?", ParentId = root.Id };
+                sub1.Insert();
+                sub1.Name = $"{root.Id}/{sub1.Id}";
+                sub1.Update();
+
+                for (int k = 0; k < 7; k++)
+                {
+                    HierarchySchema sub2 = new() { Name = "?", ParentId = sub1.Id };
+                    sub2.Insert();
+                    sub2.Name = $"{root.Id}/{sub1.Id}/{sub2.Id}";
+                    sub2.Update();
+
+                    for (int l = 0; l < 5; l++)
+                    {
+                        HierarchySchema sub3 = new() { Name = "?", ParentId = sub2.Id };
+                        sub3.Insert();
+                        sub3.Name = $"{root.Id}/{sub1.Id}/{sub2.Id}/{sub3.Id}";
+                        sub3.Update();
+                    }
+
+                }
+            }
+        }
+
+        List<HierarchySchema> roots = LazyClient.Select<HierarchySchema>(h => h.ParentId == null).ToList();
+        Assert.That(roots.Count, Is.EqualTo(10));
+
+        foreach (HierarchySchema t in roots)
+        {
+            Assert.That(t.ParentId, Is.Null);
+            Assert.That(t.Children.Count, Is.EqualTo(5));
+            Assert.That(t.Name, Is.EqualTo(t.Id.ToString()));
+
+            foreach (HierarchySchema t1 in t.Children)
+            {
+                Assert.That(t1.ParentId, Is.EqualTo(t.Id));
+                Assert.That(t1.Children.Count, Is.EqualTo(7));
+                Assert.That(t1.Name, Is.EqualTo($"{t.Id}/{t1.Id}"));
+
+                foreach (HierarchySchema t2 in t1.Children)
+                {
+                    Assert.That(t2.ParentId, Is.EqualTo(t1.Id));
+                    Assert.That(t2.Children.Count, Is.EqualTo(5));
+                    Assert.That(t2.Name, Is.EqualTo($"{t.Id}/{t1.Id}/{t2.Id}"));
+
+                    foreach (HierarchySchema t3 in t2.Children)
                     {
                         Assert.That(t3.ParentId, Is.EqualTo(t2.Id));
                         Assert.That(t3.Children.Count, Is.EqualTo(0));

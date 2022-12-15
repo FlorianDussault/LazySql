@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
@@ -10,6 +11,11 @@ public class UpdateTest
     public void Setup()
     {
         ClientTest.Initialize();
+
+        // Update 1 object
+        // Lazy
+        // LazyClient.Update(obj);
+        // 
     }
 
     [Test]
@@ -54,10 +60,62 @@ public class UpdateTest
             Assert.That(simpleTable.Username, !Is.EqualTo("UPDATE 1"));
             Assert.That(simpleTable.Username, !Is.EqualTo("UPDATE 1"));
         }
+    }
 
+    [Test]
+    public void UpdateLazyOnSchema()
+    {
+        ClientTest.AddSchemaRows();
 
-        //LazyClient.Update<SimpleTable>(new {car.Enabled, car.Name}, "Id > @Id".Bind("@Id", 10));
-        throw new NotImplementedException();
+        foreach (PrimaryValue simpleTable in LazyClient.Select<PrimaryValue>())
+        {
+            simpleTable.Value = $"USERNAME {simpleTable.Key}";
+            Assert.That(simpleTable.Update(), Is.EqualTo(1));
+        }
+
+        List<PrimaryValue> updated = LazyClient.Select<PrimaryValue>().ToList();
+        for (int index = 0; index < updated.Count; index++)
+        {
+            PrimaryValue simpleTable = updated[index];
+            Assert.That(simpleTable.Value.Split(' ')[0], Is.EqualTo("USERNAME"));
+            Assert.That(int.Parse(simpleTable.Value.Split(' ')[1]), Is.EqualTo(index+1));
+        }
+
+        PrimaryValue updateSimpleTable = new() { Value = null };
+
+        Assert.That(updateSimpleTable.Update(s => s.Key == 3), Is.EqualTo(1));
+        List<PrimaryValue> updatedList = LazyClient.Select<PrimaryValue>(s => s.Key == 3).ToList();
+        Assert.That(updatedList[0].Value, Is.Null);
+
+        foreach (PrimaryValue simpleTable in LazyClient.Select<PrimaryValue>(s => s.Key != 3))
+        {
+            Assert.That(simpleTable.Value, Is.Not.Null);
+        }
+    }
+
+    [Test]
+    public void UpdateMultipleRows()
+    {
+        ClientTest.AddSimpleTables();
+
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s=>s.Username == "X" || s.Password == "Y"));
+
+        SimpleTable simpleTable = new() { Username = "X", Password = "Y"};
+        LazyClient.Update<dynamic>("Simple_Table", new {simpleTable.Username, simpleTable.Password});
+        
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Username != "X" &&
+                                                           s.Password != "Y"));
+    }
+
+    [Test]
+    public void UpdateMultipleRowsOnSchema()
+    {
+        ClientTest.AddSchemaRows();
+
+        PrimaryValue simpleTable = new() { Value = "HELLO" };
+        Assert.That(LazyClient.Update<dynamic>("lazys","tablePrimary", new { simpleTable.Value }, new SqlQuery("Id = 10 OR Id = 15")), Is.EqualTo(2));
+
+        Assert.That(LazyClient.Select<PrimaryValue>(s => s.Key == 10 || s.Key == 15).Count(), Is.EqualTo(2));
     }
 
     [Test]
@@ -106,13 +164,37 @@ public class UpdateTest
     }
 
     [Test]
+    public void UpdateObjectOnSchema()
+    {
+        ClientTest.AddSchemaRows();
+
+        foreach (TablePrimary simpleTable in LazyClient.Select<TablePrimary>("lazys", "tablePrimary"))
+        {
+            simpleTable.Value = $"USERNAME {simpleTable.Id}";
+            int id = simpleTable.Id;
+            Assert.That(
+                LazyClient.Update("lazys", "tablePrimary", simpleTable, s => s.Id == id, nameof(TablePrimary.Id)),
+                Is.EqualTo(1));
+        }
+
+        List<TablePrimary> updated = LazyClient.Select<TablePrimary>("lazys", "tablePrimary").ToList();
+        for (int index = 0; index < updated.Count; index++)
+        {
+            TablePrimary simpleTable = updated[index];
+            Assert.That(simpleTable.Value.Split(' ')[0], Is.EqualTo("USERNAME"));
+            Assert.That(int.Parse(simpleTable.Value.Split(' ')[1]), Is.EqualTo(index + 1));
+            
+        }
+    }
+
+    [Test]
     public void UpdateDynamic()
     {
         ClientTest.AddSimpleTables();
 
         dynamic value = new {Username = "DYNA U"};
 
-        Assert.That(LazyClient.Update(value, "simple_table", new SqlQuery("User_Id = 4 OR User_Id = 5")), Is.EqualTo(2));
+        Assert.That(LazyClient.Update("simple_table", value, new SqlQuery("User_Id = 4 OR User_Id = 5")), Is.EqualTo(2));
 
         foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>(s=>s.Id == 4 || s.Id == 5))
         {
@@ -122,6 +204,26 @@ public class UpdateTest
         foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>(s => s.Id != 4 && s.Id != 5))
         {
             Assert.That(simpleTable.Username, Is.Not.EqualTo(value.Username));
+        }
+    }
+
+    [Test]
+    public void UpdateDynamicOnSchema()
+    {
+        ClientTest.AddSchemaRows();
+
+        dynamic value = new { Value = "DYNA U" };
+
+        Assert.That(LazyClient.Update<dynamic>("lazys", "tablePrimary", value, new SqlQuery("Id = 4 OR Id = 5")), Is.EqualTo(2));
+
+        foreach (PrimaryValue simpleTable in LazyClient.Select<PrimaryValue>(s => s.Key == 4 || s.Key == 5))
+        {
+            Assert.That(simpleTable.Value, Is.EqualTo(value.Value));
+        }
+
+        foreach (PrimaryValue simpleTable in LazyClient.Select<PrimaryValue>(s => s.Key != 4 && s.Key != 5))
+        {
+            Assert.That(simpleTable.Value, Is.Not.EqualTo(value.Value));
         }
     }
 

@@ -8,7 +8,7 @@ internal sealed class SelectQuery : QueryBase
     private readonly List<IOrderByQuery> _orderByQueries;
     private int? _top;
 
-    public SelectQuery(ITableDefinition tableDefinition, string tableName = null) : base(tableDefinition, tableName)
+    public SelectQuery(ITableDefinition tableDefinition, string schema = null, string tableName = null) : base(tableDefinition, schema, tableName)
     {
         _orderByQueries = new List<IOrderByQuery>();
     }
@@ -31,6 +31,7 @@ internal sealed class SelectQuery : QueryBase
     /// <returns></returns>
     public QueryBuilder BuildQuery()
     {
+        QueryBuilder.Reset();
         QueryBuilder.Append("SELECT ");
 
         #region TOP
@@ -53,7 +54,8 @@ internal sealed class SelectQuery : QueryBase
         #endregion
 
         #region FROM
-        QueryBuilder.Append($"FROM {TableName} AS {TableAlias} ");
+
+        QueryBuilder.Append($"FROM {SqlHelper.TableName(Schema, TableName)} AS {TableAlias} ");
         #endregion
 
         #region WHERE

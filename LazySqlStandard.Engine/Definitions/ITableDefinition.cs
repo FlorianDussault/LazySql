@@ -26,4 +26,8 @@ internal interface ITableDefinition : IList<ColumnDefinition>
 
     public string GetTableName(string tableName = null);
 
+    public string GetSchema(string schema = null);
+
+    public string GetSchemaAndTableName(string schema = null, string tableName = null);
+
 }

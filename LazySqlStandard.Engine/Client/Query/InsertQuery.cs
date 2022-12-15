@@ -6,7 +6,7 @@ internal class InsertQuery : QueryBase
     private string _autoIncrementColumnName;
     private string[] _excludedColumn;
 
-    public InsertQuery(object obj, ITableDefinition tableDefinition, string tableName) : base(tableDefinition, tableName)
+    public InsertQuery(object obj, ITableDefinition tableDefinition, string schema, string tableName) : base(tableDefinition, schema, tableName)
     {
         _obj = obj;
     }
@@ -30,7 +30,7 @@ internal class InsertQuery : QueryBase
         }
 
 
-        QueryBuilder.Append($"INSERT INTO {TableName}");
+        QueryBuilder.Append($"INSERT INTO {SqlHelper.TableName(Schema, TableName)}");
 
         QueryBuilder.Append(
             $" ({string.Join(", ", columnsToInsert.Where(c => c.Column.SqlType != SqlType.Children).Select(c => c.Column.SqlColumnName))})");

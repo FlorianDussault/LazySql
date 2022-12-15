@@ -61,4 +61,11 @@ internal partial class LzCSharpFunctions
         queryBuilder.Append(")");
             
     }
+
+    private void Other(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        object value = Expression.Lambda(expression).Compile().DynamicInvoke();
+        string argumentName = queryBuilder.RegisterArgument(value.GetType().ToSqlType(), value);
+        queryBuilder.Append(argumentName);
+    }
 }

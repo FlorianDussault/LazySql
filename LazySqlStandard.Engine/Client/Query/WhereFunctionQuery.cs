@@ -6,6 +6,7 @@
 internal sealed class WhereFunctionQuery : IWhereQuery
 {
     private readonly Action<QueryBase> _action;
+    public bool HasValue => _action != null;
 
     public WhereFunctionQuery(Action<QueryBase> action) => _action = action;
 
@@ -13,4 +14,5 @@ internal sealed class WhereFunctionQuery : IWhereQuery
     {
         _action(queryBase);
     }
+
 }

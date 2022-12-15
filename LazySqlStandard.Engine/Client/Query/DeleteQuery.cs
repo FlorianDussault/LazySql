@@ -2,14 +2,14 @@
 
 internal class DeleteQuery : QueryBase
 {
-    public DeleteQuery(ITableDefinition tableDefinition, string tableName) : base(tableDefinition, tableName)
+    public DeleteQuery(ITableDefinition tableDefinition,string schema, string tableName) : base(tableDefinition, schema, tableName)
     {
     }
 
 
     public virtual QueryBuilder BuildQuery()
     {
-        QueryBuilder.Append($"DELETE FROM {TableName}");
+        QueryBuilder.Append($"DELETE FROM {SqlHelper.TableName(Schema, TableName)}");
 
         if (WhereQuery != null)
         {

@@ -16,14 +16,15 @@ internal static class ClientTest
     private const string MasterConnectionString = "Server=localhost\\sqlexpress;Database=master;TrustServerCertificate=Yes;Trusted_Connection=True";
 #endif
 
-    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types", "dbo.hierarchy_table" };
+    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types", "dbo.hierarchy_table", "lazys.WithoutKeys", "lazys.tablePrimary" };
 
     public static void Initialize()
     {
         BuildTestDb();
 
         if (!LazyClient.Initialized)
-            LazyClient.Initialize(DbConnectionString, typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable), typeof(ExtendedTable), typeof(SubChildTable));
+            LazyClient.Initialize(DbConnectionString, typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable),
+                typeof(ExtendedTable), typeof(SubChildTable), typeof(PrimaryValue), typeof(WithoutKeys));
     }
 
     private static void BuildTestDb()
@@ -40,10 +41,15 @@ internal static class ClientTest
 
             DeleteStoredProcedures(sqlConnection);
             DeleteTables(sqlConnection);
-
+            CreateSchemas(sqlConnection);
             CreateTables(sqlConnection);
             CreateStoredProcedures(sqlConnection);
         }
+    }
+
+    private static void CreateSchemas(SqlConnection sqlConnection)
+    {
+        Execute(sqlConnection, "IF NOT EXISTS ( SELECT  *\r\n                FROM    sys.schemas\r\n                WHERE   name = N'lazys' )\r\n    EXEC('CREATE SCHEMA [lazys]');");
     }
 
     private static void DeleteTables(SqlConnection sqlConnection)
@@ -95,6 +101,9 @@ internal static class ClientTest
         Execute(sqlConnection, "ALTER TABLE [dbo].[child_table] CHECK CONSTRAINT [FK_child_table_simple_table]");
         Execute(sqlConnection, "ALTER TABLE [dbo].[subchild_table]  WITH CHECK ADD  CONSTRAINT [FK_subchild_table_child_table] FOREIGN KEY([parent_id]) REFERENCES [dbo].[child_table] ([id])");
         Execute(sqlConnection, "ALTER TABLE [dbo].[subchild_table] CHECK CONSTRAINT [FK_subchild_table_child_table]");
+
+        Execute(sqlConnection, "CREATE TABLE [lazys].[tablePrimary](\r\n\t[id] [int] IDENTITY(1,1) NOT NULL,\r\n\t[value] [varchar](50),\r\n CONSTRAINT [PK_tablePrimary] PRIMARY KEY CLUSTERED \r\n(\r\n\t[id] ASC\r\n)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\r\n) ON [PRIMARY]");
+        Execute(sqlConnection, "CREATE TABLE [lazys].[WithoutKeys](\r\n\t[Name] [varchar](50) NULL,\r\n\t[Age] [int] NULL\r\n) ON [PRIMARY]");
     }
 
     private static void CreateStoredProcedures(SqlConnection sqlConnection)
@@ -156,9 +165,24 @@ internal static class ClientTest
     internal static void CleanTables()
     {
         CleanSimpleTable();
+        LazyClient.Truncate<PrimaryValue>();
+        LazyClient.Truncate<WithoutKeys>();
         LazyClient.Delete<SubChildTable>(null, SqlQuery.Empty);
         LazyClient.ExecuteNonQuery("DBCC CHECKIDENT ('subchild_table', RESEED, 0);");
         LazyClient.Truncate<ExtendedTable>();
     }
 
+    public static void AddSchemaRows()
+    {
+        CleanTables();
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(new PrimaryValue {Value = "U_" + i}.Insert(), Is.EqualTo(1));
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(LazyClient.Insert("lazys", "WithoutKeys", new WithoutKeys(){Age = i, Name = $"N_{i}"}), Is.EqualTo(1));
+        }
+    }
 }

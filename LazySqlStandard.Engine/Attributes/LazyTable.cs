@@ -10,13 +10,22 @@ public sealed class LazyTable : Attribute
     /// Table Name
     /// </summary>
     internal string TableName { get; }
+    internal string Schema { get; }
 
     /// <summary>
     /// Table Name
     /// </summary>
+    /// <param name="schema"></param>
     /// <param name="tableName"></param>
+    public LazyTable(string schema, string tableName)
+    {
+        Schema = schema;
+        TableName = tableName;
+    }
+
     public LazyTable(string tableName)
     {
+        Schema = null;
         TableName = tableName;
     }
 }

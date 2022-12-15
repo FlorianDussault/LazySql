@@ -10,7 +10,7 @@ public static class SqlExtensions
     /// </summary>
     /// <typeparam name="T">Type of object</typeparam>
     /// <param name="obj">Object</param>
-    public static int Insert<T>(this T obj) where T : LazyBase => LazyClient.Insert(obj);
+    public static int Insert<T>(this T obj) where T : LazyBase => LazyClient.Insert(obj, string.Empty, Array.Empty<string>());
 
     /// <summary>
     /// Insert list of object
@@ -28,7 +28,7 @@ public static class SqlExtensions
     /// <param name="excludedColumns"></param>
     public static int Update<T>(this T obj, Expression<Func<T, bool>> where, params string[] excludedColumns) => LazyClient.Update(obj, where,excludedColumns);
 
-    public static int Update<T>(this T obj, SqlQuery where, params string[] excludedColumns) => LazyClient.Update(obj, null, where, excludedColumns);
+    public static int Update<T>(this T obj, SqlQuery where, params string[] excludedColumns) => LazyClient.Update<T>(obj, where, excludedColumns);
 
     public static int Update<T>(this T obj) where T : LazyBase => LazyClient.Update(obj);
 

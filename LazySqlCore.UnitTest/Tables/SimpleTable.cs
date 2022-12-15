@@ -3,7 +3,7 @@ using LazySql;
 
 namespace LazySqlCore.UnitTest.Tables;
 
-[LazyTable("simple_table")]
+[LazyTable("dbo","simple_table")]
 public class SimpleTable : LazyBase
 {
     [LazyColumn("user_id", SqlType.Int)]

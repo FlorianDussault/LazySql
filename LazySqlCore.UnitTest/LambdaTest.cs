@@ -25,6 +25,18 @@ public class LambdaTest
     }
 
     [Test]
+    public void GetSimple2()
+    {
+        ClientTest.AddSimpleTables();
+
+        List<int> id = new() {10};
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>(s => s.Id < id[0]))
+        {
+            Assert.Less(simpleTable.Id, 10);
+        }
+    }
+
+    [Test]
     public void Linq()
     {
         ClientTest.AddSimpleTables();

@@ -5,34 +5,49 @@ public sealed partial class LazyClient
 {
     #region Update
 
-    public static int Update(object obj) => Instance.InternalUpdate(obj.GetType(), obj, null, null, null, null);
+    public static int Update<T>(T obj) => Instance.InternalUpdate(obj.GetType(), null, null, obj,  null, null, null);
+    public static int Update<T>(string tableName, T obj) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, null, null, null);
+    public static int Update<T>(string schema, string tableName, T obj) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, null, null, null);
 
-    public static int Update<T>(object obj, Expression<Func<T,bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, null, where, null, excludedColumns);
+    public static int Update<T>(T obj, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, null, obj, null, null, excludedColumns);
+    public static int Update<T>(string tableName, T obj, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, null, null, excludedColumns);
+    public static int Update<T>(string schema, string tableName, T obj, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, null, null, excludedColumns);
 
-    public static int Update(object obj, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, null, null, where, excludedColumns);
+    public static int Update<T>(T obj, Expression<Func<T, bool>> where) => Instance.InternalUpdate(obj.GetType(), null, null, obj, where, null, null);
+    public static int Update<T>(string tableName, T obj, Expression<Func<T, bool>> where) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, where, null, null);
+    public static int Update<T>(string schema, string tableName, T obj, Expression<Func<T, bool>> where) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, where, null, null);
 
-    public static int Update<T>(object obj, string tableName, Expression<Func<T, bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, tableName, where, null, excludedColumns);
+    public static int Update<T>(T obj, Expression<Func<T, bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, null, obj, where, null, excludedColumns);
+    public static int Update<T>(string tableName, T obj, Expression<Func<T, bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, where, null, excludedColumns);
+    public static int Update<T>(string schema, string tableName, T obj, Expression<Func<T, bool>> where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, where, null, excludedColumns);
 
-    public static int Update(object obj, string tableName, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), obj, tableName, null, where, excludedColumns);
+    public static int Update<T>(T obj, SqlQuery where) => Instance.InternalUpdate(obj.GetType(), null, null, obj, null, where, null);
+    public static int Update<T>(string tableName, T obj, SqlQuery where) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, null, where, null);
+    public static int Update<T>(string schema, string tableName, T obj, SqlQuery where) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, null, where, null);
 
-    private int InternalUpdate(Type type, object obj, string tableName, Expression whereExpression, SqlQuery whereSql, params string[] excludedColumns)
+    public static int Update<T>(T obj, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, null, obj, null, where, excludedColumns);
+    public static int Update<T>(string tableName, T obj, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), null, tableName, obj, null, where, excludedColumns);
+    public static int Update<T>(string schema, string tableName, T obj, SqlQuery where, params string[] excludedColumns) => Instance.InternalUpdate(obj.GetType(), schema, tableName, obj, null, where, excludedColumns);
+
+
+    private int InternalUpdate(Type type, string schema, string tableName, object obj,  Expression whereExpression, SqlQuery whereSql, params string[] excludedColumns)
     {
         CheckInitialization(type, out ITableDefinition tableDefinition);
-        return InternalUpdateLazy(tableDefinition, obj, tableName, whereExpression, whereSql, excludedColumns);
+        return InternalUpdateLazy(tableDefinition, schema, tableName, obj, whereExpression, whereSql, excludedColumns);
     }
 
-    private int InternalUpdateLazy(ITableDefinition tableDefinition,  object obj, string tableName, Expression whereExpression, SqlQuery sqlQuery, params string[] excludedColumns)
+    private int InternalUpdateLazy(ITableDefinition tableDefinition, string schema, string tableName, object obj, Expression whereExpression, SqlQuery sqlQuery, params string[] excludedColumns)
     {
         tableDefinition.GetColumns(out _, out IReadOnlyList<ColumnDefinition> columns, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
 
-        UpdateQuery updateQuery = new(obj, tableDefinition, tableName);
+        UpdateQuery updateQuery = new(obj, tableDefinition, schema, tableName);
 
         excludedColumns ??= Array.Empty<string>();
         foreach (ColumnDefinition column in columns.Where(c=> excludedColumns.All(ec => !string.Equals(ec,
                      c.Column.ColumnName, StringComparison.InvariantCultureIgnoreCase))))
             updateQuery.AddUpdatedValue(column);
         
-        if (whereExpression == null && SqlQuery.IsEmpty(sqlQuery))
+        if (whereExpression == null && SqlQuery.IsEmpty(sqlQuery) && tableDefinition.ObjectType != ObjectType.Dynamic)
         {
             BinaryExpression binaryExpression = null;
             foreach (ColumnDefinition primaryKey in primaryKeys)

@@ -45,4 +45,6 @@ internal static class SqlHelper
             return _map[typeToCheck];
         return SqlType.Default;
     }
+
+    public static string TableName(string schema, string tableName) => string.IsNullOrWhiteSpace(schema) ? tableName : $"{schema}.{tableName}";
 }

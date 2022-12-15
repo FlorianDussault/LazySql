@@ -5,4 +5,5 @@
 /// </summary>
 internal interface IWhereQuery : IQuery
 {
+    bool HasValue { get; }
 }

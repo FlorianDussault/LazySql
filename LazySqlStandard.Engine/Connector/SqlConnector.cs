@@ -167,8 +167,9 @@ internal sealed class SqlConnector : IDisposable
         }
     }
 
-    public void BulkInsert(string tableName, DataTable dataTable)
+    public void BulkInsert(string schema, string tableName, DataTable dataTable)
     {
+        string fullTableName = SqlHelper.TableName(schema, tableName);
         try
         {
             SqlBulkCopy bulkCopy = new(
@@ -182,7 +183,7 @@ internal sealed class SqlConnector : IDisposable
             List<string> sqlColumns = new();
             using (SqlDataAdapter sqlDataAdapter = new())
             {
-                _sqlCommand.CommandText = $"SELECT * FROM {tableName} WHERE 1=0";
+                _sqlCommand.CommandText = $"SELECT * FROM {fullTableName} WHERE 1=0";
                 sqlDataAdapter.SelectCommand = _sqlCommand;
                 DataSet dataSet = new();
                 sqlDataAdapter.Fill(dataSet);
@@ -204,12 +205,12 @@ internal sealed class SqlConnector : IDisposable
                 bulkCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(dataColumn.ColumnName, columnName));
             }
 
-            bulkCopy.DestinationTableName = tableName;
+            bulkCopy.DestinationTableName = fullTableName;
             bulkCopy.WriteToServer(dataTable);
         }
         catch (Exception ex)
         {
-            throw LazySqlExecuteException.Generate(ex, $"BulkInsert in {tableName}");
+            throw LazySqlExecuteException.Generate(ex, $"BulkInsert in {fullTableName}");
         }
     }
 }

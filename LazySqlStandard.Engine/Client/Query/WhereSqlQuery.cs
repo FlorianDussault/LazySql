@@ -8,6 +8,9 @@ internal sealed class WhereSqlQuery : IWhereQuery
     private readonly string _whereSql;
     private readonly SqlArguments _sqlArguments;
 
+    public bool HasValue => !string.IsNullOrWhiteSpace(_whereSql) || _sqlArguments.Count > 0;
+
+
     public WhereSqlQuery(SqlQuery sqlQuery)
     {
         _whereSql = sqlQuery.Query;
@@ -19,4 +22,5 @@ internal sealed class WhereSqlQuery : IWhereQuery
         queryBase.QueryBuilder.Append(_whereSql);
         queryBase.QueryBuilder.AddSqlArguments(_sqlArguments);
     }
+
 }

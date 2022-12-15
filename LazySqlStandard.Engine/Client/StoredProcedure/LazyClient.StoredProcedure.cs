@@ -2,6 +2,7 @@
 
 public sealed partial class LazyClient
 {
+    public static StoredProcedureResult StoredProcedure(StoredQuery storedQuery) => Instance.InternalStoredProcedure(storedQuery.ProcedureName, storedQuery.SqlArguments);
 
     private StoredProcedureResult InternalStoredProcedure(string procedureName, SqlArguments arguments)
     {
@@ -26,5 +27,5 @@ public sealed partial class LazyClient
         return storedProcedureResult;
     }
 
-    public static StoredProcedureResult StoredProcedure(StoredQuery storedQuery) => Instance.InternalStoredProcedure(storedQuery.ProcedureName, storedQuery.SqlArguments);
+   
 }

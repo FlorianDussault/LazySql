@@ -82,4 +82,10 @@ internal sealed class QueryBuilder
     /// </summary>
     /// <param name="arguments"></param>
     public void AddSqlArguments(SqlArguments arguments) => _sqlArguments.AddRange(arguments);
+
+    public void Reset()
+    {
+        _sqlArguments.Clear();
+        _stringBuilder.Clear();
+    }
 }

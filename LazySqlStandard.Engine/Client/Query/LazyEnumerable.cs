@@ -9,10 +9,10 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     private readonly ITableDefinition _tableDefinition;
     private readonly SelectQuery _selectQuery;
 
-    internal LazyEnumerable(string tableName, Expression whereExpression, SqlQuery sqlQuery)
+    internal LazyEnumerable(string schema, string tableName, Expression whereExpression, SqlQuery sqlQuery)
     {
         LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
-        _selectQuery = new SelectQuery(_tableDefinition, tableName);
+        _selectQuery = new SelectQuery(_tableDefinition, schema, tableName);
         if (whereExpression != null)
             _selectQuery.SetWhereQuery(new WhereExpressionQuery(whereExpression));
         if (!SqlQuery.IsEmpty(sqlQuery))

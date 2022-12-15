@@ -5,7 +5,7 @@
         private readonly object _obj;
         private List<ColumnDefinition> _columnsToUpdate;
 
-        public UpdateQuery(object obj, ITableDefinition tableDefinition, string tableName) : base(tableDefinition, tableName)
+        public UpdateQuery(object obj, ITableDefinition tableDefinition, string schema, string tableName) : base(tableDefinition, schema, tableName)
         {
             _obj = obj;
             _columnsToUpdate = new List<ColumnDefinition>();
@@ -18,7 +18,7 @@
 
         public virtual QueryBuilder BuildQuery()
         {
-            QueryBuilder.Append($"UPDATE {TableName} SET ");
+            QueryBuilder.Append($"UPDATE {SqlHelper.TableName(Schema, TableName)} SET ");
 
             List<string> values = new();
             foreach (ColumnDefinition columnToUpdate in _columnsToUpdate)
@@ -29,7 +29,7 @@
 
             QueryBuilder.Append(string.Join(", ", values));
 
-            if (WhereQuery != null)
+            if (WhereQuery is {HasValue: true})
             {
                 QueryBuilder.Append(" WHERE ");
                 WhereQuery.Build(this);

@@ -3,6 +3,7 @@
     internal abstract class QueryBase
     {
         protected string TableName { get; }
+        protected string Schema { get; }
         protected IWhereQuery WhereQuery { get; private set; }
 
 
@@ -21,7 +22,16 @@
         /// </summary>
         public string TableAlias { get; }
 
+        protected QueryBase(ITableDefinition tableDefinition, string schema, string tableName)
+        {
+            TableDefinition = tableDefinition;
+            QueryBuilder = new QueryBuilder(tableDefinition);
+            Schema = tableDefinition.GetSchema(schema);
+            TableName = tableDefinition.GetTableName(tableName);
+            TableAlias = $"{TableName}_{Guid.NewGuid().ToString().Substring(0, 4)}";
+        }
 
+        [Obsolete("Add schema argument")]
         protected QueryBase(ITableDefinition tableDefinition, string tableName)
         {
             TableDefinition = tableDefinition;

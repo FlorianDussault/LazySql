@@ -59,12 +59,51 @@ public class DeleteTest
     }
 
     [Test]
+    public void DeleteLazyOnSchema()
+    {
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<PrimaryValue>();
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>());
+
+        // Add values
+
+        for (int i = 0; i < 100; i++)
+            new PrimaryValue() {Value = $"U_{i}"}.Insert();
+
+        Assert.That(LazyClient.Select<PrimaryValue>().Count(), Is.EqualTo(100));
+        Assert.IsNotEmpty(LazyClient.Select<PrimaryValue>(p=>p.Value == "U_59" ));
+
+        LazyClient.Delete<PrimaryValue>(p => p.Value == "U_59");
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>(p => p.Value == "U_59"));
+        Assert.IsNotEmpty(LazyClient.Select<PrimaryValue>());
+
+        LazyClient.Delete<PrimaryValue>("lazys", "tablePrimary", new SqlQuery("value = 'U_58'"));
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>(p => p.Value == "U_58"));
+
+        Assert.IsNotEmpty(LazyClient.Select<PrimaryValue>());
+        LazyClient.Delete<PrimaryValue>();
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>());
+    }
+
+    [Test]
     public void DeleteList()
     {
         ClientTest.AddSimpleTables();
         LazyClient.Delete<ChildTable>();
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>(s=>s.Id >= 2 && s.Id <= 10).ToList();
+        Assert.That(values.Delete(), Is.EqualTo(9));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id >= 2 && s.Id <= 10));
+    }
+
+    [Test]
+    [Ignore("TODO")]
+    public void DeleteListOnSchema()
+    {
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>(s => s.Id >= 2 && s.Id <= 10).ToList();
         Assert.That(values.Delete(), Is.EqualTo(9));
         Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id >= 2 && s.Id <= 10));
     }

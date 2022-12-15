@@ -1,4 +1,5 @@
 using System.Dynamic;
+using System.Reflection;
 using LazySql;
 using LazySqlCore.UnitTest.Tables;
 
@@ -20,6 +21,24 @@ public class InsertTest
     }
 
     [Test]
+    public void InsertLazyOnSchema()
+    {
+        LazyClient.Delete<PrimaryValue>();
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>());
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(new PrimaryValue {Value = "U_" + i}.Insert(), Is.EqualTo(1));
+            LazyClient.Insert(new PrimaryValue {Value = "F_" + i});
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"U_{i}").Count(), Is.EqualTo(1));
+            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"F_{i}").Count(), Is.EqualTo(1));
+        }
+    }
+
+    [Test]
     public void InsertObject()
     {
         ClientTest.CleanTables();
@@ -29,7 +48,7 @@ public class InsertTest
             Username = "Test1",
             Password = "Pass1"
         };
-        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+        LazyClient.Insert(simpleTable, nameof(Simple_Table.User_Id), nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
             nameof(Simple_Table.NotSqlType));
 
         Assert.That(simpleTable.User_Id, Is.EqualTo(0));
@@ -39,8 +58,8 @@ public class InsertTest
             Username = "Test2",
             Password = "Pass2"
         };
-        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
-            nameof(Simple_Table.NotSqlType));
+        Assert.That(LazyClient.Insert(simpleTable, nameof(Simple_Table.User_Id), nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+            nameof(Simple_Table.NotSqlType)), Is.EqualTo(1));
         Assert.That(simpleTable.User_Id, Is.EqualTo(1));
 
 
@@ -50,7 +69,7 @@ public class InsertTest
             Username = "Test3",
             Password = "Pass3"
         };
-        LazyClient.Insert(simpleTable, null, nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
+        LazyClient.Insert(simpleTable, nameof(Simple_Table.User_Id), nameof(Simple_Table.User_Id), nameof(Simple_Table.NotInSqlFiled),
             nameof(Simple_Table.NotSqlType));
         Assert.That(simpleTable.User_Id, !Is.EqualTo(999));
 
@@ -69,6 +88,25 @@ public class InsertTest
     }
 
     [Test]
+    public void InsertObjectOnSchema()
+    {
+        LazyClient.Delete<dynamic>("lazys", "tablePrimary");
+        Assert.IsEmpty(LazyClient.Select<TablePrimary>("lazys", "tableprimary"));
+
+        for (int i = 0; i < 20; i++)
+        {
+            Assert.That(LazyClient.Insert("lazys", "tableprimary", new TablePrimary { Value = "U_" + i }, nameof(TablePrimary.Id)), Is.EqualTo(1));
+        }
+
+        for (int i = 1; i < 21; i++)
+        {
+            List<TablePrimary> uValues = LazyClient.Select<TablePrimary>("lazys", "tableprimary", p => p.Id == i).ToList();
+            Assert.That(uValues.Count, Is.EqualTo(1));
+            Assert.That(uValues[0].Value, Is.EqualTo($"U_{i-1}"));
+        }
+    }
+
+    [Test]
     public void InsertDynamic()
     {
         ClientTest.CleanTables();
@@ -78,14 +116,14 @@ public class InsertTest
             Username = "Test1",
             Password = "Pass1"
         };
-        LazyClient.Insert(simpleTable, "simple_table");
+        LazyClient.Insert("simple_table", simpleTable);
         
         dynamic simpleTable2 = new
         {
             Username = "Test2",
             Password = "Pass2"
         };
-        LazyClient.Insert(simpleTable2, "simple_table");
+        LazyClient.Insert("simple_table", simpleTable2);
 
         dynamic simpleTable3 = new
         {
@@ -93,9 +131,9 @@ public class InsertTest
             Password = "Pass3",
             NotSqlType = 87
         };
-        LazyClient.Insert(simpleTable3, "simple_table", null, "NotSqlType");
+        LazyClient.Insert("simple_table", simpleTable3, null, "NotSqlType");
 
-        throw new NotImplementedException("With Autoincrement");
+        
 
         List<SimpleTable> values = LazyClient.Select<SimpleTable>().OrderBy(s=>s.Id).ToList();
         Assert.That(values[0].Username, Is.EqualTo("Test1"));
@@ -108,6 +146,44 @@ public class InsertTest
         Assert.That(values[2].Password, Is.EqualTo("Pass3"));
 
 
+    }
+
+    [Test]
+    public void InsertDynamicOnSchema()
+    {
+        ClientTest.CleanTables();
+
+        dynamic simpleTable = new
+        {
+            Age = 1,
+            Name = "Pass1"
+        };
+        LazyClient.Insert("lazys", "WithoutKeys", simpleTable);
+
+        dynamic simpleTable2 = new
+        {
+            Age = 2,
+            Name = "Pass2"
+        };
+        LazyClient.Insert("lazys", "WithoutKeys", simpleTable2);
+
+        dynamic simpleTable3 = new
+        {
+            Age = 3,
+            Name = "Pass3",
+            NotSqlType = 87
+        };
+        LazyClient.Insert("lazys", "WithoutKeys", simpleTable3, null, "NotSqlType");
+        
+        List<WithoutKeys> values = LazyClient.Select<WithoutKeys>().OrderBy(s => s.Age).ToList();
+        Assert.That(values[0].Age, Is.EqualTo(1));
+        Assert.That(values[0].Name, Is.EqualTo("Pass1"));
+
+        Assert.That(values[1].Age, Is.EqualTo(2));
+        Assert.That(values[1].Name, Is.EqualTo("Pass2"));
+
+        Assert.That(values[2].Age, Is.EqualTo(3));
+        Assert.That(values[2].Name, Is.EqualTo("Pass3"));
     }
 
     [Test]
@@ -169,6 +245,21 @@ public class InsertTest
     }
 
     [Test]
+    public void InsertNullOnSchema()
+    {
+        LazyClient.Truncate<PrimaryValue>();
+        Assert.IsEmpty(LazyClient.Select<PrimaryValue>());
+        new PrimaryValue()
+        {
+
+        }.Insert();
+
+        PrimaryValue item = LazyClient.Select<PrimaryValue>().First();
+        Assert.That(item.Key, Is.EqualTo(1));
+        Assert.IsNull(item.Value);
+    }
+
+    [Test]
     public void InsertList()
     {
         ClientTest.CleanTables();
@@ -187,6 +278,27 @@ public class InsertTest
         Assert.That(values[0].Username, Is.EqualTo("U1"));
         Assert.That(values[1].Username, Is.EqualTo("U2"));
         Assert.That(values[2].Username, Is.EqualTo("U3"));
+    }
+
+    [Test]
+    public void InsertListOnSchema()
+    {
+        LazyClient.Truncate<PrimaryValue>();
+
+        List<PrimaryValue> values = new()
+        {
+            new PrimaryValue{Value = "U1"},
+            new PrimaryValue{Value = "U2"},
+            new PrimaryValue{Value = "U3"}
+        };
+
+        Assert.That(values.Insert(), Is.EqualTo(3));
+
+        values = LazyClient.Select<PrimaryValue>().OrderByAsc(s => s.Key).ToList();
+
+        Assert.That(values[0].Value, Is.EqualTo("U1"));
+        Assert.That(values[1].Value, Is.EqualTo("U2"));
+        Assert.That(values[2].Value, Is.EqualTo("U3"));
     }
 
 }
