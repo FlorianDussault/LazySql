@@ -45,27 +45,13 @@ LazySql is a micro ORM that aims to facilitate access to a SQL-Server database.
 - [VII. Previous Release Notes](#vii-previous-release-notes)
 - [VIII. Licence](#vii-previous-release-notes)
 
-<!--    
-   
-   - [Select](#select)
-      - [Select with LazyBase type or object type](#select-with-lazybase-type-or-object-type)
-      - [Select with dynamic type](#select-with-dynamic-type)
-   - [Update](#update)
-      - [Update with LazyBase type or object type](#update-with-lazybase-type-or-object-type)
-      - [Update with dynamic type](#update-with-dynamic-type)
-   - [Delete](#delete)
-      - [Delete with LazyBase type or object type](#delete-with-lazybase-type-or-object-type)
-      - [Delete with dynamic type](#delete-with-dynamic-type)
-    - [Stored Procedure](#stored-procedure)
-    - [Other Queries](#other-queries)
-    - [Sql Functions](#sql-functions)
-- [License](#license) -->
-
 # II. Last Release Note
 
 ## 2.2.0-preview
 
+* Support of Schemas
 * Improving Expression
+* Review methods
 * Documentation!
 * Write queries ``"Id = @id".Bind("@Id", 1)`` instead of ``new SqlQuery("Id = @id").Bind("@Id", 1)``
 
@@ -95,7 +81,7 @@ Voici les fonctionnalités implémentées:
 | **Standard queries (SELECT, UPDATE, DELETE)** |       🟢       |                     |
 | **Bulk Insert**                               |       🟢       |                     |
 | **Stored Procedures**                         |       🟢       |                     |
-| **Views**                                     |       🟢       |                     |
+| **Views**                                     |       🔴       |                     |
 | **User-Defined SQL Functions**                |       🔴       | Nothing planned      |
 
 ## Data Types

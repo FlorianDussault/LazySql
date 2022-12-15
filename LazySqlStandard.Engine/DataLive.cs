@@ -36,7 +36,12 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <param name="item1">First item</param>
     /// <param name="item2">Second item</param>
     /// <returns></returns>
-    private bool AreEquals(T item1, T item2) => _primaryKeys.All(primaryKey => primaryKey.PropertyInfo.GetValue(item1).Equals(primaryKey.PropertyInfo.GetValue(item2)));
+    private bool AreEquals(T item1, T item2)
+    {
+        if (_primaryKeys == null || _primaryKeys.Count == 0) return false;
+        return _primaryKeys.All(primaryKey =>
+            primaryKey.PropertyInfo.GetValue(item1).Equals(primaryKey.PropertyInfo.GetValue(item2)));
+    }
 
     /// <summary>
     /// Load list (will be clear before load)
@@ -66,24 +71,29 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// Bind item in list and database
     /// </summary>
     /// <param name="item">Item to add</param>
-    public new void Add(T item)
+    public new int Add(T item)
     {
-        item.Insert();
-        base.Add(item);
+        var cnt = item.Insert();
+        if (cnt > 0)
+            base.Add(item);
+        return cnt;
     }
 
     /// <summary>
     /// Bind a collection of items in list and database
     /// </summary>
     /// <param name="collection">Collection of items</param>
-    public new void AddRange(IEnumerable<T> collection)
+    public new int AddRange(IEnumerable<T> collection)
     {
+        int cnt = 0;
         foreach (T value in collection.ToList())
         {
             if (this.Any(i => AreEquals(i, value)))
                 continue;
-            Add(value);
+            cnt += Add(value);
         }
+
+        return cnt;
     }
         
     /// <summary>
@@ -91,11 +101,14 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// </summary>
     /// <param name="index">Index in list</param>
     /// <param name="item">Item to insert</param>
-    public new void Insert(int index, T item)
+    public new int Insert(int index, T item)
     {
-        if (this.Any(i => AreEquals(i, item))) return;
-        item.Insert();
-        base.Insert(index, item);
+        int cnt = 0;
+        if (this.Any(i => AreEquals(i, item))) return cnt;
+        cnt = item.Insert();
+        if (cnt > 0)
+            base.Insert(index, item);
+        return cnt;
     }
 
     /// <summary>
@@ -103,10 +116,10 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// </summary>
     /// <param name="index">Index in list</param>
     /// <param name="collection">Collection of item</param>
-    public new void InsertRange(int index, IEnumerable<T> collection)
+    public new int InsertRange(int index, IEnumerable<T> collection)
     {
         List<T> items = new();
-
+        int cnt = 0;
         foreach (T value in collection.ToList())
         {
             if (this.Any(i => AreEquals(i, value)))
@@ -115,8 +128,9 @@ public class DataLive<T> : List<T>  where T : LazyBase
         }
 
         foreach (T item in items)
-            item.Insert();
+            cnt += item.Insert();
         base.InsertRange(index, items);
+        return cnt;
     }
 
     /// <summary>
@@ -126,8 +140,9 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// <returns>return true if the item has been removed</returns>
     public new bool Remove(T item)
     {
-        item.Delete();
-        return base.Remove(item);
+        int index = IndexOf(item);
+        if (index < 0) return false;
+        return item.Delete() > 0 && base.Remove(item);
     }
 
     /// <summary>
@@ -138,11 +153,10 @@ public class DataLive<T> : List<T>  where T : LazyBase
     public new int RemoveAll(Predicate<T> match)
     {
         int count = 0;
-
         foreach (T item in this.Where(i=>match(i)).ToList())
         {
-            Remove(item);
-            count++;
+            if (Remove(item))
+                count++;
                 
         }
         return count;

@@ -77,6 +77,7 @@ internal static class ClientTest
     private static void DeleteStoredProcedures(SqlConnection sqlConnection)
     {
         Execute(sqlConnection, "IF OBJECT_ID('simple_procedure', 'P') IS NOT NULL\r\nDROP PROC simple_procedure");
+        Execute(sqlConnection, "IF OBJECT_ID('[lazys].simple_procedureSchema', 'P') IS NOT NULL\r\nDROP PROC [lazys].simple_procedureSchema");
     }
 
     private static void CreateTables(SqlConnection sqlConnection)
@@ -109,6 +110,7 @@ internal static class ClientTest
     private static void CreateStoredProcedures(SqlConnection sqlConnection)
     {
         Execute(sqlConnection, "CREATE PROCEDURE [dbo].[simple_procedure] \r\n\t-- Bind the parameters for the stored procedure here\r\n\t@Count INT, \r\n\t@Prefix NVARCHAR(MAX),\r\n\t@IdMax INT OUTPUT,\r\n\t@IdMin INT OUTPUT\r\nAS\r\nBEGIN\r\n\t-- SET NOCOUNT ON added to prevent extra result sets from\r\n\t-- interfering with SELECT statements.\r\n\tSET NOCOUNT ON;\r\n\r\n\tIF @Count IS NULL\r\n\tBEGIN\r\n\t\tgoto eos;\r\n\tEND\r\n\r\n\tDECLARE @cnt INT = 0;\r\n\r\n\tSELECT @IdMin = MAX(User_id) FROM simple_table\r\n\r\n\tWHILE @cnt < @Count\r\n\tBEGIN\r\n\t   INSERT INTO dbo.simple_table (username, [password]) VALUES (CONCAT(@Prefix, CAST(NEWID() AS NVARCHAR(36))), 'pwd')\r\n\t   SET @cnt = @cnt + 1\r\n\tEND\r\n\tSELECT @idMax = MAX(User_id) FROM simple_table\r\n    -- Insert statements for procedure here\r\n\tSELECT * FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] ASC\r\n\tSELECT [user_id], username FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] DESC\r\n\treturn -678\r\n\teos:\r\n\treturn null\r\nEND");
+        Execute(sqlConnection, "CREATE PROCEDURE [lazys].[simple_procedureSchema] \r\n\t-- Bind the parameters for the stored procedure here\r\n\t@Count INT, \r\n\t@Prefix NVARCHAR(MAX),\r\n\t@IdMax INT OUTPUT,\r\n\t@IdMin INT OUTPUT\r\nAS\r\nBEGIN\r\n\t-- SET NOCOUNT ON added to prevent extra result sets from\r\n\t-- interfering with SELECT statements.\r\n\tSET NOCOUNT ON;\r\n\r\n\tIF @Count IS NULL\r\n\tBEGIN\r\n\t\tgoto eos;\r\n\tEND\r\n\r\n\tDECLARE @cnt INT = 0;\r\n\r\n\tSELECT @IdMin = MAX(User_id) FROM simple_table\r\n\r\n\tWHILE @cnt < @Count\r\n\tBEGIN\r\n\t   INSERT INTO dbo.simple_table (username, [password]) VALUES (CONCAT(@Prefix, CAST(NEWID() AS NVARCHAR(36))), 'pwd')\r\n\t   SET @cnt = @cnt + 1\r\n\tEND\r\n\tSELECT @idMax = MAX(User_id) FROM simple_table\r\n    -- Insert statements for procedure here\r\n\tSELECT * FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] ASC\r\n\tSELECT [user_id], username FROM simple_table where [user_id] > @IdMin ORDER BY [user_id] DESC\r\n\treturn -678\r\n\teos:\r\n\treturn null\r\nEND");
     }
 
     private static void Execute(SqlConnection sqlConnection, string sql)
