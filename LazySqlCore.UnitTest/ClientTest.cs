@@ -11,12 +11,12 @@ internal static class ClientTest
     private const string DbConnectionString = "Server=(local)\\SQL2019;Database=LazySql;User ID=sa;Password=Password12!;TrustServerCertificate=True";
     private const string MasterConnectionString = "Server=(local)\\SQL2019;Database=master;User ID=sa;Password=Password12!;TrustServerCertificate=True";
 #else
-    private const string DatabaseName = "LazySql2";
-    private const string DbConnectionString = "Server=localhost\\sqlexpress;Database=LazySql2;TrustServerCertificate=Yes;Trusted_Connection=True";
+    private const string DatabaseName = "LazySql";
+    private const string DbConnectionString = "Server=localhost\\sqlexpress;Database=LazySql;TrustServerCertificate=Yes;Trusted_Connection=True";
     private const string MasterConnectionString = "Server=localhost\\sqlexpress;Database=master;TrustServerCertificate=Yes;Trusted_Connection=True";
 #endif
 
-    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types", "dbo.hierarchy_table", "lazys.WithoutKeys", "lazys.tablePrimary" };
+    private static readonly string[] Tables = new[] {"dbo.child_table", "dbo.extended_table", "dbo.simple_table", "dbo.subchild_table", "dbo.types", "dbo.hierarchy_table", "lazys.WithoutKeys", "lazys.tablePrimary", "lazys.hierarchy_schema" };
 
     public static void Initialize()
     {
@@ -105,6 +105,7 @@ internal static class ClientTest
 
         Execute(sqlConnection, "CREATE TABLE [lazys].[tablePrimary](\r\n\t[id] [int] IDENTITY(1,1) NOT NULL,\r\n\t[value] [varchar](50),\r\n CONSTRAINT [PK_tablePrimary] PRIMARY KEY CLUSTERED \r\n(\r\n\t[id] ASC\r\n)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\r\n) ON [PRIMARY]");
         Execute(sqlConnection, "CREATE TABLE [lazys].[WithoutKeys](\r\n\t[Name] [varchar](50) NULL,\r\n\t[Age] [int] NULL\r\n) ON [PRIMARY]");
+        Execute(sqlConnection, "CREATE TABLE [lazys].[hierarchy_schema](\r\n\t[id] [int] IDENTITY(1,1) NOT NULL,\r\n\t[parent_id] [int] NULL,\r\n\t[Name] [nvarchar](50) NULL,\r\n CONSTRAINT [PK_hierarchy_table_1] PRIMARY KEY CLUSTERED \r\n(\r\n\t[id] ASC\r\n)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]\r\n) ON [PRIMARY]\r\n\r\nALTER TABLE [lazys].[hierarchy_schema]  WITH CHECK ADD  CONSTRAINT [FK_hierarchy_table_hierarchy_schema] FOREIGN KEY([parent_id])\r\nREFERENCES [lazys].[hierarchy_schema] ([id])\r\n\r\n\r\nALTER TABLE [lazys].[hierarchy_schema] CHECK CONSTRAINT [FK_hierarchy_table_hierarchy_schema]");
     }
 
     private static void CreateStoredProcedures(SqlConnection sqlConnection)

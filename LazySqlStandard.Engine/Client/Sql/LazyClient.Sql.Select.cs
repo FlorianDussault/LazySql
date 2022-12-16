@@ -91,7 +91,7 @@ public sealed partial class LazyClient
 
         Delegate delegateExpression = relationInformation.Expression.Compile();
         IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
-            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery, selectQuery.DirectQuery });
+            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery, !selectQuery.DirectQuery });
 
         IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
         foreach (object enumerableValue in enumerableChildValues)
