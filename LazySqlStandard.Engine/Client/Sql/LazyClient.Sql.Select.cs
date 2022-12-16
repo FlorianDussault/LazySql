@@ -33,17 +33,18 @@ public sealed partial class LazyClient
             throw new LazySqlException($"You cannot call the {nameof(Select)} method with a Dynamic type without a table name in argument");
         return new LazyEnumerable<T>(schema, tableName, whereExpression, sqlQuery);
     }
-    
+
     /// <summary>
     /// Execute Query
     /// </summary>
     /// <param name="type">Type of object</param>
     /// <param name="selectQuery">Table definition</param>
+    /// <param name="loadChildren"></param>
     /// <returns>IEnumerable</returns>
-    internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery)
+    internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery, bool loadChildren = true)
     {
         CheckInitialization(type, out ITableDefinition tableDefinition);
-        if (!tableDefinition.HasRelations)
+        if (!tableDefinition.HasRelations || !loadChildren)
         {
             foreach (object value in ExecuteReader(selectQuery.BuildQuery()))
                 yield return value;
@@ -90,7 +91,7 @@ public sealed partial class LazyClient
 
         Delegate delegateExpression = relationInformation.Expression.Compile();
         IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
-            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery });
+            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery, selectQuery.DirectQuery });
 
         IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
         foreach (object enumerableValue in enumerableChildValues)

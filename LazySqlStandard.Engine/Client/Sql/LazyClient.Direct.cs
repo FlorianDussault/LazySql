@@ -3,6 +3,7 @@
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
+    #region ExecuteNonQuery
     /// <summary>
     /// Executes a Transact-SQL statement against the connection and returns the number of rows affected. 
     /// </summary>
@@ -25,7 +26,9 @@ public sealed partial class LazyClient
         using SqlConnector sqlConnector = Open();
         return sqlConnector.ExecuteNonQuery(query, sqlArguments);
     }
+    #endregion
 
+    #region ExecuteScalar
     /// <summary>
     /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored
     /// </summary>
@@ -57,4 +60,15 @@ public sealed partial class LazyClient
         using SqlConnector sqlConnector = Open();
         return (T) sqlConnector.ExecuteScalar(query, arguments);
     }
+    #endregion
+
+    #region ExecuteSelect
+
+    public static IEnumerable<T> ExecuteSelect<T>(string sqlQuery) => ExecuteSelect<T>(new SqlQuery(sqlQuery));
+
+    public static IEnumerable<T> ExecuteSelect<T>(SqlQuery sqlQuery)
+    {
+        return new LazyEnumerable<T>(sqlQuery);
+    }
+    #endregion
 }

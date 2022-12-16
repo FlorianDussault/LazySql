@@ -166,10 +166,12 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// Remove item in list and database at the specified index (in list)
     /// </summary>
     /// <param name="index">Index in list</param>
-    public new void RemoveAt(int index)
+    public new int RemoveAt(int index)
     {
-        this[index].Delete();
-        base.RemoveAt(index);
+        int cnt = this[index].Delete();
+        if (cnt > 0) 
+            base.RemoveAt(index);
+        return cnt;
     }
 
     /// <summary>
@@ -177,10 +179,16 @@ public class DataLive<T> : List<T>  where T : LazyBase
     /// </summary>
     /// <param name="index">Index in list</param>
     /// <param name="count">Number of items</param>
-    public new void RemoveRange(int index, int count)
+    public new int RemoveRange(int index, int count)
     {
+        int cnt = 0;
         for (int i = 0; i < count; i++)
-            RemoveAt(index + i);
+        {
+            int cntUnit = RemoveAt(index);
+            if (cntUnit == 0) index++;
+            cnt += cntUnit;
+        }
+        return cnt;
     }
 
 }

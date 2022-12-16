@@ -157,8 +157,19 @@ public class DataLiveTest
     [Test]
     public void Remove()
     {
-        throw new NotImplementedException();
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
 
+        DataLive<SimpleTable> dataLive = new(true);
+
+        SimpleTable simpleTable = dataLive[3];
+        int itemId = simpleTable.Id;
+        string itemUsername = simpleTable.Username;
+
+        Assert.That(dataLive.Remove(simpleTable), Is.True);
+
+        Assert.IsEmpty(dataLive.Where(s => s.Id == itemId || s.Username == itemUsername));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id == itemId || s.Username == itemUsername));
     }
 
     [Test]
@@ -173,22 +184,51 @@ public class DataLiveTest
         Assert.That(dataLive.RemoveAll(s => s.Username.Contains("1")), Is.EqualTo(count));
         Assert.That(dataLive.Count(s => s.Username.Contains("1")), Is.EqualTo(0));
         Assert.That(LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count(), Is.EqualTo(0));
-
-
-
     }
 
     [Test]
     public void RemoveAt()
     {
-        throw new NotImplementedException();
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+
+        DataLive<SimpleTable> dataLive = new(true);
+
+        SimpleTable simpleTable = dataLive[3];
+        int itemId = simpleTable.Id;
+        string itemUsername = simpleTable.Username;
+
+        Assert.That(dataLive.RemoveAt(3), Is.EqualTo(1));
+
+        Assert.IsEmpty(dataLive.Where(s => s.Id == itemId || s.Username == itemUsername));
+        Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id == itemId || s.Username == itemUsername));
 
     }
 
     [Test]
     public void RemoveRange()
     {
-        throw new NotImplementedException();
+        ClientTest.AddSimpleTables();
+        LazyClient.Delete<ChildTable>();
+
+        DataLive<SimpleTable> dataLive = new(true);
+
+        List<SimpleTable> values = dataLive.GetRange(3, 8);
+        int countBefore = dataLive.Count;
+
+
+        Assert.That(dataLive.RemoveRange(3,8),Is.EqualTo(values.Count));
+        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(countBefore - values.Count));
+        Assert.That(dataLive.Count, Is.EqualTo(countBefore - values.Count));
+
+
+        foreach (SimpleTable simpleTable in values)
+        {
+            Assert.IsEmpty(dataLive.Where(s => s.Id == simpleTable.Id || s.Username == simpleTable.Username));
+            int id2 = simpleTable.Id;
+            string username2 = simpleTable.Username;
+            Assert.IsEmpty(LazyClient.Select<SimpleTable>(s => s.Id == id2 || s.Username == username2));
+        }
 
     }
 }

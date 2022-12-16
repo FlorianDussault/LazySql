@@ -19,6 +19,13 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
             _selectQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
     }
 
+    internal LazyEnumerable(SqlQuery sqlQuery)
+    {
+        LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
+        _selectQuery = new SelectQuery(_tableDefinition);
+        _selectQuery.SetPreBuild(sqlQuery);
+    }
+
     /// <summary>
     /// OrderBy ASC with expression
     /// </summary>
@@ -94,7 +101,7 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     /// <returns></returns>
     private IEnumerable Execute()
     {
-        if (!_tableDefinition.HasRelations)
+        if (!_tableDefinition.HasRelations || _selectQuery.DirectQuery)
         {
             foreach (object o in LazyClient.GetWithQuery(typeof(T), _selectQuery))
                 yield return o;

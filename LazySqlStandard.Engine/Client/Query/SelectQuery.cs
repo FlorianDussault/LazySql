@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using System.Linq;
+
+namespace LazySql;
 
 /// <summary>
 /// Select Query
@@ -7,6 +9,9 @@ internal sealed class SelectQuery : QueryBase
 {
     private readonly List<IOrderByQuery> _orderByQueries;
     private int? _top;
+    public bool DirectQuery { get; } = false;
+
+    private SqlQuery _preBuildQuery = null;
 
     public SelectQuery(ITableDefinition tableDefinition, string schema = null, string tableName = null) : base(tableDefinition, schema, tableName)
     {
@@ -32,6 +37,15 @@ internal sealed class SelectQuery : QueryBase
     public QueryBuilder BuildQuery()
     {
         QueryBuilder.Reset();
+
+        if (!SqlQuery.IsEmpty(_preBuildQuery))
+        {
+            QueryBuilder.Append(_preBuildQuery.Query);
+            QueryBuilder.AddSqlArguments(_preBuildQuery.SqlArguments);
+            return QueryBuilder;
+        }
+
+
         QueryBuilder.Append("SELECT ");
 
         #region TOP
@@ -84,5 +98,10 @@ internal sealed class SelectQuery : QueryBase
         #endregion
 
         return QueryBuilder;
+    }
+
+    public void SetPreBuild(SqlQuery sqlQuery)
+    {
+        _preBuildQuery = sqlQuery;
     }
 }
