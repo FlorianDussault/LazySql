@@ -15,7 +15,7 @@
         /// <summary>
         /// Table Definition
         /// </summary>
-        protected ITableDefinition TableDefinition { get; }
+        protected internal ITableDefinition TableDefinition { get; }
 
         /// <summary>
         /// Alias Name

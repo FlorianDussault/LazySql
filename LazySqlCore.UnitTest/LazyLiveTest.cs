@@ -20,7 +20,7 @@ public class DataLiveTest
     public void Initialize()
     {
         ClientTest.AddSimpleTables();
-        int count = LazyClient.Select<SimpleTable>().Count();
+        int count = LazyClient.Select<SimpleTable>().Count;
         DataLive<SimpleTable> dataLive = new(true);
         Assert.That(dataLive.Count, Is.EqualTo(count));
         dataLive = new();
@@ -31,7 +31,7 @@ public class DataLiveTest
     public void InitializeWithoutPk()
     {
         ClientTest.AddSchemaRows();
-        int count = LazyClient.Select<WithoutKeys>().Count();
+        int count = LazyClient.Select<WithoutKeys>().Count;
         DataLive<WithoutKeys> dataLive = new(true);
         Assert.That(dataLive.Count, Is.EqualTo(count));
         dataLive = new();
@@ -44,7 +44,7 @@ public class DataLiveTest
         ClientTest.AddSimpleTables();
         DataLive<SimpleTable> dataLive = new();
         dataLive.Load();
-        Assert.That(dataLive.Count, Is.EqualTo(LazyClient.Select<SimpleTable>().Count()));
+        Assert.That(dataLive.Count, Is.EqualTo(LazyClient.Select<SimpleTable>().Count));
     }
 
     [Test]
@@ -53,10 +53,8 @@ public class DataLiveTest
         ClientTest.AddSchemaRows();
         DataLive<WithoutKeys> dataLive = new();
         dataLive.Load();
-        Assert.That(dataLive.Count, Is.EqualTo(LazyClient.Select<WithoutKeys>().Count()));
+        Assert.That(dataLive.Count, Is.EqualTo(LazyClient.Select<WithoutKeys>().Count));
     }
-
-    
 
     [Test]
     public void LoadAdditional()
@@ -72,12 +70,12 @@ public class DataLiveTest
     {
         ClientTest.CleanTables();
         DataLive<SimpleTable> dataLive = new();
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(0));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(0));
         Assert.That(dataLive.Add(new SimpleTable {Username = "Hello"}), Is.EqualTo(1));
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(1));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(1));
         Assert.That(dataLive.Count, Is.EqualTo(1));
         Assert.That(dataLive.Add(new SimpleTable { Username = "Hello2" }), Is.EqualTo(1));
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(2));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(2));
         Assert.That(dataLive.Count, Is.EqualTo(2));
     }
 
@@ -88,7 +86,7 @@ public class DataLiveTest
 
         DataLive<SimpleTable> dataLive = new(true);
 
-        int count = LazyClient.Select<SimpleTable>().Count();
+        int count = LazyClient.Select<SimpleTable>().Count;
         List<SimpleTable> simpleTables = new();
         for (int i = 0; i < 10; i++)
         {
@@ -97,7 +95,7 @@ public class DataLiveTest
 
         Assert.That(dataLive.AddRange(simpleTables), Is.EqualTo(10));
 
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(count + 10));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(count + 10));
         Assert.That(dataLive.Count, Is.EqualTo(count + 10));
 
         int j = 0;
@@ -116,11 +114,11 @@ public class DataLiveTest
 
         DataLive<SimpleTable> dataLive = new(true);
 
-        int count = LazyClient.Select<SimpleTable>().Count();
+        int count = LazyClient.Select<SimpleTable>().Count;
 
         Assert.That(dataLive.Insert(2, new SimpleTable() {Id = -1, Username = "XXX"}), Is.EqualTo(1));
         Assert.That(dataLive[2].Username, Is.EqualTo("XXX"));
-        Assert.That(LazyClient.Select<SimpleTable>(s=>s.Username == "XXX").Count(), Is.EqualTo(1));
+        Assert.That(LazyClient.Select<SimpleTable>(s => s.Username == "XXX").Count, Is.EqualTo(1));
 
     }
 
@@ -140,7 +138,7 @@ public class DataLiveTest
 
         Assert.That(dataLive.InsertRange(3, simpleTables), Is.EqualTo(10));
 
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(count + 10));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(count + 10));
         Assert.That(dataLive.Count, Is.EqualTo(count + 10));
 
         int j = 0;
@@ -179,11 +177,11 @@ public class DataLiveTest
         LazyClient.Delete<ChildTable>();
 
         DataLive<SimpleTable> dataLive = new(s=>LzFunctions.Like(s.Username, "%1%"));
-        int count = LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count();
+        int count = LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count;
         Assert.That(count, Is.GreaterThan(0));
         Assert.That(dataLive.RemoveAll(s => s.Username.Contains("1")), Is.EqualTo(count));
         Assert.That(dataLive.Count(s => s.Username.Contains("1")), Is.EqualTo(0));
-        Assert.That(LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count(), Is.EqualTo(0));
+        Assert.That(LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count, Is.EqualTo(0));
     }
 
     [Test]
@@ -218,7 +216,7 @@ public class DataLiveTest
 
 
         Assert.That(dataLive.RemoveRange(3,8),Is.EqualTo(values.Count));
-        Assert.That(LazyClient.Select<SimpleTable>().Count(), Is.EqualTo(countBefore - values.Count));
+        Assert.That(LazyClient.Select<SimpleTable>().Count, Is.EqualTo(countBefore - values.Count));
         Assert.That(dataLive.Count, Is.EqualTo(countBefore - values.Count));
 
 

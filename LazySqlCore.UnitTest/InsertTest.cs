@@ -33,8 +33,8 @@ public class InsertTest
 
         for (int i = 0; i < 20; i++)
         {
-            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"U_{i}").Count(), Is.EqualTo(1));
-            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"F_{i}").Count(), Is.EqualTo(1));
+            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"U_{i}").Count, Is.EqualTo(1));
+            Assert.That(LazyClient.Select<PrimaryValue>(p=>p.Value == $"F_{i}").Count, Is.EqualTo(1));
         }
     }
 

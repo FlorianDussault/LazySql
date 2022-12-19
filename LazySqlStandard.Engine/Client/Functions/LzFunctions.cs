@@ -20,6 +20,30 @@ public partial class LzFunctions : LambdaFunctionParser
         method.Invoke(this, new object[] {expression, lambdaParser, queryBuilder});
     }
 
+    public static int Count(int i)
+    {
+        return - 1;
+    }
+
+    private void ParseCount(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        queryBuilder.Append(" COUNT(");
+        lambdaParser.ParseExpression(expression.Arguments[0]);
+        queryBuilder.Append(")");
+    }
+
+    private void ParseMax(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        queryBuilder.Append(" MAX(");
+        lambdaParser.ParseExpression(expression.Arguments[0]);
+        queryBuilder.Append(") AS ");
+        if (expression.Arguments[1] is ConstantExpression constantExpression)
+            queryBuilder.Append($"[{constantExpression.Value}] ");
+        else
+            throw new NotImplementedException();
+    }
+
+
     /// <summary>
     /// Like function: <code>XXX LIKE '%value%'</code>
     /// </summary>

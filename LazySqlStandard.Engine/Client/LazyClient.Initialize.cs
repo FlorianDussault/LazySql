@@ -69,15 +69,7 @@ public sealed partial class LazyClient
     /// <exception cref="LazySqlInitializeException"></exception>
     private void RegisterTableObjects(Type[] types)
     {
-        List<ITableDefinition> tables = new();
-
-        foreach (Type type in types) 
-            tables.Add(RegisterTableObject(type));
-
-        if (tables.Count == 0)
-            throw new LazySqlInitializeException("No table declared");
-
-        _tables = tables;
+        _tables = types.Select(RegisterTableObject).ToList(); ;
     }
 
     /// <summary>

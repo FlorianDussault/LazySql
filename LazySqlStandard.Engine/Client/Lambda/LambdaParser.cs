@@ -182,13 +182,10 @@ internal class LambdaParser
         LambdaFunctionParser lambdaFunctionParser;
         if (expression.Method.DeclaringType!.IsSubclassOf(typeof(LambdaFunctionParser)))
             lambdaFunctionParser = (LambdaFunctionParser)Activator.CreateInstance(expression.Method.DeclaringType);
+        else if (expression.Method.DeclaringType == typeof(FunctionExtensions))
+            lambdaFunctionParser = (LambdaFunctionParser)Activator.CreateInstance(typeof(LzFunctions));
         else
-        {
             lambdaFunctionParser  = (LambdaFunctionParser)Activator.CreateInstance(typeof(LzCSharpFunctions));
-           
-        }
-
-        
 
         lambdaFunctionParser.Parse(expression, this, _queryBuilder);
     }

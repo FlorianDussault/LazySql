@@ -47,6 +47,10 @@ public sealed partial class LazyClient
     /// <returns></returns>
     public static T ExecuteScalar<T>(SqlQuery query) => Instance.InternalExecuteScalar<T>(query.Query, query.SqlArguments);
 
+    internal static T ExecuteScalar<T>(string query, SqlArguments arguments)
+    {
+        return Instance.InternalExecuteScalar<T>(query, arguments);
+    }
 
     /// <summary>
     /// Executes the query, and returns the first column of the first row in the result set returned by the query. Additional columns or rows are ignored

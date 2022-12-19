@@ -110,7 +110,7 @@ public class LambdaTest
 
         {
             ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>(s => LzFunctions.IsDate(s.Username) == 1);
-            Assert.That(values.Count(), Is.EqualTo(1));
+            Assert.That(values.Count, Is.EqualTo(1));
         }
     }
 

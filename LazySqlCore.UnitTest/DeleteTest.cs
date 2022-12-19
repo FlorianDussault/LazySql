@@ -70,7 +70,7 @@ public class DeleteTest
         for (int i = 0; i < 100; i++)
             new PrimaryValue() {Value = $"U_{i}"}.Insert();
 
-        Assert.That(LazyClient.Select<PrimaryValue>().Count(), Is.EqualTo(100));
+        Assert.That(LazyClient.Select<PrimaryValue>().Count, Is.EqualTo(100));
         Assert.IsNotEmpty(LazyClient.Select<PrimaryValue>(p=>p.Value == "U_59" ));
 
         LazyClient.Delete<PrimaryValue>(p => p.Value == "U_59");

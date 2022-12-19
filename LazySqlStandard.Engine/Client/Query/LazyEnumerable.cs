@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using Azure.Core.GeoJson;
+
+namespace LazySql;
 
 /// <summary>
 /// LazyEnumerable
@@ -72,6 +74,20 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
         return this;
     }
 
+    public ILazyEnumerable<T> GroupBy(params Expression<Func<T, object>>[] groupByExpressions)
+    {
+        foreach (Expression<Func<T, object>> groupByExpression in groupByExpressions)
+            _selectQuery.AddGroupBy(new GroupByExpressionQuery(groupByExpression));
+        return this;
+    }
+
+    public ILazyEnumerable<T> Columns(params Expression<Func<T, object>>[] columnExpressions)
+    {
+        foreach (Expression<Func<T, object>> columnExpression in columnExpressions)
+            _selectQuery.Columns(new ColumnExpressionQuery(columnExpression));
+        return this;
+    }
+
     /// <summary>
     /// TOP
     /// </summary>
@@ -81,6 +97,16 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     {
         _selectQuery.SetTop(top);
         return this;
+    }
+
+    public int Count
+    {
+        get
+        {
+            _selectQuery.CountRows = true;
+            QueryBuilder queryBuilder  =_selectQuery.BuildQuery();
+            return LazyClient.ExecuteScalar<int>(queryBuilder.GetQuery(), queryBuilder.GetArguments()); ;
+        }
     }
 
     /// <summary>

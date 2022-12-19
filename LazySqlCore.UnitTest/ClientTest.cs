@@ -23,8 +23,8 @@ internal static class ClientTest
         BuildTestDb();
 
         if (!LazyClient.Initialized)
-            LazyClient.Initialize(DbConnectionString, typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable),
-                typeof(ExtendedTable), typeof(SubChildTable), typeof(PrimaryValue), typeof(WithoutKeys));
+            LazyClient.Initialize(DbConnectionString/*, typeof(TypesTable), typeof(SimpleTable), typeof(ChildTable),
+                typeof(ExtendedTable), typeof(SubChildTable), typeof(PrimaryValue), typeof(WithoutKeys)*/);
     }
 
     private static void BuildTestDb()
@@ -154,8 +154,8 @@ internal static class ClientTest
             }
         }
         // Check
-        Assert.That(COUNT_SIMPLE_TABLE == LazyClient.Select<SimpleTable>().ToList().Count());
-        Assert.That(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE == LazyClient.Select<ChildTable>().ToList().Count());
+        Assert.That(LazyClient.Select<SimpleTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE));
+        Assert.That(LazyClient.Select<ChildTable>().ToList().Count, Is.EqualTo(COUNT_SIMPLE_TABLE * COUNT_CHILD_TABLE));
     }
 
     internal static void CleanSimpleTable()

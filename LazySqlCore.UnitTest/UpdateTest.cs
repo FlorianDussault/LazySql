@@ -115,7 +115,7 @@ public class UpdateTest
         PrimaryValue simpleTable = new() { Value = "HELLO" };
         Assert.That(LazyClient.Update<dynamic>("lazys","tablePrimary", new { simpleTable.Value }, new SqlQuery("Id = 10 OR Id = 15")), Is.EqualTo(2));
 
-        Assert.That(LazyClient.Select<PrimaryValue>(s => s.Key == 10 || s.Key == 15).Count(), Is.EqualTo(2));
+        Assert.That(LazyClient.Select<PrimaryValue>(s => s.Key == 10 || s.Key == 15).Count, Is.EqualTo(2));
     }
 
     [Test]
