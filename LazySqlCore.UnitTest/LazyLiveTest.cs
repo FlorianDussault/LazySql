@@ -99,7 +99,7 @@ public class DataLiveTest
         Assert.That(dataLive.Count, Is.EqualTo(count + 10));
 
         int j = 0;
-        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>(s=>LzFunctions.Like(s.Username, "N%")).OrderByAsc(s=>s.Id))
+        foreach (SimpleTable simpleTable in LazyClient.Select<SimpleTable>(s=>Lf.Like(s.Username, "N%")).OrderByAsc(s=>s.Id))
         {
             int val = int.Parse(simpleTable.Username.Substring(1));
             Assert.That(val, Is.EqualTo(j++));
@@ -142,7 +142,7 @@ public class DataLiveTest
         Assert.That(dataLive.Count, Is.EqualTo(count + 10));
 
         int j = 0;
-        List<SimpleTable> list = LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "N%"))
+        List<SimpleTable> list = LazyClient.Select<SimpleTable>(s => Lf.Like(s.Username, "N%"))
                      .OrderByAsc(s => s.Id).ToList();
         for (int index = 0; index < list.Count; index++)
         {
@@ -176,12 +176,12 @@ public class DataLiveTest
         ClientTest.AddSimpleTables();
         LazyClient.Delete<ChildTable>();
 
-        DataLive<SimpleTable> dataLive = new(s=>LzFunctions.Like(s.Username, "%1%"));
-        int count = LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count;
+        DataLive<SimpleTable> dataLive = new(s=>Lf.Like(s.Username, "%1%"));
+        int count = LazyClient.Select<SimpleTable>(s => Lf.Like(s.Username, "%1%")).Count;
         Assert.That(count, Is.GreaterThan(0));
         Assert.That(dataLive.RemoveAll(s => s.Username.Contains("1")), Is.EqualTo(count));
         Assert.That(dataLive.Count(s => s.Username.Contains("1")), Is.EqualTo(0));
-        Assert.That(LazyClient.Select<SimpleTable>(s => LzFunctions.Like(s.Username, "%1%")).Count, Is.EqualTo(0));
+        Assert.That(LazyClient.Select<SimpleTable>(s => Lf.Like(s.Username, "%1%")).Count, Is.EqualTo(0));
     }
 
     [Test]

@@ -3,7 +3,7 @@
 /// <summary>
 /// SQL Functions
 /// </summary>
-public partial class LzFunctions : LambdaFunctionParser
+public partial class Lf : LambdaFunctionParser
 {
     /// <summary>
     /// Entry Point

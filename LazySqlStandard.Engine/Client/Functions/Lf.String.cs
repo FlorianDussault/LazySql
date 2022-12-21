@@ -1,6 +1,6 @@
 ﻿namespace LazySql;
 
-public partial class LzFunctions
+public partial class Lf
 {
     /// <summary>
     /// Sql: <code>ASCII(character_expression)</code>

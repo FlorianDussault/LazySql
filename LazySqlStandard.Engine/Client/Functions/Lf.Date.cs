@@ -1,6 +1,6 @@
 ﻿namespace LazySql;
 
-public partial class Lf
+public partial class LzFunctions
 {
     /// <summary>
     /// Sql: <code>ISDATE(expression)</code>

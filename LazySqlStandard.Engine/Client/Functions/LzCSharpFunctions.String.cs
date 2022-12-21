@@ -11,7 +11,7 @@ internal partial class LzCSharpFunctions
     /// <param name="expression">Expression</param>
     /// <param name="lambdaParser">Lambda Parser</param>
     /// <param name="queryBuilder">QueryBuilder</param>
-    private void String_Join(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder) => new LzFunctions().ParseConcatWs(expression, lambdaParser, queryBuilder);
+    private void String_Join(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder) => new Lf().ParseConcatWs(expression, lambdaParser, queryBuilder);
 
     /// <summary>
     /// String.Format or $
