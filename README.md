@@ -2,11 +2,15 @@
 
 LazySql is a micro ORM to simplify the interfacing between an application and a Sql Server Database.
 
-# Whats new in 2.1.0-preview?
+# Whats new in 2.2.0-preview?
 
-* Support of ``object`` and ``dynamic`` types!
-* Namespace fixed
-* Support of SqlCredential
+* Support of Schemas
+* Improving Expression
+* Implementation of: ``GROUP BY``, ``COUNT``, ``SUM``, ``MAX``
+* Review methods
+* DataLive object
+* Write queries ``"Id = @id".Bind("@Id", 1)`` instead of ``new SqlQuery("Id = @id").Bind("@Id", 1)``
+* Documentation!
 
 # Packages
 

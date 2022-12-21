@@ -81,6 +81,13 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
         return this;
     }
 
+    public ILazyEnumerable<T> GroupBy(params string[] columns)
+    {
+        foreach (string column in columns)
+            _selectQuery.AddGroupBy(new GroupBySqlQuery(column));
+        return this;
+    }
+
     public ILazyEnumerable<T> Columns(params Expression<Func<T, object>>[] columnExpressions)
     {
         foreach (Expression<Func<T, object>> columnExpression in columnExpressions)

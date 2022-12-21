@@ -443,7 +443,79 @@ public class SelectTest
         new SimpleTable { Username = "U3", Password = "P3" }.Insert();
         new SimpleTable { Username = "U3", Password = "P3" }.Insert();
 
-        List<SimpleTable> values = LazyClient.Select<SimpleTable>().Columns(s=> s.Id.Max("user_id"), s=> s.Username, s=>s.Password).GroupBy(s => s.Username, s=>s.Password).OrderByDesc(s=>s.Password).ToList();
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>().Columns(s=> s.Id.Max().As("user_id"), s=> s.Username, s=>s.Password).GroupBy(s => s.Username, s=>s.Password).OrderByDesc(s=>s.Password).ToList();
+
+        Assert.That(values.Count, Is.EqualTo(9));
+
+        Assert.That(values[0].Id, Is.EqualTo(8));
+        Assert.That(values[0].Username, Is.EqualTo("U1"));
+        Assert.That(values[0].Password, Is.EqualTo("P3"));
+        Assert.That(values[1].Id, Is.EqualTo(17));
+        Assert.That(values[1].Username, Is.EqualTo("U2"));
+        Assert.That(values[1].Password, Is.EqualTo("P3"));
+        Assert.That(values[2].Id, Is.EqualTo(26));
+        Assert.That(values[2].Username, Is.EqualTo("U3"));
+        Assert.That(values[2].Password, Is.EqualTo("P3"));
+
+        Assert.That(values[3].Id, Is.EqualTo(5));
+        Assert.That(values[3].Username, Is.EqualTo("U1"));
+        Assert.That(values[3].Password, Is.EqualTo("P2"));
+        Assert.That(values[4].Id, Is.EqualTo(14));
+        Assert.That(values[4].Username, Is.EqualTo("U2"));
+        Assert.That(values[4].Password, Is.EqualTo("P2"));
+        Assert.That(values[5].Id, Is.EqualTo(23));
+        Assert.That(values[5].Username, Is.EqualTo("U3"));
+        Assert.That(values[5].Password, Is.EqualTo("P2"));
+
+
+        Assert.That(values[6].Id, Is.EqualTo(2));
+        Assert.That(values[6].Username, Is.EqualTo("U1"));
+        Assert.That(values[6].Password, Is.EqualTo("P1"));
+        Assert.That(values[7].Id, Is.EqualTo(11));
+        Assert.That(values[7].Username, Is.EqualTo("U2"));
+        Assert.That(values[7].Password, Is.EqualTo("P1"));
+        Assert.That(values[8].Id, Is.EqualTo(20));
+
+        Assert.That(values[8].Username, Is.EqualTo("U3"));
+        Assert.That(values[8].Password, Is.EqualTo("P1"));
+    }
+
+    [Test]
+    public void SelectGroupByStringColumn()
+    {
+        ClientTest.CleanTables();
+
+        new SimpleTable { Username = "U1", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U1", Password = "P3" }.Insert();
+
+        new SimpleTable { Username = "U2", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U2", Password = "P3" }.Insert();
+
+        new SimpleTable { Username = "U3", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P1" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P2" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P3" }.Insert();
+        new SimpleTable { Username = "U3", Password = "P3" }.Insert();
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>().Columns(s => s.Id.Max().As("user_id"), s => s.Username, s => s.Password).GroupBy("Username", "Password").OrderByDesc(s => s.Password).ToList();
 
         Assert.That(values.Count, Is.EqualTo(9));
 

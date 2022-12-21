@@ -51,9 +51,11 @@ LazySql is a micro ORM that aims to facilitate access to a SQL-Server database.
 
 * Support of Schemas
 * Improving Expression
+* Implementation of: ``GROUP BY``, ``COUNT``, ``SUM``, ``MAX``
 * Review methods
-* Documentation!
+* DataLive object
 * Write queries ``"Id = @id".Bind("@Id", 1)`` instead of ``new SqlQuery("Id = @id").Bind("@Id", 1)``
+* Documentation!
 
 > **Note**
 > For previous release notes: [VII. Previous Release Notes](#vii-previous-release-notes)
@@ -71,18 +73,6 @@ LazySql is a micro ORM that aims to facilitate access to a SQL-Server database.
 Minimum version: Sql Server 2012
 
 # IV. Limitations
-
-Due to its simplified design, certain types of queries cannot be performed (such as joins). In addition, transactions are not supported.
-
-Voici les fonctionnalités implémentées:
-
-| **Type of query**                             | **Supported** | **Comment**          |
-|-----------------------------------------------|:-------------:|----------------------|
-| **Standard queries (SELECT, UPDATE, DELETE)** |       🟢       |                     |
-| **Bulk Insert**                               |       🟢       |                     |
-| **Stored Procedures**                         |       🟢       |                     |
-| **Views**                                     |       🔴       |                     |
-| **User-Defined SQL Functions**                |       🔴       | Nothing planned      |
 
 ## Data Types
 
@@ -822,6 +812,24 @@ The following is a list of functions that can be used in expressions:
 
 | **Function Name** | **C# Compatibility** | **Supported** | **Comment / Example**     |
 |-------------------|-------------|:-------------:|-----------------|
+|             |          **Aggregate Functions**           ||
+| `APPROX_COUNT_DISTINCT`    |                    |       🟡      |                 |
+| `APPROX_PERCENTILE_CONT`    |                    |       🟡      |                 |
+| `APPROX_PERCENTILE_DISC`    |                    |       🟡      |                 |
+| `AVG`    |                    |       🟡      |                 |
+| `CHECKSUM_AGG`    |                    |       🟡      |                 |
+| `COUNT`    | | 🟢 | `LzFunctions.Count(s=>s.Tickets, "new_column_name")` or `s.tickets.Count("new_column_name")` |
+| `COUNT_BIG`    |                    |       🟡      |                 |
+| `GROUPING`    |                    |       🟡      |                 |
+| `GROUPING_ID`    |                    |       🟡      |                 |
+| `MAX`    |                    |       🟡      |                 |
+| `MIN`    |                    |       🟡      |                 |
+| `STDEV`    |                    |       🟡      |                 |
+| `STDEVP`    |                    |       🟡      |                 |
+| `STRING_AGG`    |                    |       🟡      |                 |
+| `SUM`    |                    |       🟡      |                 |
+| `VAR`    |                    |       🟡      |                 |
+| `VARP`    |                    |       🟡      |                 |
 |             |          **Date Functions**           ||
 | `DATEADD`    |                    |       🟢      |     `LzFunctions.DateAdd(LzDatePart.Year, 1, o.MyDate)`            |
 | `DATEDIFF`    |                       |       🟢      |   `LzFunctions.DateDiff(LzDatePart.Year, end, start)`              |
@@ -844,7 +852,7 @@ The following is a list of functions that can be used in expressions:
 | `FORMAT`    |                          |       🟡      | In Progress     |
 | `LEFT`    |                            |       🟡      | In Progress     |
 | `LEN`    |                             |       🟡      | In Progress     |
-| `LOWER`    |                           |       🟡      | In Progress     |
+| `LOWER`    |                           |       🟢      | `LzFunctions.Lower(s.Username)` |
 | `LTRIM`    |                           |       🟡      | In Progress     |
 | `NCHAR`    |                           |       🟡      | In Progress     |
 | `PATINDEX`    |                        |       🟡      | In Progress     |
@@ -862,7 +870,7 @@ The following is a list of functions that can be used in expressions:
 | `TRANSLATE`    |                       |       🟡      | In Progress     |
 | `TRIM`    |                            |       🟡      | In Progress     |
 | `UNICODE`    |                         |       🟡      | In Progress     |
-| `UPPER`    |                           |       🟡      | In Progress     |
+| `UPPER`    |                           |       🟢      | `LzFunctions.Lower(s.Username)`     |
 |             |          **Math/Numeric Functions**           ||
 | `ABS`    |                             |       🟡      | In Progress     |
 | `ACOS`    |                            |       🟡      | In Progress     |

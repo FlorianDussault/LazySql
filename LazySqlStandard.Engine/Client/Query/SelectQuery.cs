@@ -107,7 +107,7 @@ internal sealed class SelectQuery : QueryBase
 
         if (_groupByQueries.Count > 0)
         {
-            QueryBuilder.Append(" GROUP BY");
+            QueryBuilder.Append(" GROUP BY ");
             foreach ((bool isLast, IGroupByQuery groupBy) valueTuple in _groupByQueries.ForeachWithLast())
             {
                 valueTuple.groupBy.Build(this);

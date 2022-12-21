@@ -399,6 +399,39 @@ public class LambdaTest
         Assert.IsNotEmpty(LazyClient.Select<SimpleTable>(s => s.Username == $"{hello} WORLD, {hello} {simpleTable.Id}!"));
     }
 
+    [Test]
+    public void FunctionLower()
+    {
+        ClientTest.AddSimpleTables();
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>(s=>LzFunctions.Ascii(LzFunctions.Lower("A")) == LzFunctions.Ascii("a")).ToList();
+        Assert.IsNotEmpty(values);
+    }
+
+    [Test]
+    public void FunctionUpper()
+    {
+        ClientTest.AddSimpleTables();
+
+        List<SimpleTable> values = LazyClient.Select<SimpleTable>(s => LzFunctions.Ascii(LzFunctions.Upper("a")) == LzFunctions.Ascii("A")).ToList();
+        Assert.IsNotEmpty(values);
+    }
+
+    [Test]
+    public void As()
+    {
+        ClientTest.AddSimpleTables();
+
+        ILazyEnumerable<SimpleTable> values = LazyClient.Select<SimpleTable>()
+            .Columns(s => LzFunctions.Lower(s.Username).As("Password"), s => s.Password.As("Username"));
+
+        foreach (SimpleTable simpleTable in values)
+        {
+            Assert.That(simpleTable.Username.Contains("P"));
+            Assert.That(simpleTable.Password.Contains("u"));
+        }
+    }
+
     //[Test]
     //public void CSharpStringJoin()
     //{

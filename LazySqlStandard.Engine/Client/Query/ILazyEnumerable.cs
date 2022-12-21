@@ -8,6 +8,7 @@ public interface ILazyEnumerable<T> : IEnumerable<T>
     ILazyEnumerable<T> OrderByDesc(params string[] columns);
 
     ILazyEnumerable<T> GroupBy(params Expression<Func<T, object>>[] groupByExpressions);
+    ILazyEnumerable<T> GroupBy(params string[] columns);
 
     ILazyEnumerable<T> Top(int top);
 

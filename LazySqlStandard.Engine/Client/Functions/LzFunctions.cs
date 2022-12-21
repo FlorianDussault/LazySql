@@ -20,6 +20,16 @@ public partial class LzFunctions : LambdaFunctionParser
         method.Invoke(this, new object[] {expression, lambdaParser, queryBuilder});
     }
 
+    private void ParseAs(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        lambdaParser.ParseExpression(expression.Arguments[0]);
+        queryBuilder.Append(" AS ");
+        if (expression.Arguments[1] is ConstantExpression constantExpression)
+            queryBuilder.Append($"'{constantExpression.Value}' ");
+        else
+            throw new NotImplementedException();
+    }
+
     public static int Count(int i)
     {
         return - 1;
@@ -36,11 +46,7 @@ public partial class LzFunctions : LambdaFunctionParser
     {
         queryBuilder.Append(" MAX(");
         lambdaParser.ParseExpression(expression.Arguments[0]);
-        queryBuilder.Append(") AS ");
-        if (expression.Arguments[1] is ConstantExpression constantExpression)
-            queryBuilder.Append($"[{constantExpression.Value}] ");
-        else
-            throw new NotImplementedException();
+        queryBuilder.Append(") ");
     }
 
 

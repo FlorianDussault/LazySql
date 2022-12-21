@@ -153,4 +153,21 @@ public partial class LzFunctions
         queryBuilder.Append(expression.Arguments[0]);
         queryBuilder.Append(") ");
     }
+
+    public static string Lower(string str) => str.ToLower();
+    private void ParseLower(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        queryBuilder.Append(" LOWER(");
+        queryBuilder.Append(expression.Arguments[0]);
+        queryBuilder.Append(") ");
+    }
+
+    public static string Upper(string str) => str.ToUpper();
+    private void ParseUpper(MethodCallExpression expression, LambdaParser lambdaParser, QueryBuilder queryBuilder)
+    {
+        queryBuilder.Append(" UPPER(");
+        queryBuilder.Append(expression.Arguments[0]);
+        queryBuilder.Append(") ");
+    }
 }
+
