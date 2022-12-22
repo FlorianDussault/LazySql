@@ -1,6 +1,5 @@
 using LazySql;
 using LazySqlCore.UnitTest.Tables;
-
 namespace LazySqlCore.UnitTest;
 
 [TestFixture(TestName = "Lambda Expression")]

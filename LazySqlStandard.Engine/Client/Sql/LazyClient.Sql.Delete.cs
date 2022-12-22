@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
@@ -39,24 +41,24 @@ public sealed partial class LazyClient
 
     #region Delete
 
-    public static int Delete(string schema, string tableName) => Instance.InternalDelete(schema, tableName, null);
+    public static int Delete(string schema, string tableName) => Instance.InternalDelete(schema, tableName, null, null);
 
-    public static int Delete(object obj) => Instance.InternalDelete(null, null, obj);
-    public static int Delete(string tableName, object obj) => Instance.InternalDelete(null, tableName, obj);
-    public static int Delete(string schema, string tableName, object obj) => Instance.InternalDelete(schema, tableName, obj);
+    public static int Delete(object obj) => Instance.InternalDelete(null, null, obj, null);
+    public static int Delete(string tableName, object obj) => Instance.InternalDelete(null, tableName, obj, null);
+    public static int Delete(string schema, string tableName, object obj) => Instance.InternalDelete(schema, tableName, obj, null);
 
 
-    public static int Delete<T>(Expression<Func<T, bool>> where) => Instance.InternalDelete(null, null, typeof(T), where, null);
+    public static int Delete<T>(Expression<Func<T, bool>> where) => Instance.InternalDelete(null, null, typeof(T), where, null, null);
 
-    public static int Delete<T>(string tableName, Expression<Func<T, bool>> where) => Instance.InternalDelete(null, tableName, typeof(T), where, null);
+    public static int Delete<T>(string tableName, Expression<Func<T, bool>> where) => Instance.InternalDelete(null, tableName, typeof(T), where, null, null);
 
-    public static int Delete<T>(string schema, string tableName, Expression<Func<T, bool>> where) => Instance.InternalDelete(schema, tableName, typeof(T), where, null);
+    public static int Delete<T>(string schema, string tableName, Expression<Func<T, bool>> where) => Instance.InternalDelete(schema, tableName, typeof(T), where, null, null);
 
-    public static int Delete<T>(SqlQuery where = null) => Instance.InternalDelete(null, null, typeof(T), null, where);
+    public static int Delete<T>(SqlQuery where = null) => Instance.InternalDelete(null, null, typeof(T), null, where, null);
 
-    public static int Delete<T>(string tableName, SqlQuery where = null) => Instance.InternalDelete(null, tableName, typeof(T), null, where);
+    public static int Delete<T>(string tableName, SqlQuery where = null) => Instance.InternalDelete(null, tableName, typeof(T), null, where, null);
 
-    public static int Delete<T>(string schema, string tableName, SqlQuery where = null) => Instance.InternalDelete(schema, tableName, typeof(T), null, where);
+    public static int Delete<T>(string schema, string tableName, SqlQuery where = null) => Instance.InternalDelete(schema, tableName, typeof(T), null, where, null);
 
     /// <summary>
     /// Delete one or more items from the database
@@ -64,7 +66,7 @@ public sealed partial class LazyClient
     /// <param name="type">Type of item</param>
     /// <param name="tableName"></param>
     /// <param name="expression">Filter Expression</param>
-    private int InternalDelete(string schema, string tableName, Type type, Expression expression, SqlQuery sqlQuery)
+    internal int InternalDelete(string schema, string tableName, Type type, Expression expression, SqlQuery sqlQuery, LazyTransaction lazyTransaction)
     {
         CheckInitialization(type, out ITableDefinition tableDefinition);
 
@@ -76,7 +78,7 @@ public sealed partial class LazyClient
             deleteQuery.SetWhereQuery(new WhereSqlQuery(sqlQuery));
 
         QueryBuilder queryBuilder = deleteQuery.BuildQuery();
-        return ExecuteNonQuery(queryBuilder);
+        return ExecuteNonQuery(queryBuilder, lazyTransaction);
     }
 
 
@@ -85,7 +87,7 @@ public sealed partial class LazyClient
     /// </summary>
     /// <param name="obj">Item</param>
     /// <param name="tableName"></param>
-    private int InternalDelete(string schema, string tableName, object obj)
+    internal int InternalDelete(string schema, string tableName, object obj, LazyTransaction lazyTransaction)
     {
         CheckInitialization(obj.GetType(), out ITableDefinition tableDefinition);
         tableDefinition.GetColumns(out _, out _, out _, out IReadOnlyList<ColumnDefinition> primaryKeys);
@@ -105,7 +107,7 @@ public sealed partial class LazyClient
             binaryExpression = Expression.AndAlso(binaryExpression, childExpression);
         }
 
-        return InternalDelete(schema, tableName, obj.GetType(), binaryExpression, null);
+        return InternalDelete(schema, tableName, obj.GetType(), binaryExpression, null, lazyTransaction);
     }
 
     #endregion

@@ -11,6 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		appveyor.yml = appveyor.yml
 		README.md = README.md
+		docs\CNAME = docs\CNAME
+		docs\README.md = docs\README.md
+		docs\relation_0_to_1.png = docs\relation_0_to_1.png
+		docs\relation_0_to_n.png = docs\relation_0_to_n.png
+		docs\_config.yml = docs\_config.yml
 	EndProjectSection
 EndProject
 Global

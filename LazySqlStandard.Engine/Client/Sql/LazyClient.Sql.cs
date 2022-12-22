@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 /// <summary>
 /// LazyClient
@@ -24,19 +26,20 @@ public sealed partial class LazyClient
     /// ExecuteReader
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
+    /// <param name="lazyTransaction"></param>
     /// <returns></returns>
-    internal static IEnumerable<object> ExecuteReader(QueryBuilder queryBuilder) => Instance.InternalExecuteReader(queryBuilder);
+    private static IEnumerable<object> ExecuteReader(QueryBuilder queryBuilder, LazyTransaction lazyTransaction) => Instance.InternalExecuteReader(queryBuilder, lazyTransaction);
 
     /// <summary>
     /// ExecuteReader
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
+    /// <param name="lazyTransaction"></param>
     /// <returns></returns>
-    private IEnumerable<object> InternalExecuteReader(QueryBuilder queryBuilder)
+    private IEnumerable<object> InternalExecuteReader(QueryBuilder queryBuilder, LazyTransaction lazyTransaction)
     {
         using SqlConnector sqlConnector = Open();
-        using SqlDataReader sqlDataReader =
-            sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+        using SqlDataReader sqlDataReader = lazyTransaction == null ? sqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments()) : lazyTransaction.SqlConnector.ExecuteQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments()) ;
         ITableDefinition tableDefinition = queryBuilder.GetTableDefinition();
 
         List<(int Index, ColumnDefinition ColumnDefinition)> columns = new();
@@ -83,9 +86,13 @@ public sealed partial class LazyClient
     /// ExecuteScalar
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
+    /// <param name="lazyTransaction"></param>
     /// <returns></returns>
-    internal object ExecuteScalar(QueryBuilder queryBuilder)
+    internal object ExecuteScalar(QueryBuilder queryBuilder, LazyTransaction lazyTransaction = null)
     {
+        if (lazyTransaction != null)
+            return lazyTransaction.SqlConnector.ExecuteScalar(queryBuilder.GetQuery(), queryBuilder.GetArguments());
+        
         using SqlConnector sqlConnector = Open();
         return sqlConnector.ExecuteScalar(queryBuilder.GetQuery(), queryBuilder.GetArguments());
     }
@@ -94,8 +101,11 @@ public sealed partial class LazyClient
     /// ExecuteNonQuery
     /// </summary>
     /// <param name="queryBuilder">Query Builder</param>
-    internal int ExecuteNonQuery(QueryBuilder queryBuilder)
+    /// <param name="lazyTransaction"></param>
+    internal int ExecuteNonQuery(QueryBuilder queryBuilder, LazyTransaction lazyTransaction = null)
     {
+        if (lazyTransaction != null)
+            return lazyTransaction.SqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
         using SqlConnector sqlConnector = Open();
         return sqlConnector.ExecuteNonQuery(queryBuilder.GetQuery(), queryBuilder.GetArguments());
     }

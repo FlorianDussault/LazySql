@@ -1,23 +1,25 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
 
-    public static ILazyEnumerable<T> Select<T>() => Instance.InternalSelect<T>(null, null, null, null);
-    public static ILazyEnumerable<T> Select<T>(string tableName) => Instance.InternalSelect<T>(null, tableName, null, null);
-    public static ILazyEnumerable<T> Select<T>(string schema, string tableName) => Instance.InternalSelect<T>(schema, tableName, null, null);
+    public static ILazyEnumerable<T> Select<T>() => Instance.InternalSelect<T>(null, null, null, null, null);
+    public static ILazyEnumerable<T> Select<T>(string tableName) => Instance.InternalSelect<T>(null, tableName, null, null, null);
+    public static ILazyEnumerable<T> Select<T>(string schema, string tableName) => Instance.InternalSelect<T>(schema, tableName, null, null, null);
 
-    public static ILazyEnumerable<T> Select<T>(Expression<Func<T, bool>> where) => Instance.InternalSelect<T>(null, null, where, null);
+    public static ILazyEnumerable<T> Select<T>(Expression<Func<T, bool>> where) => Instance.InternalSelect<T>(null, null, where, null, null);
 
     public static ILazyEnumerable<T> Select<T>(string tableName, Expression<Func<T, bool>> where) =>
-        Instance.InternalSelect<T>(null, tableName, where, null);
+        Instance.InternalSelect<T>(null, tableName, where, null, null);
     public static ILazyEnumerable<T> Select<T>(string schema, string tableName, Expression<Func<T, bool>> where) =>
-        Instance.InternalSelect<T>(schema, tableName, where, null);
+        Instance.InternalSelect<T>(schema, tableName, where, null, null);
 
-    public static ILazyEnumerable<T> Select<T>(SqlQuery sqlQuery) => Instance.InternalSelect<T>(null, null, null, sqlQuery);
-    public static ILazyEnumerable<T> Select<T>(string tableName, SqlQuery sqlQuery) => Instance.InternalSelect<T>(null, tableName, null, sqlQuery);
-    public static ILazyEnumerable<T> Select<T>(string schema, string tableName, SqlQuery sqlQuery) => Instance.InternalSelect<T>(schema, tableName, null, sqlQuery);
+    public static ILazyEnumerable<T> Select<T>(SqlQuery sqlQuery) => Instance.InternalSelect<T>(null, null, null, sqlQuery, null);
+    public static ILazyEnumerable<T> Select<T>(string tableName, SqlQuery sqlQuery) => Instance.InternalSelect<T>(null, tableName, null, sqlQuery, null);
+    public static ILazyEnumerable<T> Select<T>(string schema, string tableName, SqlQuery sqlQuery) => Instance.InternalSelect<T>(schema, tableName, null, sqlQuery, null);
 
     /// <summary>
     /// Select in database
@@ -26,12 +28,12 @@ public sealed partial class LazyClient
     /// <param name="tableName">Table name (mandatory for dynamic type)</param>
     /// <returns>Enumerable</returns>
     /// <exception cref="LazySqlException"></exception>
-    private ILazyEnumerable<T> InternalSelect<T>(string schema, string tableName, Expression whereExpression, SqlQuery sqlQuery)
+    internal ILazyEnumerable<T> InternalSelect<T>(string schema, string tableName, Expression whereExpression, SqlQuery sqlQuery, LazyTransaction lazyTransaction)
     {
         CheckInitialization(typeof(T), out ITableDefinition tableDefinition);
         if (string.IsNullOrWhiteSpace(tableName) && tableDefinition.ObjectType == ObjectType.Dynamic)
             throw new LazySqlException($"You cannot call the {nameof(Select)} method with a Dynamic type without a table name in argument");
-        return new LazyEnumerable<T>(schema, tableName, whereExpression, sqlQuery);
+        return new LazyEnumerable<T>(schema, tableName, whereExpression, sqlQuery, lazyTransaction);
     }
 
     /// <summary>
@@ -41,21 +43,21 @@ public sealed partial class LazyClient
     /// <param name="selectQuery">Table definition</param>
     /// <param name="loadChildren"></param>
     /// <returns>IEnumerable</returns>
-    internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery, bool loadChildren = true)
+    internal static IEnumerable<object> GetWithQuery(Type type, SelectQuery selectQuery, bool loadChildren, LazyTransaction lazyTransaction)
     {
         CheckInitialization(type, out ITableDefinition tableDefinition);
         if (!tableDefinition.HasRelations || !loadChildren)
         {
-            foreach (object value in ExecuteReader(selectQuery.BuildQuery()))
+            foreach (object value in ExecuteReader(selectQuery.BuildQuery(), lazyTransaction))
                 yield return value;
             yield break;
         }
 
-        List<object> values = ExecuteReader(selectQuery.BuildQuery()).ToList();
+        List<object> values = ExecuteReader(selectQuery.BuildQuery(), lazyTransaction).ToList();
         if (values.Count == 0) yield break;
 
         foreach (RelationInformation relation in tableDefinition.Relations)
-            LoadChildren(type, relation, values);
+            LoadChildren(type, relation, values, lazyTransaction);
 
         foreach (object value in values)
             yield return value;
@@ -68,7 +70,7 @@ public sealed partial class LazyClient
     /// <param name="relationInformation">Relation Information</param>
     /// <param name="values">Parent values</param>
     /// <exception cref="NotImplementedException"></exception>
-    internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values)
+    internal static void LoadChildren(Type parentType, RelationInformation relationInformation, List<object> values, LazyTransaction lazyTransaction)
     {
         if (values.Count == 0) return;
         CheckInitialization(parentType, out ITableDefinition parentTableDefinition);
@@ -91,7 +93,7 @@ public sealed partial class LazyClient
 
         Delegate delegateExpression = relationInformation.Expression.Compile();
         IEnumerable enumerableChildValues = ReflectionHelper.InvokeStaticMethod<IEnumerable>(typeof(LazyClient),
-            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery, !selectQuery.DirectQuery });
+            nameof(GetWithQuery), new object[] { relationInformation.ChildType, selectQuery, !selectQuery.DirectQuery, lazyTransaction });
 
         IList childValues = ReflectionHelper.CreateList(relationInformation.ChildType);
         foreach (object enumerableValue in enumerableChildValues)

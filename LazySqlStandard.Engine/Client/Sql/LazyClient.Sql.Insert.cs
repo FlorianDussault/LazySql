@@ -1,27 +1,28 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
 {
     #region Insert
 
-    public static int Insert(object obj) => Instance.InternalInsert(null, null, obj, null, Array.Empty<string>());
+    public static int Insert(object obj) => Instance.InternalInsert(null, null, obj, null, Array.Empty<string>(), null);
 
-    public static int Insert(string tableName, object obj) => Instance.InternalInsert(null, tableName, obj, null, Array.Empty<string>());
-    public static int Insert(string schema, string tableName, object obj) => Instance.InternalInsert(schema, tableName, obj, null, Array.Empty<string>());
+    public static int Insert(string tableName, object obj) => Instance.InternalInsert(null, tableName, obj, null, Array.Empty<string>(), null);
+    public static int Insert(string schema, string tableName, object obj) => Instance.InternalInsert(schema, tableName, obj, null, Array.Empty<string>(), null);
 
-    public static int Insert(object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(null, null, obj, autoIncrementColumn, excludedColumns);
+    public static int Insert(object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(null, null, obj, autoIncrementColumn, excludedColumns, null);
 
-    public static int Insert(string tableName, object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(null, tableName, obj, autoIncrementColumn, excludedColumns);
+    public static int Insert(string tableName, object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(null, tableName, obj, autoIncrementColumn, excludedColumns, null);
 
-    public static int Insert(string schema, string tableName, object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(schema, tableName, obj, autoIncrementColumn, excludedColumns);
+    public static int Insert(string schema, string tableName, object obj, string autoIncrementColumn, params string[] excludedColumns) => Instance.InternalInsert(schema, tableName, obj, autoIncrementColumn, excludedColumns, null);
 
-    public static int Insert(object obj, string autoIncrementColumn) => Instance.InternalInsert(null, null, obj, autoIncrementColumn, Array.Empty<string>());
+    public static int Insert(object obj, string autoIncrementColumn) => Instance.InternalInsert(null, null, obj, autoIncrementColumn, Array.Empty<string>(), null);
 
-    public static int Insert(string tableName, object obj, string autoIncrementColumn) => Instance.InternalInsert(null, tableName, obj, autoIncrementColumn, Array.Empty<string>());
+    public static int Insert(string tableName, object obj, string autoIncrementColumn) => Instance.InternalInsert(null, tableName, obj, autoIncrementColumn, Array.Empty<string>(), null);
 
-    public static int Insert(string schema, string tableName, object obj, string autoIncrementColumn) => Instance.InternalInsert(schema, tableName, obj, autoIncrementColumn, Array.Empty<string>());
-
+    public static int Insert(string schema, string tableName, object obj, string autoIncrementColumn) => Instance.InternalInsert(schema, tableName, obj, autoIncrementColumn, Array.Empty<string>(), null);
 
     /// <summary>
     /// Insert an item
@@ -32,7 +33,7 @@ public sealed partial class LazyClient
     /// <param name="tableName"></param>
     /// <param name="autoIncrementColumn"></param>
     /// <param name="excludedColumns"></param>
-    private int InternalInsert(string schema, string tableName, object obj, string autoIncrementColumnName, string[] excludedColumns)
+    internal int InternalInsert(string schema, string tableName, object obj, string autoIncrementColumnName, string[] excludedColumns, LazyTransaction lazyTransaction)
     {
         CheckInitialization(obj.GetType(), out ITableDefinition tableDefinition);
 
@@ -46,12 +47,12 @@ public sealed partial class LazyClient
 
         if (autoIncrementProperty != null)
         {
-            object output = ExecuteScalar(queryBuilder);
+            object output = ExecuteScalar(queryBuilder, lazyTransaction);
             autoIncrementProperty.SetValue(obj, output);
             return 1;
         }
 
-        return ExecuteNonQuery(queryBuilder);
+        return ExecuteNonQuery(queryBuilder, lazyTransaction);
     }
     #endregion
 }

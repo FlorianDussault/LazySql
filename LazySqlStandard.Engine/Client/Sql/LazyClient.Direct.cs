@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 // ReSharper disable once ClassCannotBeInstantiated
 public sealed partial class LazyClient
@@ -47,9 +49,9 @@ public sealed partial class LazyClient
     /// <returns></returns>
     public static T ExecuteScalar<T>(SqlQuery query) => Instance.InternalExecuteScalar<T>(query.Query, query.SqlArguments);
 
-    internal static T ExecuteScalar<T>(string query, SqlArguments arguments)
+    internal static T ExecuteScalar<T>(string query, SqlArguments arguments, LazyTransaction lazyTransaction = null)
     {
-        return Instance.InternalExecuteScalar<T>(query, arguments);
+        return Instance.InternalExecuteScalar<T>(query, arguments, lazyTransaction);
     }
 
     /// <summary>
@@ -59,8 +61,10 @@ public sealed partial class LazyClient
     /// <param name="query">Query</param>
     /// <param name="arguments">Arguments</param>
     /// <returns></returns>
-    private T InternalExecuteScalar<T>(string query, SqlArguments arguments = null)
+    private T InternalExecuteScalar<T>(string query, SqlArguments arguments = null, LazyTransaction lazyTransaction = null)
     {
+        if (lazyTransaction != null)
+            return (T) lazyTransaction.SqlConnector.ExecuteScalar(query, arguments);
         using SqlConnector sqlConnector = Open();
         return (T) sqlConnector.ExecuteScalar(query, arguments);
     }

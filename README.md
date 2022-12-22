@@ -2,6 +2,12 @@
 
 LazySql is a micro ORM to simplify the interfacing between an application and a Sql Server Database.
 
+Welcome to our C# micro ORM, the ultimate tool for time-traveling data wizards! Are you tired of sifting through ancient databases and struggling to make sense of outdated schemas? Fear not, for our micro ORM is here to save the day.
+
+With our tool, you can easily access and manage data from any era, whether it's the industrial revolution or the digital age. Simply send out a query with our intuitive syntax and watch as your data is automatically mapped to objects like magic. And when it comes to transactions, our micro ORM has got you covered – just snap your fingers (figuratively speaking, of course) and watch as changes are seamlessly saved to the database.
+
+So why wait? Start your journey through the annals of history with our trusty micro ORM by your side!
+
 # Whats new in 2.2.0-preview?
 
 * Support of Schemas

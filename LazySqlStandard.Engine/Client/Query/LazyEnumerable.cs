@@ -1,4 +1,5 @@
 ﻿using Azure.Core.GeoJson;
+using LazySql.Transaction;
 
 namespace LazySql;
 
@@ -10,9 +11,11 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
 {
     private readonly ITableDefinition _tableDefinition;
     private readonly SelectQuery _selectQuery;
+    private readonly LazyTransaction _lazyTransaction;
 
-    internal LazyEnumerable(string schema, string tableName, Expression whereExpression, SqlQuery sqlQuery)
+    internal LazyEnumerable(string schema, string tableName, Expression whereExpression, SqlQuery sqlQuery, LazyTransaction lazyTransaction)
     {
+        _lazyTransaction = lazyTransaction;
         LazyClient.CheckInitialization(typeof(T), out _tableDefinition);
         _selectQuery = new SelectQuery(_tableDefinition, schema, tableName);
         if (whereExpression != null)
@@ -112,7 +115,7 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
         {
             _selectQuery.CountRows = true;
             QueryBuilder queryBuilder  =_selectQuery.BuildQuery();
-            return LazyClient.ExecuteScalar<int>(queryBuilder.GetQuery(), queryBuilder.GetArguments()); ;
+            return LazyClient.ExecuteScalar<int>(queryBuilder.GetQuery(), queryBuilder.GetArguments(), _lazyTransaction); ;
         }
     }
 
@@ -136,16 +139,16 @@ internal sealed class LazyEnumerable<T> : ILazyEnumerable<T>
     {
         if (!_tableDefinition.HasRelations || _selectQuery.DirectQuery)
         {
-            foreach (object o in LazyClient.GetWithQuery(typeof(T), _selectQuery))
+            foreach (object o in LazyClient.GetWithQuery(typeof(T), _selectQuery, true, _lazyTransaction))
                 yield return o;
             yield break;
         }
 
-        List<object> values = LazyClient.GetWithQuery(typeof(T), _selectQuery).ToList();
+        List<object> values = LazyClient.GetWithQuery(typeof(T), _selectQuery, true, _lazyTransaction).ToList();
         if (values.Count == 0) yield break;
 
         foreach (RelationInformation relation in _tableDefinition.Relations)
-            LazyClient.LoadChildren(typeof(T), relation, values);
+            LazyClient.LoadChildren(typeof(T), relation, values, _lazyTransaction);
 
         foreach (object value in values)
             yield return value;

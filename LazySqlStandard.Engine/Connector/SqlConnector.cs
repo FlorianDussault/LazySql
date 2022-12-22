@@ -1,4 +1,6 @@
-﻿namespace LazySql;
+﻿using LazySql.Transaction;
+
+namespace LazySql;
 
 /// <summary>
 /// Sql Connector
@@ -7,11 +9,6 @@ internal sealed class SqlConnector : IDisposable
 {
     private readonly SqlConnection _sqlConnection;
     private readonly SqlCommand _sqlCommand;
-
-    public SqlConnector()
-    {
-        
-    }
 
     public SqlConnector(string connectionString, SqlCredential sqlCredential)
     {
@@ -41,6 +38,7 @@ internal sealed class SqlConnector : IDisposable
     /// <param name="sqlArguments">Arguments</param>
     private void AddValues(SqlArguments sqlArguments)
     {
+        _sqlCommand.Parameters.Clear();
         if (sqlArguments == null) return;
         foreach (SqlArgument sqlArgument in sqlArguments) AddValue(sqlArgument);
     }
@@ -212,5 +210,19 @@ internal sealed class SqlConnector : IDisposable
         {
             throw LazySqlExecuteException.Generate(ex, $"BulkInsert in {fullTableName}");
         }
+    }
+
+    internal LazyTransaction BeginTransaction(IsoLevel isolationLevel, string transactionName)
+    {
+        SqlTransaction sqlTransaction = _sqlConnection.BeginTransaction((IsolationLevel)isolationLevel, transactionName);
+        _sqlCommand.Transaction = sqlTransaction;
+        return new LazyTransaction(this, sqlTransaction, transactionName);
+    }
+    
+    internal LazyTransaction BeginTransaction(string transactionName)
+    {
+        SqlTransaction sqlTransaction = _sqlConnection.BeginTransaction(transactionName);
+        _sqlCommand.Transaction = sqlTransaction;
+        return new LazyTransaction(this, sqlTransaction, transactionName);
     }
 }
