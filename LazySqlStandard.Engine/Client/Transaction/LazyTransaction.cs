@@ -22,6 +22,8 @@ public class LazyTransaction : IDisposable
     public void Commit() => SqlTransaction.Commit();
     public void Rollback() => SqlTransaction.Rollback();
 
+    // TODO: Execute methods
+    
     #region Select
     public ILazyEnumerable<T> Select<T>() => LazyClient.Instance.InternalSelect<T>(null, null, null, null, this);
     public ILazyEnumerable<T> Select<T>(string tableName) => LazyClient.Instance.InternalSelect<T>(null, tableName, null, null, this);

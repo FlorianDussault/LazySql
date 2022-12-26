@@ -150,7 +150,7 @@ internal class LambdaParser
             return;
         }
 
-        if (expression.Member.DeclaringType == _tableDefinition.TableType && _tableDefinition.GetColumn(expression.Member.Name) is { } columnDefinition)
+        if (expression.Expression.NodeType == ExpressionType.Parameter && expression.Member.DeclaringType == _tableDefinition.TableType && _tableDefinition.GetColumn(expression.Member.Name) is { } columnDefinition)
         {
             _queryBuilder.Append($" {columnDefinition.Column.SqlColumnName}");
         }
